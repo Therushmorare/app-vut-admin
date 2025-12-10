@@ -1,0 +1,654 @@
+"use client"
+
+import React, { useState, useMemo } from 'react';
+import { Search, FolderOpen, File, Flag, CheckCircle, Download, Eye, Filter, X, ChevronRight, AlertCircle } from 'lucide-react';
+
+const COLORS = {
+  primary: '#201C52',
+  secondary: '#D08A00',
+  text: '#002F6E',
+  accent: '#8B745A',
+  danger: '#DB282F',
+  info: '#0076C0',
+  success: '#009862',
+  warning: '#FFDB00',
+  bgLight: '#F9F9F9',
+  bgWhite: '#FFFFFF',
+  textDark: '#000000',
+  textMedium: '#505050',
+  border: '#B9B9B9'
+};
+
+const generateStudents = (count) => {
+  const programmes = [
+    'National Certificate: IT Systems Support', 
+    'National Diploma: Software Development', 
+    'Certificate: Data Analytics', 
+    'Diploma: Business Administration', 
+    'Certificate: Project Management'
+  ];
+  
+  const faculties = [
+    'Faculty of Information Technology',
+    'Faculty of Business & Management',
+    'Faculty of Engineering',
+    'Faculty of Commerce',
+    'Faculty of Applied Sciences'
+  ];
+  
+  const statuses = ['Active', 'Completed', 'On Hold', 'Withdrawn', 'Suspended'];
+  const setas = ['SERVICES SETA', 'ETDP SETA', 'MICT SETA', 'BANKSETA', 'FASSET'];
+  
+  const employers = [
+    'Tech Solutions Ltd', 'Business Dynamics', 'Innovation Hub',
+    'Digital Systems Corp', 'Enterprise Solutions', 'SmartTech SA',
+    'Global Industries', 'Future Ventures', 'Prime Consulting'
+  ];
+  
+  const firstNames = ['Thabo', 'Lerato', 'Sipho', 'Nomsa', 'Kwame', 'Zinhle', 'Bongani', 'Thandi', 'Mpho', 'Ayanda'];
+  const lastNames = ['Nkosi', 'Dlamini', 'Mokoena', 'Khumalo', 'Mthembu', 'Ndlovu', 'Zulu', 'Mahlangu', 'Molefe', 'Sithole'];
+  
+  const students = [];
+  
+  for (let i = 1; i <= count; i++) {
+    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const programme = programmes[Math.floor(Math.random() * programmes.length)];
+    const faculty = faculties[Math.floor(Math.random() * faculties.length)];
+    const status = statuses[Math.floor(Math.random() * statuses.length)];
+    const seta = setas[Math.floor(Math.random() * setas.length)];
+    const employer = employers[Math.floor(Math.random() * employers.length)];
+    const attendance = Math.floor(Math.random() * 40) + 60;
+    const compliance = attendance >= 80 ? 'Compliant' : attendance >= 70 ? 'At Risk' : 'Non-Compliant';
+    
+    const year = Math.floor(Math.random() * 30) + 90;
+    const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+    const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+    const idNumber = `${year}${month}${day}${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}0${Math.floor(Math.random() * 10)}0`;
+    
+    students.push({
+      id: i,
+      studentNr: `STU${String(i).padStart(6, '0')}`,
+      firstName,
+      lastName,
+      name: `${firstName} ${lastName}`,
+      email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@university.ac.za`,
+      phone: `+27 ${Math.floor(Math.random() * 90) + 10} ${Math.floor(Math.random() * 900) + 100} ${Math.floor(Math.random() * 9000) + 1000}`,
+      programme,
+      faculty,
+      status,
+      seta,
+      employer,
+      attendance,
+      compliance,
+      idNumber
+    });
+  }
+  
+  return students;
+};
+
+const generateDocuments = (students) => {
+  const documentTypes = [
+    { type: 'ID Document', folder: 'Personal Documents', required: true },
+    { type: 'Proof of Residence', folder: 'Personal Documents', required: true },
+    { type: 'Matric Certificate', folder: 'Academic Records', required: true },
+    { type: 'CV', folder: 'Personal Documents', required: false },
+    { type: 'Employment Contract', folder: 'Employment Documents', required: true },
+    { type: 'SETA Agreement', folder: 'SETA Documents', required: true },
+    { type: 'Monthly Report', folder: 'Progress Reports', required: true },
+    { type: 'Assessment Results', folder: 'Academic Records', required: true },
+    { type: 'Timesheet', folder: 'Progress Reports', required: true },
+    { type: 'Medical Certificate', folder: 'Personal Documents', required: false },
+  ];
+
+  const documents = [];
+  let docId = 1;
+
+  students.forEach(student => {
+    const numDocs = Math.floor(Math.random() * 5) + 6; // 6-10 documents per student
+    const selectedTypes = [...documentTypes].sort(() => 0.5 - Math.random()).slice(0, numDocs);
+
+    selectedTypes.forEach(docType => {
+      const uploadDate = new Date(2024, Math.floor(Math.random() * 11), Math.floor(Math.random() * 28) + 1);
+      const status = Math.random() > 0.15 ? (Math.random() > 0.3 ? 'approved' : 'pending') : 'flagged';
+      
+      documents.push({
+        id: docId++,
+        studentId: student.id,
+        studentNr: student.studentNr,
+        studentName: student.name,
+        firstName: student.firstName,
+        lastName: student.lastName,
+        fileName: `${student.studentNr}_${student.firstName}_${student.lastName}_${docType.type.replace(/\s+/g, '_')}_${uploadDate.toISOString().split('T')[0]}.pdf`,
+        documentType: docType.type,
+        folder: docType.folder,
+        uploadDate: uploadDate.toISOString().split('T')[0],
+        status,
+        fileSize: `${Math.floor(Math.random() * 900) + 100} KB`,
+        programme: student.programme,
+        seta: student.seta,
+        faculty: student.faculty
+      });
+    });
+  });
+
+  return documents;
+};
+
+const StudentDocumentManager = () => {
+  const [students] = useState(() => generateStudents(50));
+  const [documents, setDocuments] = useState(() => generateDocuments(generateStudents(50)));
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFolder, setSelectedFolder] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [documentTypeFilter, setDocumentTypeFilter] = useState('all');
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+
+  const folders = useMemo(() => {
+    const folderSet = new Set(documents.map(doc => doc.folder));
+    return ['all', ...Array.from(folderSet).sort()];
+  }, [documents]);
+
+  const documentTypes = useMemo(() => {
+    const typeSet = new Set(documents.map(doc => doc.documentType));
+    return ['all', ...Array.from(typeSet).sort()];
+  }, [documents]);
+
+  const filteredDocuments = useMemo(() => {
+    return documents.filter(doc => {
+      const matchesSearch = searchTerm === '' || 
+        doc.fileName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.studentNr.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesFolder = selectedFolder === 'all' || doc.folder === selectedFolder;
+      const matchesStatus = statusFilter === 'all' || doc.status === statusFilter;
+      const matchesType = documentTypeFilter === 'all' || doc.documentType === documentTypeFilter;
+      const matchesStudent = !selectedStudent || doc.studentId === selectedStudent;
+
+      return matchesSearch && matchesFolder && matchesStatus && matchesType && matchesStudent;
+    });
+  }, [documents, searchTerm, selectedFolder, statusFilter, documentTypeFilter, selectedStudent]);
+
+  const folderStats = useMemo(() => {
+    const stats = {};
+    documents.forEach(doc => {
+      if (!stats[doc.folder]) {
+        stats[doc.folder] = { total: 0, flagged: 0, approved: 0, pending: 0 };
+      }
+      stats[doc.folder].total++;
+      stats[doc.folder][doc.status]++;
+    });
+    return stats;
+  }, [documents]);
+
+  const handleStatusChange = (docId, newStatus) => {
+    setDocuments(docs => 
+      docs.map(doc => doc.id === docId ? { ...doc, status: newStatus } : doc)
+    );
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'approved': return COLORS.success;
+      case 'flagged': return COLORS.danger;
+      case 'pending': return COLORS.warning;
+      default: return COLORS.textMedium;
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'approved': return <CheckCircle size={16} />;
+      case 'flagged': return <Flag size={16} />;
+      case 'pending': return <AlertCircle size={16} />;
+      default: return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen p-6" style={{ backgroundColor: COLORS.bgLight }}>
+      <div className="max-w-7xl mx-auto">
+
+      {/* Stats Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+        <div style={{ backgroundColor: COLORS.bgWhite, padding: '20px', borderRadius: '8px', border: `1px solid ${COLORS.border}` }}>
+          <div style={{ fontSize: '12px', color: COLORS.textMedium, marginBottom: '8px' }}>Total Documents</div>
+          <div style={{ fontSize: '28px', fontWeight: '700', color: COLORS.primary }}>{documents.length}</div>
+        </div>
+        <div style={{ backgroundColor: COLORS.bgWhite, padding: '20px', borderRadius: '8px', border: `1px solid ${COLORS.border}` }}>
+          <div style={{ fontSize: '12px', color: COLORS.textMedium, marginBottom: '8px' }}>Pending Review</div>
+          <div style={{ fontSize: '28px', fontWeight: '700', color: COLORS.warning }}>
+            {documents.filter(d => d.status === 'pending').length}
+          </div>
+        </div>
+        <div style={{ backgroundColor: COLORS.bgWhite, padding: '20px', borderRadius: '8px', border: `1px solid ${COLORS.border}` }}>
+          <div style={{ fontSize: '12px', color: COLORS.textMedium, marginBottom: '8px' }}>Flagged</div>
+          <div style={{ fontSize: '28px', fontWeight: '700', color: COLORS.danger }}>
+            {documents.filter(d => d.status === 'flagged').length}
+          </div>
+        </div>
+        <div style={{ backgroundColor: COLORS.bgWhite, padding: '20px', borderRadius: '8px', border: `1px solid ${COLORS.border}` }}>
+          <div style={{ fontSize: '12px', color: COLORS.textMedium, marginBottom: '8px' }}>Approved</div>
+          <div style={{ fontSize: '28px', fontWeight: '700', color: COLORS.success }}>
+            {documents.filter(d => d.status === 'approved').length}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '24px' }}>
+        {/* Sidebar - Folders */}
+        <div style={{ backgroundColor: COLORS.bgWhite, padding: '20px', borderRadius: '8px', border: `1px solid ${COLORS.border}`, height: 'fit-content' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: '600', color: COLORS.primary, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <FolderOpen size={18} />
+            Document Folders
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {folders.map(folder => {
+              const stats = folder === 'all' 
+                ? { total: documents.length, flagged: documents.filter(d => d.status === 'flagged').length }
+                : folderStats[folder] || { total: 0, flagged: 0 };
+              
+              return (
+                <button
+                  key={folder}
+                  onClick={() => setSelectedFolder(folder)}
+                  style={{
+                    padding: '12px',
+                    backgroundColor: selectedFolder === folder ? COLORS.primary : 'transparent',
+                    color: selectedFolder === folder ? COLORS.bgWhite : COLORS.text,
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    fontSize: '14px',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {folder === 'all' ? 'All Documents' : folder}
+                  </span>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    {stats.flagged > 0 && (
+                      <span style={{
+                        backgroundColor: COLORS.danger,
+                        color: COLORS.bgWhite,
+                        fontSize: '11px',
+                        padding: '2px 6px',
+                        borderRadius: '10px',
+                        fontWeight: '600'
+                      }}>
+                        {stats.flagged}
+                      </span>
+                    )}
+                    <span style={{
+                      backgroundColor: selectedFolder === folder ? 'rgba(255,255,255,0.2)' : COLORS.bgLight,
+                      padding: '2px 8px',
+                      borderRadius: '10px',
+                      fontSize: '12px',
+                      fontWeight: '600'
+                    }}>
+                      {stats.total}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Student Filter */}
+          <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: `1px solid ${COLORS.border}` }}>
+            <h4 style={{ fontSize: '14px', fontWeight: '600', color: COLORS.primary, marginBottom: '12px' }}>
+              Filter by Student
+            </h4>
+            <select
+              value={selectedStudent || ''}
+              onChange={(e) => setSelectedStudent(e.target.value ? parseInt(e.target.value) : null)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: `1px solid ${COLORS.border}`,
+                borderRadius: '6px',
+                fontSize: '14px',
+                backgroundColor: COLORS.bgWhite,
+                color: COLORS.text
+              }}
+            >
+              <option value="">All Students</option>
+              {students.map(student => (
+                <option key={student.id} value={student.id}>
+                  {student.studentNr} - {student.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div>
+          {/* Search and Filters */}
+          <div style={{ backgroundColor: COLORS.bgWhite, padding: '20px', borderRadius: '8px', border: `1px solid ${COLORS.border}`, marginBottom: '16px' }}>
+            <div style={{ display: 'flex', gap: '12px', marginBottom: showFilters ? '16px' : '0' }}>
+              <div style={{ flex: 1, position: 'relative' }}>
+                <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: COLORS.textMedium }} />
+                <input
+                  type="text"
+                  placeholder="Search by student number, name, or filename..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 12px 12px 40px',
+                    border: `1px solid ${COLORS.border}`,
+                    borderRadius: '6px',
+                    fontSize: '14px'
+                  }}
+                />
+              </div>
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                style={{
+                  padding: '12px 20px',
+                  backgroundColor: showFilters ? COLORS.primary : COLORS.bgWhite,
+                  color: showFilters ? COLORS.bgWhite : COLORS.text,
+                  border: `1px solid ${COLORS.border}`,
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                <Filter size={18} />
+                Filters
+              </button>
+            </div>
+
+            {showFilters && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', paddingTop: '16px', borderTop: `1px solid ${COLORS.border}` }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: COLORS.textMedium, marginBottom: '6px' }}>
+                    Status
+                  </label>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: `1px solid ${COLORS.border}`,
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="approved">Approved</option>
+                    <option value="pending">Pending</option>
+                    <option value="flagged">Flagged</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: COLORS.textMedium, marginBottom: '6px' }}>
+                    Document Type
+                  </label>
+                  <select
+                    value={documentTypeFilter}
+                    onChange={(e) => setDocumentTypeFilter(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: `1px solid ${COLORS.border}`,
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  >
+                    {documentTypes.map(type => (
+                      <option key={type} value={type}>
+                        {type === 'all' ? 'All Types' : type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Active Filters */}
+          {(selectedStudent || statusFilter !== 'all' || documentTypeFilter !== 'all' || searchTerm) && (
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+              {selectedStudent && (
+                <span style={{
+                  backgroundColor: COLORS.info,
+                  color: COLORS.bgWhite,
+                  padding: '6px 12px',
+                  borderRadius: '16px',
+                  fontSize: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  Student: {students.find(s => s.id === selectedStudent)?.name}
+                  <X size={14} style={{ cursor: 'pointer' }} onClick={() => setSelectedStudent(null)} />
+                </span>
+              )}
+              {statusFilter !== 'all' && (
+                <span style={{
+                  backgroundColor: getStatusColor(statusFilter),
+                  color: COLORS.bgWhite,
+                  padding: '6px 12px',
+                  borderRadius: '16px',
+                  fontSize: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  Status: {statusFilter}
+                  <X size={14} style={{ cursor: 'pointer' }} onClick={() => setStatusFilter('all')} />
+                </span>
+              )}
+              {documentTypeFilter !== 'all' && (
+                <span style={{
+                  backgroundColor: COLORS.secondary,
+                  color: COLORS.bgWhite,
+                  padding: '6px 12px',
+                  borderRadius: '16px',
+                  fontSize: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  Type: {documentTypeFilter}
+                  <X size={14} style={{ cursor: 'pointer' }} onClick={() => setDocumentTypeFilter('all')} />
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Document Count */}
+          <div style={{ marginBottom: '16px', color: COLORS.textMedium, fontSize: '14px' }}>
+            Showing {filteredDocuments.length} of {documents.length} documents
+          </div>
+
+          {/* Documents List */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {filteredDocuments.length === 0 ? (
+              <div style={{
+                backgroundColor: COLORS.bgWhite,
+                padding: '60px',
+                borderRadius: '8px',
+                border: `1px solid ${COLORS.border}`,
+                textAlign: 'center',
+                color: COLORS.textMedium
+              }}>
+                <File size={48} style={{ margin: '0 auto 16px', opacity: 0.3 }} />
+                <p>No documents found matching your criteria</p>
+              </div>
+            ) : (
+              filteredDocuments.map(doc => (
+                <div
+                  key={doc.id}
+                  style={{
+                    backgroundColor: COLORS.bgWhite,
+                    padding: '16px',
+                    borderRadius: '8px',
+                    border: `1px solid ${COLORS.border}`,
+                    display: 'grid',
+                    gridTemplateColumns: '1fr auto',
+                    gap: '16px',
+                    alignItems: 'center'
+                  }}
+                >
+                  <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                    <div style={{
+                      width: '48px',
+                      height: '48px',
+                      backgroundColor: COLORS.bgLight,
+                      borderRadius: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: COLORS.text
+                    }}>
+                      <File size={24} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '14px', fontWeight: '600', color: COLORS.text }}>
+                          {doc.fileName}
+                        </span>
+                        <span style={{
+                          fontSize: '11px',
+                          padding: '2px 8px',
+                          borderRadius: '10px',
+                          color: COLORS.bgWhite,
+                          fontWeight: '600'
+                        }}>
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '12px', color: COLORS.textMedium, display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                        <span>{doc.studentNr} - {doc.studentName}</span>
+                        <span>•</span>
+                        <span>{doc.documentType}</span>
+                        <span>•</span>
+                        <span>{doc.folder}</span>
+                        <span>•</span>
+                        <span>{doc.fileSize}</span>
+                        <span>•</span>
+                        <span>Uploaded: {doc.uploadDate}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '6px 12px',
+                      borderRadius: '16px',
+                      backgroundColor: getStatusColor(doc.status) + '20',
+                      color: getStatusColor(doc.status),
+                      fontSize: '12px',
+                      fontWeight: '600'
+                    }}>
+                      {getStatusIcon(doc.status)}
+                      {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                    </div>
+
+                    <button
+                      onClick={() => handleStatusChange(doc.id, 'flagged')}
+                      disabled={doc.status === 'flagged'}
+                      style={{
+                        padding: '8px 12px',
+                        backgroundColor: doc.status === 'flagged' ? COLORS.bgLight : COLORS.bgWhite,
+                        color: doc.status === 'flagged' ? COLORS.textMedium : COLORS.danger,
+                        border: `1px solid ${doc.status === 'flagged' ? COLORS.border : COLORS.danger}`,
+                        borderRadius: '6px',
+                        cursor: doc.status === 'flagged' ? 'not-allowed' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '13px',
+                        fontWeight: '500',
+                        opacity: doc.status === 'flagged' ? 0.5 : 1
+                      }}
+                      title="Flag document"
+                    >
+                      <Flag size={14} />
+                      Flag
+                    </button>
+
+                    <button
+                      onClick={() => handleStatusChange(doc.id, 'approved')}
+                      disabled={doc.status === 'approved'}
+                      style={{
+                        padding: '8px 12px',
+                        backgroundColor: doc.status === 'approved' ? COLORS.bgLight : COLORS.success,
+                        color: doc.status === 'approved' ? COLORS.textMedium : COLORS.bgWhite,
+                        border: `1px solid ${doc.status === 'approved' ? COLORS.border : COLORS.success}`,
+                        borderRadius: '6px',
+                        cursor: doc.status === 'approved' ? 'not-allowed' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '13px',
+                        fontWeight: '500',
+                        opacity: doc.status === 'approved' ? 0.5 : 1
+                      }}
+                      title="Approve document"
+                    >
+                      <CheckCircle size={14} />
+                      Approve
+                    </button>
+
+                    <button
+                      style={{
+                        padding: '8px',
+                        backgroundColor: COLORS.bgWhite,
+                        color: COLORS.info,
+                        border: `1px solid ${COLORS.info}`,
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                      title="View document"
+                    >
+                      <Eye size={16} />
+                    </button>
+
+                    <button
+                      style={{
+                        padding: '8px',
+                        backgroundColor: COLORS.bgWhite,
+                        color: COLORS.text,
+                        border: `1px solid ${COLORS.border}`,
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                      title="Download document"
+                    >
+                      <Download size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  );
+};
+
+export default StudentDocumentManager;
