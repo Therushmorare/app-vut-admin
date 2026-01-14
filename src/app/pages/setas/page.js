@@ -1,4 +1,4 @@
-import SETAManagementSystem from "../../components/Setas/SetaManagement";
+import SETAManagementSystem from "../../components/Setas/SetaManagementSystem";
 
 export default function Setas() {
   return <SETAManagementSystem />;

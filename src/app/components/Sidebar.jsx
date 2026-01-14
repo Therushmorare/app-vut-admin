@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
 
@@ -26,9 +26,9 @@ const Sidebar = () => {
       {/* Logo Section */}    
       <div className="bg-white p-6 border-b border-gray-200 flex-shrink-0">
         <img 
-          src="https://cdn.brandfetch.io/idf5lI7C7u/w/550/h/178/theme/light/logo.png?c=1bxid64Mup7aczewSAYMX&t=1757018743913" 
+          src="https://upload.wikimedia.org/wikipedia/commons/5/5f/VUT_logo-TM.png" 
           alt="Logo" 
-          className="w-full h-16 object-contain"
+          className=""
         />
       </div>
 

@@ -28,4 +28,17 @@ const checkExpiringSoon = (endDate) => {
   return daysUntilExpiry <= 90 && daysUntilExpiry > 0;
 };
 
+export const getStatusIcon = (status) => {
+  return status;
+};
+
+export const getStatusColor = (status) => {
+  switch(status) {
+    case 'Active': return 'bg-green-100 text-green-800 border-green-300';
+    case 'Pending': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+    case 'Expired': return 'bg-red-100 text-red-800 border-red-300';
+    default: return 'bg-gray-100 text-gray-800';
+  }
+
+};
 export { COLORS, generateId, formatDate, checkExpiringSoon };

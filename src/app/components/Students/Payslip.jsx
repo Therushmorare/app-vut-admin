@@ -120,7 +120,7 @@ const PayslipModal = ({ student, onClose }) => {
           <div id="payslip-print-area" ref={printRef} className="p-8 bg-white">
             {/* Header */}
             <div className="text-center mb-4">
-              <h1 className="text-2xl font-bold mb-1" style={{color: '#0245A3'}}>UNIVERSITY OF TECHNOLOGY</h1>
+              <h1 className="text-2xl font-bold mb-1" style={{color: '#0245A3'}}>VAAL UNIVERSITY OF TECHNOLOGY</h1>
               <h2 className="text-xl font-semibold text-gray-700">STUDENT STIPEND PAYSLIP</h2>
               <div className="mt-2 text-sm text-gray-600">
                 <p><strong>Payslip No.:</strong> {payslipData.payslipNumber}</p>
