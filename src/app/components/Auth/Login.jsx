@@ -48,14 +48,14 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
     try {
       // Login request
       const payload = {
-        user_type: "student",
+        user_type: "administrator",
         email: formData.email.trim(),
         id_number: "",
         password: formData.password,
       };
 
       const response = await axios.post(
-        "https://seta-management-api-fvzc9.ondigitalocean.app/api/students/login",
+        "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/login",
         payload,
         {
           headers: { "Content-Type": "application/json" },
@@ -66,36 +66,34 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
 
       // Save basic auth details
       sessionStorage.setItem("access_token", access_token);
-      sessionStorage.setItem("user_id", user_id);
+      sessionStorage.setItem("admin_id", user_id);
 
       setApiSuccess(message || "Login successful!");
 
-      // Fetch student full profile
+      // Fetch admin full profile
       const profileRes = await axios.get(
-        `https://seta-management-api-fvzc9.ondigitalocean.app/api/students/student/${user_id}`,
+        `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/administrator/${user_id}`,
       );
 
-      const student = profileRes.data;
+      const admin = profileRes.data;
 
       // Map API snake_case → camelCase
-      const mappedStudent = {
-        id: student.id,
-        firstName: student.first_name,
-        lastName: student.last_name,
-        email: student.email,
-        phone: student.phone_number,
-        idNumber: student.ID_number,
-        studentNumber: student.student_number,
-        faculty: student.faculty,
-        programme: student.programme,
-        status: student.status,
-        registrationDate: student.registrationDate
+      const mappedAdmin = {
+        id: admin.id,
+        firstName: admin.first_name,
+        lastName: admin.last_name,
+        email: admin.email,
+        phone: admin.phone_number,
+        employeeNumber: admin.employee_number,
+        role: admin.role,
+        status: admin.status,
+        dateJoined: admin.Joined_at
       };
 
       // Store full student object
-      sessionStorage.setItem("student", JSON.stringify(mappedStudent));
+      sessionStorage.setItem("administrator", JSON.stringify(mappedAdmin));
 
-      if (onLogin) onLogin(mappedStudent);
+      if (onLogin) onLogin(mappedAdmin);
 
       // Redirect
       router.push("/mfa");
