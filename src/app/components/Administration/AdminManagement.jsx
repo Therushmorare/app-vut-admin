@@ -16,8 +16,8 @@ import {
 import { COLORS, formatDate } from "../../utils/helpers";
 
 // API endpoints
-const TABLE_API_URL = "https://your-api-domain.com/admins"; // GET for table
-const ADD_ADMIN_API_URL = "https://your-api-domain.com/add-admin"; // POST for form
+const TABLE_API_URL = "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/allAdmins"; // GET for table
+const ADD_ADMIN_API_URL = "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/add"; // POST for form
 
 export default function AdminManagement() {
   const [admins, setAdmins] = useState([]);

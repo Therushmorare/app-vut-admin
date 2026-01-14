@@ -29,8 +29,8 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
 
   const userAvatar = "";
-  const userName = "Nombuso Simelane";
-  const userEmail = "nombuso.simelane@email.com";
+  const userName = sessionStorage.getItem("firstName");
+  const userEmail = sessionStorage.getItem("lastName")
 
   const menuItems = {
     "/pages/students": { title: "Student Management", icon: GraduationCap },
