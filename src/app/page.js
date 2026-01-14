@@ -1,7 +1,27 @@
-import StudentManagementSystem from "./components/Students/StudentManagement";
+"use client";
 
-export default function Home() {
+import { useRouter } from "next/navigation"; //next/navigation
+import Login from "../components/auth/Login";
+
+export default function LoginPage() {
+  const router = useRouter();
+
+  // Callback after login
+  const handleLogin = (data) => {
+    console.log("Login successful:", data);
+    // Redirect to MFA page
+    router.push("/mfa");
+  };
+
+  const switchToForgotPassword = () => {
+    router.push("/forgot");
+  };
+
   return (
-    <StudentManagementSystem />
+    <Login
+      onLogin={handleLogin}
+      onSwitchToRegister={switchToRegister}
+      onSwitchToForgotPassword={switchToForgotPassword}
+    />
   );
 }

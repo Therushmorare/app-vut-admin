@@ -13,7 +13,8 @@ const Sidebar = () => {
     { id: 'hosts', label: 'Host Companies', href: '/pages/hosts' },
     { id: 'setas', label: 'SETAs', href: '/pages/setas' },
     { id: 'reports', label: 'Reports', href: '/pages/reports' },
-    { id: 'documents', label: 'Documents', href: '/pages/documents' }
+    { id: 'documents', label: 'Documents', href: '/pages/documents' },
+    { id: 'admins', label: 'Admins', href: '/pages/admins'}
   ];
 
   const handleItemClick = (href) => {
