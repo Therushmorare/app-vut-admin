@@ -43,7 +43,7 @@ export default function MFA({ onVerify }) {
       console.log("MFA Response:", response.data);
 
       if (onVerify) onVerify(response.data);
-      router.push("/dashboard"); 
+      router.push("/students"); 
 
     } catch (err) {
       console.error("MFA error:", err);

@@ -37,7 +37,9 @@ const Navbar = () => {
     "/pages/hosts": { title: "Host Company Management", icon: Users },
     "/pages/setas": { title: "SETA Management", icon: BriefcaseBusiness },
     "/pages/reports": { title: "Reports", icon: FileText },
-    "/pages/documents": { title: "Documents", icon: FileText }
+    "/pages/documents": { title: "Documents", icon: FileText },
+    "/pages/admins": {title: "Admins", icon: Users}
+
   };
 
   const currentMenuItem = menuItems[pathname];
