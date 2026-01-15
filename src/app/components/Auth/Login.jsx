@@ -64,10 +64,6 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
 
       const { message, user_id, access_token } = response.data;
 
-      // Save basic auth details
-      sessionStorage.setItem("access_token", access_token);
-      sessionStorage.setItem("admin_id", user_id);
-
       setApiSuccess(message || "Login successful!");
 
       // Fetch admin full profile
@@ -87,11 +83,15 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
         employeeNumber: admin.employee_number,
         role: admin.role,
         status: admin.status,
-        dateJoined: admin.Joined_at
+        dateJoined: admin.Joined_at,
       };
 
-      // Store full student object
-      sessionStorage.setItem("administrator", JSON.stringify(mappedAdmin));
+      // ✅ Browser-only sessionStorage
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("access_token", access_token);
+        sessionStorage.setItem("admin_id", user_id);
+        sessionStorage.setItem("administrator", JSON.stringify(mappedAdmin));
+      }
 
       if (onLogin) onLogin(mappedAdmin);
 
