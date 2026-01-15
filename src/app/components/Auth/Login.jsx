@@ -6,7 +6,7 @@ import { GraduationCap, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { COLORS } from "../../constants/colors";
 import { useRouter } from "next/navigation";
 
-const Login = ({ onLogin, onSwitchToRegister }) => {
+const Login = ({ onLogin }) => {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
