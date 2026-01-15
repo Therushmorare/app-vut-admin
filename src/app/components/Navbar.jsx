@@ -29,8 +29,17 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
 
   const userAvatar = "";
-  const userName = sessionStorage.getItem("firstName");
-  const userEmail = sessionStorage.getItem("email")
+
+  // ✅ Fix sessionStorage SSR issue
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setUserName(sessionStorage.getItem("firstName") || "");
+      setUserEmail(sessionStorage.getItem("email") || "");
+    }
+  }, []);
 
   const menuItems = {
     "/pages/students": { title: "Student Management", icon: GraduationCap },
@@ -39,7 +48,6 @@ const Navbar = () => {
     "/pages/reports": { title: "Reports", icon: FileText },
     "/pages/documents": { title: "Documents", icon: FileText },
     "/pages/admins": {title: "Admins", icon: Users}
-
   };
 
   const currentMenuItem = menuItems[pathname];
@@ -112,7 +120,6 @@ const Navbar = () => {
     );
   };
 
-  // Get placeholder based on current page
   const getSearchPlaceholder = () => {
     switch(pathname) {
       case '/pages/students':
@@ -123,6 +130,7 @@ const Navbar = () => {
         return 'Search SETAs by name, skills, position...';
       case '/pages/reports':
         return 'Search reports by title, type, date...';
+      default:
         return 'Search...';
     }
   };
@@ -130,7 +138,6 @@ const Navbar = () => {
   return (
     <>
       <nav className="h-28 bg-white flex items-center justify-between px-6 sticky top-0 z-30 shadow-[0_0_10px_0_rgba(0,0,0,0.15)]">
-        
         {/* Left side: Title + Icon */}
         <div className="ml-20 flex items-center gap-3">
           {CurrentIcon && (
@@ -157,7 +164,6 @@ const Navbar = () => {
 
         {/* Right side items */}
         <div className="flex items-center space-x-4">
-
           {/* Notifications */}
           <div className="relative">
             <button
@@ -185,7 +191,6 @@ const Navbar = () => {
 
             {showProfileDropdown && (
               <div className="absolute right-0 top-full mt-2 w-75 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50 animate-in slide-in-from-top-2 duration-200">
-                
                 {/* User Info */}
                 <div className="px-4 py-3 border-b border-gray-100">
                   <div className="flex items-center space-x-3">
