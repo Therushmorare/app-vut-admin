@@ -20,7 +20,6 @@ export default function LoginPage() {
   return (
     <Login
       onLogin={handleLogin}
-      onSwitchToRegister={switchToRegister}
       onSwitchToForgotPassword={switchToForgotPassword}
     />
   );
