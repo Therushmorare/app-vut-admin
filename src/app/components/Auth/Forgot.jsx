@@ -135,18 +135,6 @@ export default function Forgot({ onSwitchToRegister }) {
               Login here
             </button>
           </p>
-          {onSwitchToRegister && (
-            <p className="text-gray-600 mt-2">
-              Don't have an account?{" "}
-              <button
-                onClick={onSwitchToRegister}
-                className="font-semibold hover:underline"
-                style={{ color: COLORS.primary }}
-              >
-                Register here
-              </button>
-            </p>
-          )}
         </div>
       </div>
     </div>
