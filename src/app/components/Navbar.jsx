@@ -30,7 +30,7 @@ const Navbar = () => {
 
   const userAvatar = "";
   const userName = sessionStorage.getItem("firstName");
-  const userEmail = sessionStorage.getItem("lastName")
+  const userEmail = sessionStorage.getItem("email")
 
   const menuItems = {
     "/pages/students": { title: "Student Management", icon: GraduationCap },
