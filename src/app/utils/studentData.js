@@ -1,7 +1,8 @@
 import axios from "axios";
 
+// ✅ Use Next.js env vars (NEXT_PUBLIC_ prefix for client-side access)
 const API_BASE =
-  import.meta.env.VITE_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
   "https://seta-management-api-5zwfv.ondigitalocean.app";
 
 const generateStudents = async () => {
