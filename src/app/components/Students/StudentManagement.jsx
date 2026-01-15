@@ -10,7 +10,7 @@ import { generateStudents } from '../../utils/studentData';
 const STUDENTS_PER_PAGE = 30;
 
 export default function StudentManagementSystem() {
-  const [allStudents] = useState(() => generateStudents(150));
+  const [allStudents, setAllStudents] = useState([]); // initialize empty
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [filters, setFilters] = useState({
@@ -19,7 +19,26 @@ export default function StudentManagementSystem() {
   });
   const [sortConfig, setSortConfig] = useState({ key: 'studentNr', direction: 'asc' });
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true); // new loading state
 
+  // ✅ Fetch students client-side
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const students = await generateStudents(); // async call
+        setAllStudents(students);
+      } catch (error) {
+        console.error('Student API integration failed:', error);
+        setAllStudents([]); // fallback
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudents();
+  }, []);
+
+  // Global search listener
   useEffect(() => {
     const handleGlobalSearch = (event) => {
       setSearchTerm(event.detail);
@@ -27,7 +46,7 @@ export default function StudentManagementSystem() {
     };
 
     window.addEventListener('globalSearchChange', handleGlobalSearch);
-    
+
     if (window.globalSearchTerm !== undefined) {
       setSearchTerm(window.globalSearchTerm);
     }
@@ -37,10 +56,7 @@ export default function StudentManagementSystem() {
     };
   }, []);
 
-  useEffect(() => {
-    console.log('Search term changed:', searchTerm);
-  }, [searchTerm]);
-
+  // Save students to localStorage
   useEffect(() => {
     if (typeof window !== 'undefined' && allStudents.length > 0) {
       localStorage.setItem('all-students', JSON.stringify(allStudents));
@@ -61,18 +77,12 @@ export default function StudentManagementSystem() {
         const idMatch = student.idNumber?.toLowerCase().includes(search);
         const setaMatch = student.seta?.toLowerCase().includes(search);
         const employerMatch = student.employer?.toLowerCase().includes(search);
-        
         return nameMatch || studentNrMatch || emailMatch || programmeMatch || facultyMatch || idMatch || setaMatch || employerMatch;
       });
     }
 
-    if (filters.programme) {
-      filtered = filtered.filter(s => s.programme === filters.programme);
-    }
-    if (filters.faculty) {
-      filtered = filtered.filter(s => s.faculty === filters.faculty);
-    }
-
+    if (filters.programme) filtered = filtered.filter(s => s.programme === filters.programme);
+    if (filters.faculty) filtered = filtered.filter(s => s.faculty === filters.faculty);
 
     filtered.sort((a, b) => {
       let aVal = a[sortConfig.key];
@@ -118,6 +128,8 @@ export default function StudentManagementSystem() {
       setSelectedStudent(student);
     }
   };
+
+  if (loading) return <p>Loading students...</p>; // loading indicator
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
