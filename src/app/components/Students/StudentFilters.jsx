@@ -2,7 +2,7 @@
 
 import React from "react";
 import { BookOpen, Building2 } from "lucide-react";
-import { FACULTIES, PROGRAMMES_BY_FACULTY } from "@/constants/facultiesProgrammes";
+import { FACULTIES, PROGRAMMES_BY_FACULTY } from "../../constants/facultiesProgrammes";
 
 const STUDENTS_PER_PAGE = 30;
 
