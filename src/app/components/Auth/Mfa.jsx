@@ -93,8 +93,11 @@ export default function MFA({ onVerify }) {
 
     try {
       const response = await axios.post(
-        `${API_BASE}/api/students/resend-token`,
-        { email: adminEmail },
+        `${API_BASE}/api/administrators/resend-mfa`,
+        { 
+          email: adminEmail,
+          user_type: "administrator"
+         },
         { headers: { "Content-Type": "application/json" } }
       );
 
