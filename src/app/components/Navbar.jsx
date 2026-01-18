@@ -35,9 +35,22 @@ const Navbar = () => {
   const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setUserName(sessionStorage.getItem("firstName") || "");
-      setUserEmail(sessionStorage.getItem("email") || "");
+    if (typeof window === "undefined") return;
+
+    const adminRaw = sessionStorage.getItem("administrator");
+
+    if (!adminRaw) {
+      console.warn("No administrator session found");
+      return;
+    }
+
+    try {
+      const admin = JSON.parse(adminRaw);
+
+      setUserName(admin.firstName || "");
+      setUserEmail(admin.email || "");
+    } catch (err) {
+      console.error("Failed to parse administrator session:", err);
     }
   }, []);
 
