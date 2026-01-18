@@ -63,7 +63,7 @@ export default function MFA({ onVerify }) {
         `${API_BASE}/api/students/verify-mfa`,
         {
           user_id: adminId,
-          mfa_code: form.mfa_code.trim(),
+          code: form.mfa_code.trim(),
         },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -93,7 +93,7 @@ export default function MFA({ onVerify }) {
 
     try {
       const response = await axios.post(
-        `${API_BASE}/api/students/resend-mfa`,
+        `${API_BASE}/api/students/resend-token`,
         { email: adminEmail },
         { headers: { "Content-Type": "application/json" } }
       );
