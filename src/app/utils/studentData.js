@@ -1,18 +1,18 @@
 import axios from "axios";
 
-// ✅ API base (client-safe)
+//API base (client-safe)
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ??
   "https://seta-management-api-fvzc9.ondigitalocean.app";
 
-// ✅ Shared axios instance
+//Shared axios instance
 const api = axios.create({
   baseURL: API_BASE,
   withCredentials: true, // ONLY keep if backend supports cookies correctly
   timeout: 15000, // prevent 504 hanging forever
 });
 
-// ✅ Safe request helper (never throws)
+//Safe request helper (never throws)
 const safeGet = async (url) => {
   try {
     const res = await api.get(url);
@@ -36,7 +36,7 @@ export const generateStudents = async () => {
     return [];
   }
 
-  // ✅ Fetch endpoints safely (no Promise.all crash)
+  //Fetch endpoints safely (no Promise.all crash)
   const studentsData = await safeGet("/api/administrators/students");
   const biographicsData = await safeGet("/api/administrators/biographics");
   const setasData = await safeGet("/api/administrators/setas");
@@ -47,7 +47,7 @@ export const generateStudents = async () => {
   const setas = setasData.setas ?? [];
   const companies = companiesData.companies ?? [];
 
-  // ✅ Index related data
+  //Index related data
   const bioMap = Object.fromEntries(
     biographics.map((b) => [b.user_id, b])
   );
@@ -60,7 +60,7 @@ export const generateStudents = async () => {
     companies.map((c) => [c.id, c])
   );
 
-  // ✅ Normalize student records
+  //Normalize student records
   return students.map((student) => {
     const bio = bioMap[student.id] || {};
     const seta = setaMap[student.seta_id] || {};
@@ -108,7 +108,7 @@ export const generateStudents = async () => {
         student.first_name + " " + student.last_name
       )}&background=0245A3&color=ffffff&size=128`,
 
-      // ✅ Biographics
+      //Biographics
       dateOfBirth: bio.date_of_birth ?? null,
       gender: bio.gender ?? null,
       physicalAddress: bio.address ?? null,
