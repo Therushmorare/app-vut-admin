@@ -3,7 +3,7 @@ import axios from "axios";
 // ✅ Use Next.js env vars (NEXT_PUBLIC_ prefix for client-side access)
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
-  "https://seta-management-api-5zwfv.ondigitalocean.app";
+  "https://seta-management-api-fvzc9.ondigitalocean.app";
 
 /**
  * Fetch students data safely.
