@@ -75,7 +75,7 @@ const Login = ({ onLogin }) => {
 
       // Map API snake_case → camelCase
       const mappedAdmin = {
-        id: admin.id,
+        id: admin.admin_id,
         firstName: admin.first_name,
         lastName: admin.last_name,
         email: admin.email,
@@ -83,7 +83,7 @@ const Login = ({ onLogin }) => {
         employeeNumber: admin.employee_number,
         role: admin.role,
         status: admin.status,
-        dateJoined: admin.Joined_at,
+        dateJoined: admin.joined_at,
       };
 
       // Browser-only sessionStorage
