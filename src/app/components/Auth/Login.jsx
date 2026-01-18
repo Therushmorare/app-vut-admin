@@ -137,7 +137,7 @@ const Login = ({ onLogin }) => {
           >
             Welcome Back
           </h1>
-          <p className="text-gray-600">Login to your student portal</p>
+          <p className="text-gray-600">Login to your portal</p>
         </div>
 
         {apiError && (
