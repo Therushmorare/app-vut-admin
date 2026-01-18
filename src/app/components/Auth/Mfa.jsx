@@ -10,8 +10,9 @@ const API_BASE = "https://seta-management-api-fvzc9.ondigitalocean.app";
 
 export default function MFA({ onVerify }) {
   const [form, setForm] = useState({ mfa_code: "" });
-  const [adminId, setAdminId] = useState(null);
-  const [adminEmail, setAdminEmail] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [userEmail, setUserEmail] = useState(null);
+  const [userType, setUserType] = useState(null);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [error, setError] = useState("");
@@ -20,19 +21,21 @@ export default function MFA({ onVerify }) {
 
   const router = useRouter();
 
-  // 🔹 Load session data once
   useEffect(() => {
     const id = sessionStorage.getItem("admin_id");
-    setAdminId(id);
-
     const adminRaw = sessionStorage.getItem("administrator");
-    if (adminRaw) {
+
+    if (id && adminRaw) {
       try {
         const admin = JSON.parse(adminRaw);
-        setAdminEmail(admin.email);
+        setUserId(id);
+        setUserEmail(admin.email);
+        setUserType("administrator");
       } catch {
         setError("Invalid session data. Please login again.");
       }
+    } else {
+      setError("Session expired. Please login again.");
     }
   }, []);
 
@@ -42,7 +45,7 @@ export default function MFA({ onVerify }) {
     setSuccess("");
   };
 
-  // Verify MFA
+  // 🔹 Verify MFA (exact payload)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -51,38 +54,45 @@ export default function MFA({ onVerify }) {
       return;
     }
 
-    if (!adminId) {
+    if (!userId) {
       setError("Session expired. Please login again.");
       return;
     }
 
     setLoading(true);
+    setError("");
+    setSuccess("");
 
     try {
-      const response = await axios.post(
-        `${API_BASE}/api/students/verify-mfa`,
-        {
-          user_id: adminId,
-          code: form.mfa_code.trim(),
-        },
-        { headers: { "Content-Type": "application/json" } }
-      );
+      const endpoint =
+        userType === "administrator"
+          ? `${API_BASE}/api/administrators/verify-mfa`
+          : `${API_BASE}/api/students/verify-mfa`;
+
+      const payload =
+        userType === "administrator"
+          ? { user_id: userId, code: form.mfa_code.trim() } // admin verify
+          : { user_id: userId, code: form.mfa_code.trim() }; // student verify
+
+      const response = await axios.post(endpoint, payload, {
+        headers: { "Content-Type": "application/json" },
+      });
 
       setSuccess(response.data.message || "MFA verified!");
-
       if (onVerify) onVerify(response.data);
 
       router.push("/pages/students");
     } catch (err) {
+      console.error("MFA verify error:", err);
       setError(err.response?.data?.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Resend MFA Token (EMAIL BASED)
+  // 🔹 Resend MFA (exact payload)
   const handleResend = async () => {
-    if (!adminEmail) {
+    if (!userEmail || !userType) {
       setError("Session expired. Please login again.");
       return;
     }
@@ -92,17 +102,20 @@ export default function MFA({ onVerify }) {
     setSuccess("");
 
     try {
-      const response = await axios.post(
-        `${API_BASE}/api/administrators/resend-mfa`,
-        { 
-          email: adminEmail,
-          user_type: "administrator"
-         },
-        { headers: { "Content-Type": "application/json" } }
-      );
+      const endpoint =
+        userType === "administrator"
+          ? `${API_BASE}/api/administrators/resend-mfa`
+          : `${API_BASE}/api/students/resend-mfa`;
+
+      const payload = { email: userEmail, user_type: userType };
+
+      const response = await axios.post(endpoint, payload, {
+        headers: { "Content-Type": "application/json" },
+      });
 
       setSuccess(response.data.message || "MFA code resent successfully.");
     } catch (err) {
+      console.error("Resend MFA error:", err);
       setError(err.response?.data?.message || "Failed to resend MFA code.");
     } finally {
       setResending(false);
@@ -110,14 +123,8 @@ export default function MFA({ onVerify }) {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{ backgroundColor: COLORS.bgLight }}
-    >
-      <div
-        className="w-full max-w-md rounded-lg shadow-lg p-8"
-        style={{ backgroundColor: COLORS.bgWhite }}
-      >
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: COLORS.bgLight }}>
+      <div className="w-full max-w-md rounded-lg shadow-lg p-8" style={{ backgroundColor: COLORS.bgWhite }}>
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
@@ -129,10 +136,7 @@ export default function MFA({ onVerify }) {
                 onError={() => setImageLoaded(false)}
               />
             ) : (
-              <GraduationCap
-                className="w-16 h-16"
-                style={{ color: COLORS.primary }}
-              />
+              <GraduationCap className="w-16 h-16" style={{ color: COLORS.primary }} />
             )}
           </div>
           <h1 className="text-3xl font-bold mb-2" style={{ color: COLORS.primary }}>
@@ -142,23 +146,13 @@ export default function MFA({ onVerify }) {
         </div>
 
         {/* Messages */}
-        {error && (
-          <p className="text-sm text-center mb-4" style={{ color: COLORS.danger }}>
-            {error}
-          </p>
-        )}
-        {success && (
-          <p className="text-sm text-center mb-4" style={{ color: COLORS.success }}>
-            {success}
-          </p>
-        )}
+        {error && <p className="text-sm text-center mb-4" style={{ color: COLORS.danger }}>{error}</p>}
+        {success && <p className="text-sm text-center mb-4" style={{ color: COLORS.success }}>{success}</p>}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2 text-gray-700">
-              MFA Code
-            </label>
+            <label className="block text-sm font-medium mb-2 text-gray-700">MFA Code</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
