@@ -96,7 +96,7 @@ const Login = ({ onLogin }) => {
       if (onLogin) onLogin(mappedAdmin);
 
       // Redirect
-      router.push("/mfa");
+      router.push("/pages/students");
 
     } catch (err) {
       console.error("Login error:", err);
