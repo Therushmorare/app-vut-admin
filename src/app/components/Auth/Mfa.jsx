@@ -1,17 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { GraduationCap, Lock } from "lucide-react";
+import { GraduationCap, Lock, RotateCw } from "lucide-react";
 import { COLORS } from "../../constants/colors";
 import { useRouter } from "next/navigation";
 
+const API_BASE = "https://seta-management-api-fvzc9.ondigitalocean.app";
+
 export default function MFA({ onVerify }) {
   const [form, setForm] = useState({ mfa_code: "" });
+  const [adminId, setAdminId] = useState(null);
+  const [adminEmail, setAdminEmail] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [imageLoaded, setImageLoaded] = useState(true);
+
+  const router = useRouter();
+
+  // 🔹 Load session data once
+  useEffect(() => {
+    const id = sessionStorage.getItem("admin_id");
+    setAdminId(id);
+
+    const adminRaw = sessionStorage.getItem("administrator");
+    if (adminRaw) {
+      try {
+        const admin = JSON.parse(adminRaw);
+        setAdminEmail(admin.email);
+      } catch {
+        setError("Invalid session data. Please login again.");
+      }
+    }
+  }, []);
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -19,7 +42,7 @@ export default function MFA({ onVerify }) {
     setSuccess("");
   };
 
-  const router = useRouter();
+  // Verify MFA
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -28,28 +51,58 @@ export default function MFA({ onVerify }) {
       return;
     }
 
+    if (!adminId) {
+      setError("Session expired. Please login again.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const payload = { mfa_code: form.mfa_code.trim() };
-
       const response = await axios.post(
-        "https://seta-management-api-fvzc9.ondigitalocean.app/api/students/verify-mfa",
-        payload,
+        `${API_BASE}/api/students/verify-mfa`,
+        {
+          user_id: adminId,
+          mfa_code: form.mfa_code.trim(),
+        },
         { headers: { "Content-Type": "application/json" } }
       );
 
       setSuccess(response.data.message || "MFA verified!");
-      console.log("MFA Response:", response.data);
 
       if (onVerify) onVerify(response.data);
-      router.push("/students"); 
 
+      router.push("/pages/students");
     } catch (err) {
-      console.error("MFA error:", err);
       setError(err.response?.data?.message || "Something went wrong.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Resend MFA Token (EMAIL BASED)
+  const handleResend = async () => {
+    if (!adminEmail) {
+      setError("Session expired. Please login again.");
+      return;
+    }
+
+    setResending(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await axios.post(
+        `${API_BASE}/api/students/resend-mfa`,
+        { email: adminEmail },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      setSuccess(response.data.message || "MFA code resent successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to resend MFA code.");
+    } finally {
+      setResending(false);
     }
   };
 
@@ -66,14 +119,12 @@ export default function MFA({ onVerify }) {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             {imageLoaded ? (
-              <div className="flex items-center justify-center">
-                <img
-                  src="https://res.cloudinary.com/dbuuizuka/image/upload/v1761697835/id3tj44Wsz_1761674029816_z2fjde.png"
-                  alt="Graduation Cap"
-                  className="w-20 h-20 object-contain"
-                  onError={() => setImageLoaded(false)}
-                />
-              </div>
+              <img
+                src="https://res.cloudinary.com/dbuuizuka/image/upload/v1761697835/id3tj44Wsz_1761674029816_z2fjde.png"
+                alt="Graduation Cap"
+                className="w-20 h-20 object-contain"
+                onError={() => setImageLoaded(false)}
+              />
             ) : (
               <GraduationCap
                 className="w-16 h-16"
@@ -87,7 +138,7 @@ export default function MFA({ onVerify }) {
           <p className="text-gray-600">Enter the code sent to your email</p>
         </div>
 
-        {/* Error / Success */}
+        {/* Messages */}
         {error && (
           <p className="text-sm text-center mb-4" style={{ color: COLORS.danger }}>
             {error}
@@ -106,10 +157,9 @@ export default function MFA({ onVerify }) {
               MFA Code
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                name="mfa_code"
                 value={form.mfa_code}
                 onChange={(e) => handleChange("mfa_code", e.target.value)}
                 placeholder="Enter MFA Code"
@@ -122,12 +172,26 @@ export default function MFA({ onVerify }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-lg text-white font-semibold hover:opacity-90 transition-opacity"
+            className="w-full py-3 rounded-lg text-white font-semibold"
             style={{ backgroundColor: COLORS.primary }}
           >
             {loading ? "Verifying..." : "Verify"}
           </button>
         </form>
+
+        {/* Resend Button */}
+        <div className="text-center mt-6">
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={resending}
+            className="flex items-center justify-center gap-2 text-sm font-medium"
+            style={{ color: COLORS.primary }}
+          >
+            <RotateCw className={resending ? "animate-spin" : ""} size={16} />
+            {resending ? "Resending..." : "Resend MFA Code"}
+          </button>
+        </div>
       </div>
     </div>
   );
