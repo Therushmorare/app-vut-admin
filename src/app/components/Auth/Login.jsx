@@ -86,7 +86,7 @@ const Login = ({ onLogin }) => {
         dateJoined: admin.Joined_at,
       };
 
-      // ✅ Browser-only sessionStorage
+      // Browser-only sessionStorage
       if (typeof window !== "undefined") {
         sessionStorage.setItem("access_token", access_token);
         sessionStorage.setItem("admin_id", user_id);
