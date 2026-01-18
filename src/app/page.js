@@ -1,15 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation"; //next/navigation
+import { useRouter } from "next/navigation";
 import Login from "./components/Auth/Login";
+
+// Tells Next.js to not wrap this page in any layout
+export const dynamic = 'force-dynamic'; // optional, ensures dynamic rendering
 
 export default function LoginPage() {
   const router = useRouter();
 
-  // Callback after login
   const handleLogin = (data) => {
     console.log("Login successful:", data);
-    // Redirect to MFA page
     router.push("/mfa");
   };
 

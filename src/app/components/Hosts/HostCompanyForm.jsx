@@ -18,6 +18,8 @@ export default function HostCompanyForm({ company, agreements, onSubmit, onCance
   });
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false); // 🔥 ADDED
+  const [apiError, setApiError] = useState(''); // 🔥 ADDED
 
   const industrySectors = [
     'Manufacturing',
@@ -55,11 +57,49 @@ export default function HostCompanyForm({ company, agreements, onSubmit, onCance
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  //UPDATED: API + existing onSubmit support
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      onSubmit(formData);
-    }
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+    setApiError('');
+
+    //Backend payload mapping
+    const payload = {
+      administrator_id: sessionStorage.getItem("admin_id"),
+      company_name: formData.companyName,
+      registration_number: formData.registrationNumber,
+      address: formData.address,
+      contact_person: formData.contactPerson,
+      company_email: formData.contactEmail,
+      company_phone: formData.contactPhone,
+      industry: formData.industrySector,
+      capacity_of_required_learners: Number(formData.learnerCapacity)
+    };
+    try {
+        const url = company
+          ? `/api/administrators/editHostCompany/${company.company_id}`
+          : '/api/administrators/addHostCompany';
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) throw new Error(data?.message || 'API request failed');
+
+        // Call existing onSubmit callback
+        onSubmit?.(formData);
+
+      } catch (error) {
+        setApiError(error.message);
+      } finally {
+        setIsSubmitting(false);
+      }
   };
 
   const handleChange = (e) => {
@@ -75,6 +115,13 @@ export default function HostCompanyForm({ company, agreements, onSubmit, onCance
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* API Error */}
+      {apiError && (
+        <div className="text-sm p-3 rounded bg-red-50 border border-red-200 text-red-700">
+          {apiError}
+        </div>
+      )}
+
       {/* Company Information */}
       <div>
         <h3 className="text-lg font-semibold mb-4" style={{ color: COLORS.primary }}>
@@ -335,10 +382,13 @@ export default function HostCompanyForm({ company, agreements, onSubmit, onCance
         </button>
         <button
           type="submit"
-          className="flex-1 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90"
+          disabled={isSubmitting}
+          className="flex-1 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 disabled:opacity-50"
           style={{ backgroundColor: COLORS.success }}
         >
-          {company ? 'Update Company' : 'Create Company'}
+          {isSubmitting
+            ? 'Saving...'
+            : company ? 'Update Company' : 'Create Company'}
         </button>
       </div>
     </form>

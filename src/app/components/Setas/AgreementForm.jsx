@@ -22,14 +22,10 @@ const AgreementForm = ({ agreement, onSubmit, onCancel }) => {
   const [uploadPreview, setUploadPreview] = useState(agreement?.documentName || null);
 
   const availableFaculties = [
-    'Engineering',
-    'Business',
-    'IT & Computing',
-    'Health Sciences',
-    'Applied Sciences',
-    'Education',
-    'Arts & Design',
-    'Law'
+    'Faculty of Applied & Computer Science',
+    'Faculty of Management Science',
+    'Faculty of Engineering & Technology',
+    'Faculty of Human Science'
   ];
 
   const validate = () => {
