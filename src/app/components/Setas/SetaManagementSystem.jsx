@@ -233,7 +233,7 @@ export default function SETAManagementSystem() {
     };
     setProfiles([...profiles, newProfile]);
     setAgreements(agreements.map(a =>
-      a.id === data.agreement_id ? { ...a, hasProfile: true } : a
+      a.agreement_id === data.agreement_id ? { ...a, hasProfile: true } : a
     ));
     closeModal();
     showToast('Profile created successfully!');
