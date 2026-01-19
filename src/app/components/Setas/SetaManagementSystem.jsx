@@ -477,15 +477,15 @@ export default function SETAManagementSystem() {
               <select
                 className="w-full px-4 py-2 border rounded-lg"
                 style={{ borderColor: COLORS.border }}
-                onChange={(e) => setSelectedItem(agreements.find(a => a.id === e.target.value))}
+                onChange={(e) => setSelectedItem(agreements.find(a => a.agreement_id === e.target.value))}
               >
                 <option value="">Choose an agreement with a profile...</option>
                 {agreements.filter(a => a.hasProfile).map(a => (
-                  <option key={a.id} value={a.id}>{a.setaName} - {a.agreementRef}</option>
+                  <option key={a.agreement_id} value={a.agreement_id}>{a.name} - {a.reference_number}</option>
                 ))}
               </select>
             </div>
-            {selectedItem && <FundingWindowForm agreementId={selectedItem.id} onSubmit={handleCreateWindow} onCancel={closeModal} />}
+            {selectedItem && <FundingWindowForm agreementId={selectedItem.agreement_id} onSubmit={handleCreateWindow} onCancel={closeModal} />}
           </div>
         );
       
