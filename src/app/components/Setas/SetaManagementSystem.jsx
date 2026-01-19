@@ -175,15 +175,15 @@ export default function SETAManagementSystem() {
     });
   }, [fundingWindows, searchTerm, agreements, allocatedLearners]);
 
-  const validProfiles = profiles.filter(p =>
-    agreements.some(a =>
-      a.agreement_id === p.agreement_id &&
-      a.status === 'Active'
-    )
-  );
-
   const showToast = (message, type = 'success') => setToast({ message, type });
   
+  const validProfiles = profiles.filter(p =>
+  agreements.some(a =>
+    a.agreement_id === p.agreement_id &&
+    a.status === 'Active'
+  )
+  );
+
   const openModal = (type, item = null) => {
     setModalType(type);
     setSelectedItem(item);
@@ -356,7 +356,7 @@ export default function SETAManagementSystem() {
       );
     }
     
-    if (activeTab === 'funding') {
+      if (activeTab === 'funding') {
       return (
         <button
           onClick={() => {
@@ -374,6 +374,7 @@ export default function SETAManagementSystem() {
         </button>
       );
     }
+  };
 
   const getModalTitle = () => {
     const titles = {
