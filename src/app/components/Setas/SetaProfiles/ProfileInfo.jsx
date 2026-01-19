@@ -12,7 +12,7 @@ export default function ProfileInfo({ profile }) {
             Financial Year
           </p>
           <p className="font-bold text-lg" style={{ color: COLORS.primary }}>
-            {profile.financialYear}
+            {profile.financial_year}
           </p>
         </div>
         <div className="p-3 rounded-lg" style={{ backgroundColor: COLORS.bgLight }}>
@@ -21,7 +21,7 @@ export default function ProfileInfo({ profile }) {
             Contact Person
           </p>
           <p className="font-bold text-lg" style={{ color: COLORS.primary }}>
-            {profile.contactPerson || 'N/A'}
+            {profile.seta_email || 'N/A'}
           </p>
         </div>
       </div>
@@ -30,7 +30,7 @@ export default function ProfileInfo({ profile }) {
         <div className="mb-4">
           <p className="text-xs text-gray-500 mb-2 font-semibold">PROGRAM TYPES</p>
           <div className="flex flex-wrap gap-2">
-            {profile.programTypes.map(type => (
+            {profile.program_type.map(type => (
               <span 
                 key={type} 
                 className="px-4 py-2 rounded-full text-xs font-bold shadow-sm" 

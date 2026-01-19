@@ -51,7 +51,7 @@ const API_BASE =
 export default function SETAManagementSystem() {
   
   const [agreements, setAgreements] = useState([]);
-  const [profiles, setProfiles] = useLocalStorage('seta-profiles', []);
+  const [profiles, setProfiles] = useState([]);
   const [fundingWindows, setFundingWindows] = useLocalStorage('seta-windows', []);
   const [allocatedLearners, setAllocatedLearners] = useLocalStorage('allocated-learners', []);
   const [allStudents, setAllStudents] = useLocalStorage('all-students', []);
@@ -90,6 +90,21 @@ export default function SETAManagementSystem() {
 
     fetchAgreements();
 
+    const fetchProfiles = async () => {
+      try {
+        const res = await axios.get(
+          `${API_BASE}/api/administrators/setas`,
+          { withCredentials: true}
+        );
+
+        setProfiles(res.data);
+      } catch (err) {
+        console.error("Failed to load SETA Profiles:", err);
+      }
+    }
+
+    fetchProfiles();
+
     return () => {
       window.removeEventListener('globalSearchChange', handleGlobalSearch);
     };
@@ -126,14 +141,14 @@ export default function SETAManagementSystem() {
     if (!searchTerm) return profiles;
     const search = searchTerm.toLowerCase();
     return profiles.filter(profile => {
-      const agreement = agreements.find(a => a.id === profile.agreementId);
+      const agreement = agreements.find(a => a.id === profile.agreement_id);
       return (
-        profile.profileName?.toLowerCase().includes(search) ||
-        profile.financialYear?.toLowerCase().includes(search) ||
-        profile.contactPerson?.toLowerCase().includes(search) ||
+        profile.name?.toLowerCase().includes(search) ||
+        profile.financial_year?.toLowerCase().includes(search) ||
+        profile.seta_email?.toLowerCase().includes(search) ||
         profile.description?.toLowerCase().includes(search) ||
-        agreement?.setaName?.toLowerCase().includes(search) ||
-        agreement?.agreementRef?.toLowerCase().includes(search)
+        agreement?.name?.toLowerCase().includes(search) ||
+        agreement?.reference_number?.toLowerCase().includes(search)
       );
     });
   }, [profiles, searchTerm, agreements]);
@@ -383,11 +398,11 @@ export default function SETAManagementSystem() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-600 mb-1">SETA Name</p>
-                <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.setaName}</p>
+                <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.name}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600 mb-1">Agreement Reference</p>
-                <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.agreementRef}</p>
+                <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.reference_number}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600 mb-1">Faculty</p>
@@ -399,11 +414,11 @@ export default function SETAManagementSystem() {
               </div>
               <div>
                 <p className="text-sm text-gray-600 mb-1">Start Date</p>
-                <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.startDate}</p>
+                <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.start_period}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600 mb-1">End Date</p>
-                <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.endDate}</p>
+                <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.end_period}</p>
               </div>
             </div>
             <div className="flex gap-3 pt-4">
