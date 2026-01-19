@@ -489,6 +489,7 @@ export default function SETAManagementSystem() {
                   const agreement = agreements.find(
                     a => a.id === Number(e.target.value)
                   );
+                  console.log('SELECTED AGREEMENT:', agreement);
                   setSelectedItem(agreement);
                 }}
               >
