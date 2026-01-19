@@ -27,14 +27,12 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  /* keep agreementId in sync */
+  // Keep agreementId in sync if parent changes it
   useEffect(() => {
-    if (agreementId) {
-      setFormData(prev => ({ ...prev, agreementId }));
-    }
+    if (agreementId) setFormData(prev => ({ ...prev, agreementId }));
   }, [agreementId]);
 
-  /* ---------- validation ---------- */
+  /* ---------- VALIDATION ---------- */
   const validate = () => {
     const newErrors = {};
 
@@ -57,7 +55,7 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
     return newErrors;
   };
 
-  /* ---------- handlers ---------- */
+  /* ---------- HANDLERS ---------- */
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: undefined }));
@@ -109,23 +107,26 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
 
     setIsSubmitting(true);
     setSubmitError(null);
+    setSubmitSuccess(false);
 
     const adminId = sessionStorage.getItem("admin_id");
     if (!adminId) {
-      alert("Admin session expired. Please log in again.");
+      setSubmitError("Admin session expired. Please log in again.");
+      setIsSubmitting(false);
       return;
     }
 
     try {
-      /* 1️⃣ CREATE FUNDING WINDOW */
+      // 1️⃣ CREATE FUNDING WINDOW
       const fwRes = await fetch(
         `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/funding-windows`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', // ensure cookies/session
           body: JSON.stringify({
             administrator_id: adminId,
-            agreement_id: formData.agreementId,
+            agreement_id: String(formData.agreementId),
             funding_window_name: formData.windowName,
             start_date: formData.startDate,
             end_date: formData.endDate,
@@ -137,36 +138,43 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
         }
       );
 
-      if (!fwRes.ok) throw new Error('Failed to create funding window');
-
       const fwData = await fwRes.json();
+      if (!fwRes.ok) {
+        throw new Error(fwData.message || "Failed to create funding window");
+      }
       const fundingWindowId = fwData.id;
 
-      /* 2️⃣ CREATE PROGRAMMES */
+      // 2️⃣ CREATE PROGRAMMES
       for (const prog of formData.programmes) {
-        await fetch(
+        const progRes = await fetch(
           `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/programmes`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({
               administrator_id: adminId,
-              agreement_id: formData.agreementId,
+              agreement_id: String(formData.agreementId),
               funding_window_id: fundingWindowId,
               programme_name: prog.programmeName,
               duration: prog.programmeDuration,
               required_num_students: Number(prog.requiredNumStudents || 0),
               programme_budget: Number(prog.budgetAllocation),
-              documents_arr: prog.requiredDocs,
-              notes: prog.notes
+              documents_arr: prog.requiredDocs || [],
+              notes: prog.notes || ''
             })
           }
         );
+
+        const progData = await progRes.json();
+        if (!progRes.ok) {
+          throw new Error(progData.message || `Failed to create programme: ${prog.programmeName}`);
+        }
       }
 
       setSubmitSuccess(true);
     } catch (err) {
-      console.error(err);
+      console.error("Funding window submission failed:", err);
       setSubmitError(err.message);
     } finally {
       setIsSubmitting(false);
