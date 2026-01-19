@@ -1,45 +1,51 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react';
-import { Upload, X } from 'lucide-react';
-import { COLORS, formatDate } from '../../utils/helpers';
+import React, { useState } from "react";
+import { Upload, X } from "lucide-react";
+import { COLORS, formatDate } from "../../utils/helpers";
 import axios from "axios";
 
 const AgreementForm = ({ agreement, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
-    setaName: agreement?.setaName || '',
+    setaName: agreement?.setaName || "",
     faculties: agreement?.faculties || [],
-    agreementRef: agreement?.agreementRef || '',
-    startDate: agreement?.startDate || '',
-    endDate: agreement?.endDate || '',
-    status: agreement?.status || 'Pending',
+    agreementRef: agreement?.agreementRef || "",
+    startDate: agreement?.startDate || "",
+    endDate: agreement?.endDate || "",
+    status: agreement?.status || "Pending",
     uploadDate: agreement?.uploadDate || formatDate(new Date()),
-    documentName: agreement?.documentName || '',
-    documentUrl: agreement?.documentUrl || ''
+    documentName: agreement?.documentName || "",
+    documentUrl: agreement?.documentUrl || ""
   });
 
   const [errors, setErrors] = useState({});
   const [uploadedFile, setUploadedFile] = useState(null);
-  const [uploadPreview, setUploadPreview] = useState(agreement?.documentName || null);
+  const [uploadPreview, setUploadPreview] = useState(
+    agreement?.documentName || null
+  );
 
   const availableFaculties = [
-    'Faculty of Applied & Computer Science',
-    'Faculty of Management Science',
-    'Faculty of Engineering & Technology',
-    'Faculty of Human Science'
+    "Faculty of Applied & Computer Science",
+    "Faculty of Management Science",
+    "Faculty of Engineering & Technology",
+    "Faculty of Human Science"
   ];
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.setaName) newErrors.setaName = 'SETA name is required';
-    if (!formData.faculties || formData.faculties.length === 0) {
-      newErrors.faculties = 'At least one faculty is required';
-    }
-    if (!formData.agreementRef) newErrors.agreementRef = 'Agreement reference is required';
-    if (!formData.startDate) newErrors.startDate = 'Start date is required';
-    if (!formData.endDate) newErrors.endDate = 'End date is required';
-    if (new Date(formData.endDate) <= new Date(formData.startDate)) {
-      newErrors.endDate = 'End date must be after start date';
+    if (!formData.setaName) newErrors.setaName = "SETA name is required";
+    if (!formData.faculties.length)
+      newErrors.faculties = "At least one faculty is required";
+    if (!formData.agreementRef)
+      newErrors.agreementRef = "Agreement reference is required";
+    if (!formData.startDate) newErrors.startDate = "Start date is required";
+    if (!formData.endDate) newErrors.endDate = "End date is required";
+    if (
+      formData.startDate &&
+      formData.endDate &&
+      new Date(formData.endDate) <= new Date(formData.startDate)
+    ) {
+      newErrors.endDate = "End date must be after start date";
     }
     return newErrors;
   };
@@ -54,35 +60,35 @@ const AgreementForm = ({ agreement, onSubmit, onCancel }) => {
     }
 
     const newErrors = validate();
-    if (Object.keys(newErrors).length > 0) {
+    if (Object.keys(newErrors).length) {
       setErrors(newErrors);
       return;
     }
 
     if (!uploadedFile) {
-      setErrors(prev => ({
-        ...prev,
-        document: "Agreement document is required"
-      }));
+      setErrors({ document: "Agreement document is required" });
       return;
     }
 
     try {
-      const formDataPayload = new FormData();
+      const payload = new FormData();
 
-      formDataPayload.append("administrator_id", adminId);
-      formDataPayload.append("agreement_file", uploadedFile);
-      formDataPayload.append("seta_name", formData.setaName);
-      formDataPayload.append("faculties", JSON.stringify(formData.faculties));
-      formDataPayload.append("start_period", formData.startDate);
-      formDataPayload.append("end_period", formData.endDate);
-      formDataPayload.append("reference_number", formData.agreementRef);
-      formDataPayload.append("status", formData.status);
+      payload.append("administrator_id", adminId);
+      payload.append("agreement_file", uploadedFile);
+      payload.append("seta_name", formData.setaName);
+
+      // 🔥 FIX #1 — BACKEND EXPECTS "faculty", NOT "faculties"
+      payload.append("faculty", formData.faculties.join(","));
+
+      payload.append("start_period", formData.startDate);
+      payload.append("end_period", formData.endDate);
+      payload.append("reference_number", formData.agreementRef);
+      payload.append("status", formData.status);
 
       await axios.post(
         "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/agreements",
-        formDataPayload,
-        { withCredentials: true }
+        payload
+        // 🔥 FIX #2 — removed withCredentials
       );
 
       onSubmit?.();
@@ -93,56 +99,49 @@ const AgreementForm = ({ agreement, onSubmit, onCancel }) => {
   };
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   };
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      if (file.type !== 'application/pdf') {
-        alert('Please upload a PDF file');
-        return;
-      }
+    if (!file) return;
 
-      if (file.size > 10 * 1024 * 1024) {
-        alert('File size must be less than 10MB');
-        return;
-      }
-
-      setUploadedFile(file);
-      setUploadPreview(file.name);
-      handleChange('documentName', file.name);
-      
-//server
-      const fileUrl = URL.createObjectURL(file);
-      handleChange('documentUrl', fileUrl);
+    if (file.type !== "application/pdf") {
+      alert("Please upload a PDF file");
+      return;
     }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert("File size must be less than 10MB");
+      return;
+    }
+
+    setUploadedFile(file);
+    setUploadPreview(file.name);
+    handleChange("documentName", file.name);
   };
 
   const handleRemoveFile = () => {
     setUploadedFile(null);
     setUploadPreview(null);
-    handleChange('documentName', '');
-    handleChange('documentUrl', '');
+    handleChange("documentName", "");
+    handleChange("documentUrl", "");
 
-    const fileInput = document.getElementById('pdf-upload');
-    if (fileInput) fileInput.value = '';
+    const fileInput = document.getElementById("pdf-upload");
+    if (fileInput) fileInput.value = "";
   };
 
   const handleToggleFaculty = (faculty) => {
-    const currentFaculties = formData.faculties || [];
-    let newFaculties;
-    
-    if (currentFaculties.includes(faculty)) {
-      newFaculties = currentFaculties.filter(f => f !== faculty);
-    } else {
-      newFaculties = [...currentFaculties, faculty];
-    }
-    
-    handleChange('faculties', newFaculties);
+    const exists = formData.faculties.includes(faculty);
+    handleChange(
+      "faculties",
+      exists
+        ? formData.faculties.filter((f) => f !== faculty)
+        : [...formData.faculties, faculty]
+    );
   };
 
   return (
