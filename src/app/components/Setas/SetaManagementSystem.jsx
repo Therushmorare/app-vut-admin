@@ -210,7 +210,7 @@ export default function SETAManagementSystem() {
 
   const handleUpdateAgreement = (data) => {
     setAgreements(agreements.map(a => 
-      a.id === selectedItem.id ? { ...a, ...data } : a
+      a.agreement_id === selectedItem.agreement_id ? { ...a, ...data } : a
     ));
     closeModal();
     showToast('Agreement updated successfully!');
@@ -484,20 +484,23 @@ export default function SETAManagementSystem() {
 
               <select
                 className="w-full px-4 py-2 border rounded-lg"
-                style={{ borderColor: COLORS.border }}
                 onChange={(e) => {
                   const agreement = agreements.find(
-                    a => a.id === Number(e.target.value)
+                    a => a.agreement_id === e.target.value
                   );
                   console.log('SELECTED AGREEMENT:', agreement);
                   setSelectedItem(agreement);
                 }}
               >
-                <option value="">Choose an agreement with a profile...</option>
+                <option value="">Choose an agreement...</option>
+
                 {agreements
                   .filter(a => a.status === "Active")
                   .map(a => (
-                    <option key={a.id} value={a.id}>
+                    <option
+                      key={a.agreement_id}
+                      value={a.agreement_id}
+                    >
                       {a.name} - {a.reference_number}
                     </option>
                   ))}
@@ -506,7 +509,7 @@ export default function SETAManagementSystem() {
 
             {selectedItem && (
               <FundingWindowForm
-                agreementId={selectedItem.id}
+                agreementId={selectedItem.agreement_id}
                 onSubmit={handleCreateWindow}
                 onCancel={closeModal}
               />
