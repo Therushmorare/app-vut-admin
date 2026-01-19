@@ -49,9 +49,9 @@ export default function AgreementsTable({ agreements, onView, onEdit, onDelete, 
                   </td>
                   <td className="px-6 py-4 text-gray-600">{agreement.faculty}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    <div>{agreement.start_date}</div>
-                    <div className="text-xs">to {agreement.end_date}</div>
-                    {checkExpiringSoon(agreement.end_date) && (
+                    <div>{agreement.start_period}</div>
+                    <div className="text-xs">to {agreement.end_period}</div>
+                    {checkExpiringSoon(agreement.end_period) && (
                       <div className="flex items-center gap-1 mt-1 text-orange-600">
                         <AlertCircle className="w-3 h-3" />
                         <span className="text-xs">Expiring soon</span>
