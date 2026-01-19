@@ -38,6 +38,12 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
     const handleSubmit = async (e) => {
       e.preventDefault();
 
+      const adminId = sessionStorage.getItem("admin_id");
+      if (!adminId) {
+        alert("Admin session expired. Please log in again.");
+        return;
+      }
+
       const newErrors = validate();
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
@@ -46,6 +52,7 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
 
       try {
         const payload = {
+          administrator_id: adminId,
           agreement_id: formData.agreementId,
           description: formData.description,
           financial_year: formData.financialYear,
