@@ -356,17 +356,18 @@ export default function SETAManagementSystem() {
       );
     }
     
-      if (activeTab === 'funding') {
+    if (activeTab === 'funding') {
       return (
         <button
           onClick={() => {
-            if (validProfiles.length === 0) {
-              showToast('Create a SETA profile for an active agreement first', 'error');
+            const eligible = agreements.some(a => a.status === 'Active');
+            if (!eligible) {
+              showToast('Create an active agreement first', 'error');
               return;
             }
             openModal('createWindow');
           }}
-          className="flex items-center gap-2 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 transition-opacity shadow-md"
+          className="flex items-center gap-2 px-6 py-3 rounded-lg text-white font-medium"
           style={{ backgroundColor: COLORS.success }}
         >
           <Plus className="w-5 h-5" />
