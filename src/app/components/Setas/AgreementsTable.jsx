@@ -40,18 +40,18 @@ export default function AgreementsTable({ agreements, onView, onEdit, onDelete, 
                     <div className="flex items-center gap-2">
                       <FileText className="w-4 h-4" style={{ color: COLORS.text }} />
                       <span className="font-medium" style={{ color: COLORS.primary }}>
-                        {agreement.agreementRef}
+                        {agreement.reference_number}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 font-medium" style={{ color: COLORS.primary }}>
-                    {agreement.setaName}
+                    {agreement.name}
                   </td>
                   <td className="px-6 py-4 text-gray-600">{agreement.faculty}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    <div>{agreement.startDate}</div>
-                    <div className="text-xs">to {agreement.endDate}</div>
-                    {checkExpiringSoon(agreement.endDate) && (
+                    <div>{agreement.start_date}</div>
+                    <div className="text-xs">to {agreement.end_date}</div>
+                    {checkExpiringSoon(agreement.end_date) && (
                       <div className="flex items-center gap-1 mt-1 text-orange-600">
                         <AlertCircle className="w-3 h-3" />
                         <span className="text-xs">Expiring soon</span>
