@@ -16,6 +16,8 @@ export default function ProgrammesSection({
 }) {
   return (
     <div className="border-t pt-6" style={{ borderColor: COLORS.border }}>
+      
+      {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold" style={{ color: COLORS.primary }}>
           Programme Details
@@ -30,24 +32,22 @@ export default function ProgrammesSection({
         </button>
       </div>
 
-      {programmes.map((programme, index) => {
-        const progIndex = programmes.findIndex(p => p.id === programme.id);
-        return (
-          <ProgrammeItem
-            key={programme.id}
-            programme={programme}
-            index={index}
-            progIndex={progIndex}
-            errors={errors}
-            canRemove={programmes.length > 1}
-            onChange={(field, value) => onProgrammeChange(programme.id, field, value)}
-            onRemove={() => onRemoveProgramme(programme.id)}
-            onFileChange={(file) => onFileChange(programme.id, file)}
-            onRemoveFile={() => onRemoveFile(programme.id)}
-          />
-        );
-      })}
+      {/* Programme Items */}
+      {programmes.map((programme, index) => (
+        <ProgrammeItem
+          key={programme.id}
+          programme={programme}
+          index={index}
+          errors={errors}
+          canRemove={programmes.length > 1}
+          onChange={(field, value) => onProgrammeChange(programme.id, field, value)}
+          onRemove={() => onRemoveProgramme(programme.id)}
+          onFileChange={(file) => onFileChange(programme.id, file)}
+          onRemoveFile={() => onRemoveFile(programme.id)}
+        />
+      ))}
 
+      {/* Budget Summary */}
       {programmes.length > 0 && (
         <BudgetSummary
           totalProgrammeBudget={getTotalBudget()}
