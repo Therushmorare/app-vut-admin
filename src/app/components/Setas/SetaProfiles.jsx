@@ -300,7 +300,7 @@ export default function ProfilesGrid({ profiles, agreements, onEdit, onDelete })
                   {agreement && (
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <FileText className="w-4 h-4" />
-                      <span>{agreement.setaName} - {agreement.agreementRef}</span>
+                      <span>{agreement.name} - {agreement.reference_number}</span>
                     </div>
                   )}
                 </div>

@@ -2,7 +2,11 @@
 
 import React, { useState } from 'react';
 import { COLORS } from '../../utils/helpers';
+import axios from "axios";
 
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "https://seta-management-api-fvzc9.ondigitalocean.app";
 
 const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -31,15 +35,44 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newErrors = validate();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-    onSubmit(formData);
-  };
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+
+      const newErrors = validate();
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
+      }
+
+      try {
+        const payload = {
+          agreement_id: formData.agreementId,
+          description: formData.description,
+          financial_year: formData.financialYear,
+          seta_phone: formData.contactPhone,
+          seta_email: formData.contactEmail,
+          program_type: formData.programTypes.join(", "),
+          comments: formData.notes
+        };
+
+        const res = await axios.post(
+          `${API_BASE}/api/administrators/seta-profiles`,
+          payload,
+          { withCredentials: true }
+        );
+
+        console.log("SETA profile created:", res.data);
+
+        // optional: close modal / refresh list
+        onSubmit?.(res.data);
+
+      } catch (err) {
+        console.error(
+          "Failed to create SETA profile:",
+          err.response?.data || err
+        );
+      }
+    };
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));

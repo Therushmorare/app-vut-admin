@@ -108,12 +108,12 @@ export default function SETAManagementSystem() {
       
       const search = searchTerm.toLowerCase();
       const matchesSearch = !searchTerm || 
-        agreement.setaName?.toLowerCase().includes(search) ||
-        agreement.agreementRef?.toLowerCase().includes(search) ||
+        agreement.name?.toLowerCase().includes(search) ||
+        agreement.reference_number?.toLowerCase().includes(search) ||
         agreement.faculty?.toLowerCase().includes(search) ||
         agreement.status?.toLowerCase().includes(search) ||
-        agreement.startDate?.toLowerCase().includes(search) ||
-        agreement.endDate?.toLowerCase().includes(search);
+        agreement.start_period?.toLowerCase().includes(search) ||
+        agreement.end_period?.toLowerCase().includes(search);
       
       const matchesStatus = !filterStatus || agreement.status === filterStatus;
       const matchesFaculty = !filterFaculty || agreement.faculty === filterFaculty;
