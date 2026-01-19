@@ -425,7 +425,7 @@ export default function SETAManagementSystem() {
               <div className="rounded-lg p-4 mb-4" style={{ backgroundColor: COLORS.bgLight }}>
                 <p className="text-sm text-gray-600">Creating profile for:</p>
                 <p className="font-semibold" style={{ color: COLORS.primary }}>
-                  {selectedItem.setaName} - {selectedItem.agreementRef}
+                  {selectedItem.name} - {selectedItem.reference_number}
                 </p>
               </div>
             ) : (
@@ -440,7 +440,7 @@ export default function SETAManagementSystem() {
                 >
                   <option value="">Choose an active agreement...</option>
                   {agreements.filter(a => a.status === 'Active' && !a.hasProfile).map(a => (
-                    <option key={a.id} value={a.id}>{a.setaName} - {a.agreementRef}</option>
+                    <option key={a.id} value={a.id}>{a.name} - {a.reference_number}</option>
                   ))}
                 </select>
               </div>
@@ -450,7 +450,7 @@ export default function SETAManagementSystem() {
         );
       
       case 'editProfile':
-        return <ProfileForm profile={selectedItem} agreementId={selectedItem.agreementId} onSubmit={handleUpdateProfile} onCancel={closeModal} />;
+        return <ProfileForm profile={selectedItem} agreementId={selectedItem.agreement_id} onSubmit={handleUpdateProfile} onCancel={closeModal} />;
       
       case 'createWindow':
         return (
