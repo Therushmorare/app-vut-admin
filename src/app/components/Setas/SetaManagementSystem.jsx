@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useMemo, useEffect } from 'react';
+import axios from "axios";
 import { Upload, Plus } from 'lucide-react';
 import { COLORS, generateId, checkExpiringSoon } from '../../utils/helpers';
 import StatsCards from './StatsCards';
@@ -43,9 +44,13 @@ const useLocalStorage = (key, initialValue) => {
   return [value, setStoredValue];
 };
 
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "https://seta-management-api-fvzc9.ondigitalocean.app";
+
 export default function SETAManagementSystem() {
   
-  const [agreements, setAgreements] = useLocalStorage('seta-agreements', []);
+  const [agreements, setAgreements] = useState([]);
   const [profiles, setProfiles] = useLocalStorage('seta-profiles', []);
   const [fundingWindows, setFundingWindows] = useLocalStorage('seta-windows', []);
   const [allocatedLearners, setAllocatedLearners] = useLocalStorage('allocated-learners', []);
@@ -65,10 +70,29 @@ export default function SETAManagementSystem() {
   useEffect(() => {
     const handleGlobalSearch = (event) => setSearchTerm(event.detail);
     window.addEventListener('globalSearchChange', handleGlobalSearch);
+
     if (window.globalSearchTerm !== undefined) {
       setSearchTerm(window.globalSearchTerm);
     }
-    return () => window.removeEventListener('globalSearchChange', handleGlobalSearch);
+
+    const fetchAgreements = async () => {
+      try {
+        const res = await axios.get(
+          `${API_BASE}/api/administrators/setaAgreements`,
+          { withCredentials: true }
+        );
+
+        setAgreements(res.data);
+      } catch (err) {
+        console.error("Failed to load SETA agreements:", err);
+      }
+    };
+
+    fetchAgreements();
+
+    return () => {
+      window.removeEventListener('globalSearchChange', handleGlobalSearch);
+    };
   }, []);
 
   const stats = useMemo(() => ({
