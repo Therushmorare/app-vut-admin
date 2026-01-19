@@ -233,7 +233,7 @@ export default function SETAManagementSystem() {
     };
     setProfiles([...profiles, newProfile]);
     setAgreements(agreements.map(a =>
-      a.id === data.agreementId ? { ...a, hasProfile: true } : a
+      a.id === data.agreement_id ? { ...a, hasProfile: true } : a
     ));
     closeModal();
     showToast('Profile created successfully!');
@@ -255,7 +255,7 @@ export default function SETAManagementSystem() {
         setProfiles(profiles.filter(p => p.id !== profile.id));
         setFundingWindows(fundingWindows.filter(w => w.agreementId !== profile.agreementId));
         setAgreements(agreements.map(a =>
-          a.id === profile.agreementId ? { ...a, hasProfile: false } : a
+          a.id === profile.agreement_id ? { ...a, hasProfile: false } : a
         ));
         setConfirmDialog(null);
         showToast('Profile deleted successfully!');
