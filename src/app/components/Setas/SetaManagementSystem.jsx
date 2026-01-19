@@ -175,6 +175,12 @@ export default function SETAManagementSystem() {
     });
   }, [fundingWindows, searchTerm, agreements, allocatedLearners]);
 
+  const validProfiles = profiles.filter(p =>
+    agreements.some(a =>
+      a.agreement_id === p.agreement_id &&
+      a.status === 'Active'
+    )
+  );
 
   const showToast = (message, type = 'success') => setToast({ message, type });
   
@@ -354,8 +360,8 @@ export default function SETAManagementSystem() {
       return (
         <button
           onClick={() => {
-            if (profiles.length === 0) {
-              showToast('Create a SETA profile first', 'error');
+            if (validProfiles.length === 0) {
+              showToast('Create a SETA profile for an active agreement first', 'error');
               return;
             }
             openModal('createWindow');
@@ -368,7 +374,6 @@ export default function SETAManagementSystem() {
         </button>
       );
     }
-  };
 
   const getModalTitle = () => {
     const titles = {
@@ -480,7 +485,7 @@ export default function SETAManagementSystem() {
                 onChange={(e) => setSelectedItem(agreements.find(a => a.id === e.target.value))}
               >
                 <option value="">Choose an agreement with a profile...</option>
-                {agreements.filter(a => a.hasProfile).map(a => (
+                {agreements.filter(a => a.status==="Active").map(a => (
                   <option key={a.id} value={a.id}>{a.name} - {a.reference_number}</option>
                 ))}
               </select>
