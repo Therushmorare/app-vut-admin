@@ -445,7 +445,7 @@ export default function SETAManagementSystem() {
                 </select>
               </div>
             )}
-            {selectedItem && <ProfileForm agreementId={selectedItem.id} onSubmit={handleCreateProfile} onCancel={closeModal} />}
+            {selectedItem && <ProfileForm agreementId={selectedItem.agreement_id} onSubmit={handleCreateProfile} onCancel={closeModal} />}
           </div>
         );
       
