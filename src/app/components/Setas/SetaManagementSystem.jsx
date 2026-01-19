@@ -82,7 +82,7 @@ export default function SETAManagementSystem() {
           { withCredentials: true }
         );
 
-        setAgreements(res.data.setas);
+        setAgreements(res.data);
       } catch (err) {
         console.error("Failed to load SETA agreements:", err);
       }
@@ -97,7 +97,7 @@ export default function SETAManagementSystem() {
           { withCredentials: true}
         );
 
-        setProfiles(res.data);
+        setProfiles(res.data?.setas ?? []);
       } catch (err) {
         console.error("Failed to load SETA Profiles:", err);
       }
