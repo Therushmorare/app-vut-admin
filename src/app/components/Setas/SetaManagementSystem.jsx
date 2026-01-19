@@ -82,7 +82,7 @@ export default function SETAManagementSystem() {
           { withCredentials: true }
         );
 
-        setAgreements(res.data);
+        setAgreements(res.data.setas);
       } catch (err) {
         console.error("Failed to load SETA agreements:", err);
       }
