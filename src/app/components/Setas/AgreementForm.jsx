@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Upload, X } from 'lucide-react';
 import { COLORS, formatDate } from '../../utils/helpers';
+import axios from "axios";
 
 const AgreementForm = ({ agreement, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -43,20 +44,52 @@ const AgreementForm = ({ agreement, onSubmit, onCancel }) => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const adminId = sessionStorage.getItem("admin_id");
+    if (!adminId) {
+      alert("Admin session expired. Please log in again.");
+      return;
+    }
+
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-    
-    const submissionData = {
-      ...formData,
-      uploadedFile: uploadedFile
-    };
-    
-    onSubmit(submissionData);
+
+    if (!uploadedFile) {
+      setErrors(prev => ({
+        ...prev,
+        document: "Agreement document is required"
+      }));
+      return;
+    }
+
+    try {
+      const formDataPayload = new FormData();
+
+      formDataPayload.append("administrator_id", adminId);
+      formDataPayload.append("agreement_file", uploadedFile);
+      formDataPayload.append("seta_name", formData.setaName);
+      formDataPayload.append("faculties", JSON.stringify(formData.faculties));
+      formDataPayload.append("start_period", formData.startDate);
+      formDataPayload.append("end_period", formData.endDate);
+      formDataPayload.append("reference_number", formData.agreementRef);
+      formDataPayload.append("status", formData.status);
+
+      await axios.post(
+        "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/agreements",
+        formDataPayload,
+        { withCredentials: true }
+      );
+
+      onSubmit?.();
+    } catch (err) {
+      console.error("Agreement upload failed:", err);
+      alert(err.response?.data?.message || "Failed to create agreement");
+    }
   };
 
   const handleChange = (field, value) => {
