@@ -284,7 +284,7 @@ export default function ProfilesGrid({ profiles, agreements, onEdit, onDelete })
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {profiles.map(profile => {
-        const agreement = agreements.find(a => a.id === profile.agreementId);
+        const agreement = agreements.find(a => a.agreement_id === profile.agreement_id);
         const isExpanded = expandedProfile === profile.id;
         const documents = profile.documents || [];
         const logs = getDocumentLogs(profile.id);
