@@ -504,7 +504,7 @@ export default function SETAManagementSystem() {
 
             {selectedItem && (
               <FundingWindowForm
-                agreementId={selectedItem.id}
+                agreementId={selectedItem.agreement_id}
                 onSubmit={handleCreateWindow}
                 onCancel={closeModal}
               />
