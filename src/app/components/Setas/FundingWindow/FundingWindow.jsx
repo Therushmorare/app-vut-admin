@@ -42,8 +42,14 @@ const FundingWindowForm = ({ window, agreementId, onSubmit, onCancel }) => {
       <FormActions
         isEditMode={!!window}
         onCancel={onCancel}
-        onSubmit={() => handleSubmit(onSubmit)}
+        onSubmit={() =>
+          handleSubmit((result) => {
+            if (result.success) alert("Funding window created successfully!");
+            else alert(`Error: ${result.error}`);
+          })
+        }
       />
+      
     </div>
   );
 };
