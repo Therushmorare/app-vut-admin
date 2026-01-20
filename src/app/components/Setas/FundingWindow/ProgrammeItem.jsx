@@ -56,6 +56,21 @@ export default function ProgrammeItem({
 
         <div>
           <label className="block text-sm font-medium mb-2" style={{ color: COLORS.primary }}>
+            Required Number Of Students
+          </label>
+          <input
+            type="number"
+            value={programme.requiredNumStudents}
+            onChange={(e) => onChange('requiredNumStudents', e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white"
+            style={{ borderColor: COLORS.border }}
+            min="1"
+            placeholder="1"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2" style={{ color: COLORS.primary }}>
             Duration (months)
           </label>
           <input
