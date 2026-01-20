@@ -151,41 +151,47 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
       const fundingWindowId = fwData.funding_window_id;
 
       // 2️⃣ CREATE PROGRAMMES
-      for (const prog of formData.programmes) {
-        const documentsArr =
-          typeof prog.requiredDocs === "string"
-            ? prog.requiredDocs.split("\n").map(d => d.trim()).filter(Boolean)
-            : prog.requiredDocs || [];
+    for (const prog of formData.programmes) {
+      const documentsArr =
+        typeof prog.requiredDocs === "string"
+          ? prog.requiredDocs.split("\n").map(d => d.trim()).filter(Boolean)
+          : prog.requiredDocs || [];
 
-        const payload = {
-          administrator_id: adminId,
-          agreement_id: String(formData.agreementId),
-          funding_window_id: fundingWindowId,
-          programme_name: prog.programmeName.trim(),
-          duration: prog.programmeDuration,
-          required_num_students: Number(prog.requiredNumStudents || 0),
-          programme_budget: Number(prog.budgetAllocation || 0),
-          documents_arr: documentsArr,
-          time_sheet_template: prog.timesheetTemplate,
-          notes: prog.notes?.trim() || ""
-        };
+      // Create FormData
+      const payload = new FormData();
+      payload.append("administrator_id", adminId);
+      payload.append("agreement_id", String(formData.agreementId));
+      payload.append("funding_window_id", fundingWindowId);
+      payload.append("programme_name", prog.programmeName.trim());
+      payload.append("duration", prog.programmeDuration ? `${prog.programmeDuration} months` : "0 months");
+      payload.append("required_num_students", Number(prog.requiredNumStudents || 0));
+      payload.append("programme_budget", Number(prog.budgetAllocation || 0));
+      payload.append("notes", prog.notes?.trim() || "");
 
-        const progRes = await fetch(
-          "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/programmes",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(payload)
-          }
-        );
+      // Append documents array
+      documentsArr.forEach(doc => payload.append("documents_arr", doc));
 
-        const progData = await progRes.json();
-        if (!progRes.ok) {
-          console.error("Programme payload failed:", payload, progData);
-          throw new Error(progData.message || `Failed to create programme: ${prog.programmeName}`);
-        }
+      // Append timesheet file if exists
+      if (prog.timesheetTemplate) {
+        payload.append("time_sheet_template", prog.timesheetTemplate);
       }
+
+      // Make request
+      const progRes = await fetch(
+        "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/programmes",
+        {
+          method: "POST",
+          body: payload,
+          credentials: "include",
+        }
+      );
+
+      const progData = await progRes.json();
+      if (!progRes.ok) {
+        console.error("Programme payload failed:", payload, progData);
+        throw new Error(progData.message || `Failed to create programme: ${prog.programmeName}`);
+      }
+    }
 
       setSubmitSuccess(true);
     } catch (err) {
