@@ -27,45 +27,41 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  // Keep agreementId in sync if parent changes it
   useEffect(() => {
-    if (agreementId) setFormData(prev => ({ ...prev, agreementId }));
+    if (agreementId) {
+      setFormData(prev => ({ ...prev, agreementId }));
+    }
   }, [agreementId]);
 
   /* ---------- VALIDATION ---------- */
   const validate = () => {
-    const newErrors = {};
+    const errs = {};
 
-    if (!formData.windowName) newErrors.windowName = 'Window name is required';
-    if (!formData.startDate) newErrors.startDate = 'Start date is required';
-    if (!formData.endDate) newErrors.endDate = 'End date is required';
-    if (!formData.numLearners || formData.numLearners <= 0)
-      newErrors.numLearners = 'Valid number required';
-    if (!formData.slotsAvailable || formData.slotsAvailable <= 0)
-      newErrors.slotsAvailable = 'Valid slots required';
-    if (!formData.budgetAllocation || formData.budgetAllocation <= 0)
-      newErrors.budgetAllocation = 'Valid budget required';
+    if (!formData.windowName) errs.windowName = 'Window name is required';
+    if (!formData.startDate) errs.startDate = 'Start date is required';
+    if (!formData.endDate) errs.endDate = 'End date is required';
+    if (+formData.numLearners <= 0) errs.numLearners = 'Invalid learners';
+    if (+formData.slotsAvailable <= 0) errs.slotsAvailable = 'Invalid slots';
+    if (+formData.budgetAllocation <= 0) errs.budgetAllocation = 'Invalid budget';
 
     formData.programmes.forEach((p, i) => {
-      if (!p.programmeName) newErrors[`programme_${i}_name`] = 'Programme name required';
-      if (!p.budgetAllocation || p.budgetAllocation <= 0)
-        newErrors[`programme_${i}_budget`] = 'Valid budget required';
+      if (!p.programmeName) errs[`programme_${i}_name`] = 'Programme name required';
+      if (+p.budgetAllocation <= 0) errs[`programme_${i}_budget`] = 'Invalid budget';
     });
 
-    return newErrors;
+    return errs;
   };
 
   /* ---------- HANDLERS ---------- */
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    if (errors[field]) setErrors(prev => ({ ...prev, [field]: undefined }));
   };
 
-  const handleProgrammeChange = (programmeId, field, value) => {
+  const handleProgrammeChange = (id, field, value) => {
     setFormData(prev => ({
       ...prev,
       programmes: prev.programmes.map(p =>
-        p.id === programmeId ? { ...p, [field]: value } : p
+        p.id === id ? { ...p, [field]: value } : p
       )
     }));
   };
@@ -86,116 +82,120 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
     }));
   };
 
-  const removeProgramme = (programmeId) => {
+  const removeProgramme = id => {
     if (formData.programmes.length === 1) return;
     setFormData(prev => ({
       ...prev,
-      programmes: prev.programmes.filter(p => p.id !== programmeId)
+      programmes: prev.programmes.filter(p => p.id !== id)
     }));
   };
 
-  const getTotalProgrammeBudget = () =>
-    formData.programmes.reduce((sum, p) => sum + (+p.budgetAllocation || 0), 0);
-
-  /* ---------- API SUBMIT ---------- */
+  /* ---------- SUBMIT ---------- */
   const handleSubmit = async () => {
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length) {
-      setErrors(validationErrors);
+    const errs = validate();
+    if (Object.keys(errs).length) {
+      setErrors(errs);
       return;
     }
 
     setIsSubmitting(true);
     setSubmitError(null);
-    setSubmitSuccess(false);
 
     const adminId = sessionStorage.getItem("admin_id");
     if (!adminId) {
-      setSubmitError("Admin session expired. Please log in again.");
+      setSubmitError("Session expired");
       setIsSubmitting(false);
       return;
     }
 
     try {
-      // 1️⃣ CREATE FUNDING WINDOW
-      const payload = {
+      /* ---------- CREATE FUNDING WINDOW ---------- */
+      const fwPayload = {
         administrator_id: adminId,
         agreement_id: String(formData.agreementId),
         funding_window_name: formData.windowName,
         start_date: formData.startDate,
         end_date: formData.endDate,
-        num_of_learners: Number(formData.numLearners),
+        num_of_learners: +formData.numLearners,
         financial_year: formData.financialYear,
-        slots_available: Number(formData.slotsAvailable),
-        budget_allocation: Number(formData.budgetAllocation)
+        slots_available: +formData.slotsAvailable,
+        budget_allocation: +formData.budgetAllocation
       };
 
-      console.log("Funding window payload:", payload);
-
       const fwRes = await fetch(
-        `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/funding-windows`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(payload)
-        }
-      );
-
-      const fwData = await fwRes.json();
-
-      if (!fwRes.ok) {
-        throw new Error(fwData.message || "Failed to create funding window");
-      }
-
-      const fundingWindowId = fwData.funding_window_id;
-
-      // 2️⃣ CREATE PROGRAMMES
-    for (const prog of formData.programmes) {
-      const documentsArr =
-        typeof prog.requiredDocs === "string"
-          ? prog.requiredDocs.split("\n").map(d => d.trim()).filter(Boolean)
-          : prog.requiredDocs || [];
-
-      // Create FormData
-      const payload = new FormData();
-      payload.append("administrator_id", adminId);
-      payload.append("agreement_id", String(formData.agreementId));
-      payload.append("funding_window_id", fundingWindowId);
-      payload.append("programme_name", prog.programmeName.trim());
-      payload.append("duration", prog.programmeDuration ? `${prog.programmeDuration} months` : "0 months");
-      payload.append("required_num_students", Number(prog.requiredNumStudents || 0));
-      payload.append("programme_budget", Number(prog.budgetAllocation || 0));
-      payload.append("notes", prog.notes?.trim() || "");
-
-      // Append documents array
-      documentsArr.forEach(doc => payload.append("documents_arr", doc));
-
-      // Append timesheet file if exists
-      if (prog.timesheetTemplate) {
-        payload.append("time_sheet_template", prog.timesheetTemplate);
-      }
-
-      // Make request
-      const progRes = await fetch(
-        "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/programmes",
+        "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/funding-windows",
         {
           method: "POST",
-          body: payload,
+          headers: { "Content-Type": "application/json" },
           credentials: "include",
+          body: JSON.stringify(fwPayload)
         }
       );
 
-      const progData = await progRes.json();
-      if (!progRes.ok) {
-        console.error("Programme payload failed:", payload, progData);
-        throw new Error(progData.message || `Failed to create programme: ${prog.programmeName}`);
+      let fwData;
+      try {
+        fwData = await fwRes.json();
+      } catch {
+        throw new Error("Funding window API did not return JSON");
       }
-    }
+
+      if (!fwRes.ok) {
+        throw new Error(fwData?.message || "Failed to create funding window");
+      }
+
+      const fundingWindowId =
+        fwData?.funding_window_id ||
+        fwData?.id ||
+        fwData?.funding_window?.id;
+
+      if (!fundingWindowId) {
+        throw new Error("Funding window ID missing from response");
+      }
+
+      /* ---------- CREATE PROGRAMMES ---------- */
+      for (const prog of formData.programmes) {
+        const fd = new FormData();
+
+        fd.append("administrator_id", adminId);
+        fd.append("agreement_id", String(formData.agreementId));
+        fd.append("funding_window_id", fundingWindowId);
+        fd.append("programme_name", prog.programmeName.trim());
+        fd.append("duration", prog.programmeDuration || "0 months");
+        fd.append("required_num_students", +prog.requiredNumStudents || 0);
+        fd.append("programme_budget", +prog.budgetAllocation || 0);
+        fd.append("notes", prog.notes || "");
+
+        (Array.isArray(prog.requiredDocs) ? prog.requiredDocs : [])
+          .forEach(doc => fd.append("documents_arr", doc));
+
+        if (prog.timesheetTemplate) {
+          fd.append("time_sheet_template", prog.timesheetTemplate);
+        }
+
+        const progRes = await fetch(
+          "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/programmes",
+          {
+            method: "POST",
+            credentials: "include",
+            body: fd
+          }
+        );
+
+        let progData;
+        try {
+          progData = await progRes.json();
+        } catch {
+          throw new Error(`Programme ${prog.programmeName} returned invalid JSON`);
+        }
+
+        if (!progRes.ok) {
+          throw new Error(progData?.message || `Failed to create programme`);
+        }
+      }
 
       setSubmitSuccess(true);
     } catch (err) {
-      console.error("Funding window submission failed:", err);
+      console.error(err);
       setSubmitError(err.message);
     } finally {
       setIsSubmitting(false);
@@ -212,7 +212,6 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
     handleProgrammeChange,
     addProgramme,
     removeProgramme,
-    getTotalProgrammeBudget,
     handleSubmit
   };
 }
