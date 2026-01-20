@@ -118,30 +118,36 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
 
     try {
       // 1️⃣ CREATE FUNDING WINDOW
+      const payload = {
+        administrator_id: adminId,
+        agreement_id: String(formData.agreementId),
+        funding_window_name: formData.windowName,
+        start_data: formData.startDate, // ✅ FIXED
+        end_date: formData.endDate,
+        num_of_learners: Number(formData.numLearners),
+        financial_year: formData.financialYear,
+        slots_available: Number(formData.slotsAvailable),
+        budget_allocation: Number(formData.budgetAllocation)
+      };
+
+      console.log("Funding window payload:", payload);
+
       const fwRes = await fetch(
         `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/funding-windows`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          credentials: 'include', // ensure cookies/session
-          body: JSON.stringify({
-            administrator_id: adminId,
-            agreement_id: String(formData.agreementId),
-            funding_window_name: formData.windowName,
-            start_data: formData.startDate,
-            end_date: formData.endDate,
-            num_of_learners: Number(formData.numLearners),
-            financial_year: formData.financialYear,
-            slots_available: Number(formData.slotsAvailable),
-            budget_allocation: Number(formData.budgetAllocation)
-          })
+          credentials: 'include',
+          body: JSON.stringify(payload)
         }
       );
 
       const fwData = await fwRes.json();
+
       if (!fwRes.ok) {
         throw new Error(fwData.message || "Failed to create funding window");
       }
+
       const fundingWindowId = fwData.id;
 
       // 2️⃣ CREATE PROGRAMMES
