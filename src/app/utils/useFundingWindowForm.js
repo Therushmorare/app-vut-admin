@@ -152,29 +152,50 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
 
       // 2️⃣ CREATE PROGRAMMES
       for (const prog of formData.programmes) {
+        const documentsArr =
+          typeof prog.requiredDocs === "string"
+            ? prog.requiredDocs
+                .split("\n")
+                .map(d => d.trim())
+                .filter(Boolean)
+            : [];
+
+        const duration =
+          prog.programmeDuration
+            ? `${prog.programmeDuration}`
+            : "0";
+
+        const payload = {
+          administrator_id: String(adminId),
+          agreement_id: String(formData.agreementId),
+          funding_window_id: String(fundingWindowId),
+
+          programme_name: prog.programmeName.trim(),
+          duration: duration,
+
+          required_num_students: Number(prog.requiredNumStudents || 0),
+          programme_budget: Number(prog.budgetAllocation || 0),
+
+          documents_arr: documentsArr,
+          notes: prog.notes?.trim() || ""
+        };
+
+        console.log("Programme payload:", payload);
+
         const progRes = await fetch(
           `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/programmes`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({
-              administrator_id: adminId,
-              agreement_id: String(formData.agreementId),
-              funding_window_id: fundingWindowId,
-              programme_name: prog.programmeName,
-              duration: prog.programmeDuration,
-              required_num_students: Number(prog.requiredNumStudents || 0),
-              programme_budget: Number(prog.budgetAllocation),
-              documents_arr: prog.requiredDocs || [],
-              notes: prog.notes || ''
-            })
+            body: JSON.stringify(payload)
           }
         );
 
         const progData = await progRes.json();
         if (!progRes.ok) {
-          throw new Error(progData.message || `Failed to create programme: ${prog.programmeName}`);
+          console.error(progData);
+          throw new Error(progData.message || `Failed to create programme`);
         }
       }
 
