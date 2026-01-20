@@ -15,18 +15,18 @@ export default function FundingWindowsList({
   return (
     <div className="space-y-6">
       {windows.map(window => {
-        const agreement = agreements.find(a => a.id === window.agreementId);
-        const windowLearners = allocatedLearners.filter(l => l.fundingWindowId === window.id);
-        const remainingSlots = window.slotsAvailable - windowLearners.length;
-        const isExpanded = expandedWindows.includes(window.id);
+        const agreement = agreements.find(a => a.id === window.agreement_id);
+        const windowLearners = allocatedLearners.filter(l => l.fundingWindowId === window.funding_window_id);
+        const remainingSlots = window.slots_available - windowLearners.length;
+        const isExpanded = expandedWindows.includes(window.funding_window_id);
         
         return (
-          <div key={window.id} className="rounded-lg p-6 shadow-sm border" style={{ backgroundColor: COLORS.bgWhite, borderColor: COLORS.border }}>
+          <div key={window.funding_window_id} className="rounded-lg p-6 shadow-sm border" style={{ backgroundColor: COLORS.bgWhite, borderColor: COLORS.border }}>
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h3 className="text-lg font-bold mb-1" style={{ color: COLORS.primary }}>{window.windowName}</h3>
                 {agreement && (
-                  <p className="text-sm text-gray-600">{agreement.setaName} - {agreement.agreementRef}</p>
+                  <p className="text-sm text-gray-600">{agreement.name} - {agreement.reference_number}</p>
                 )}
               </div>
               <div className="flex gap-2">
@@ -59,12 +59,12 @@ export default function FundingWindowsList({
               <div>
                 <p className="text-xs text-gray-500 mb-1">Contract Period</p>
                 <p className="text-sm font-medium" style={{ color: COLORS.primary }}>
-                  {window.startDate} to {window.endDate}
+                  {window.start_data} to {window.end_date}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 mb-1">Total Slots</p>
-                <p className="text-xl font-bold" style={{ color: COLORS.primary }}>{window.slotsAvailable}</p>
+                <p className="text-xl font-bold" style={{ color: COLORS.primary }}>{window.slots_available}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 mb-1">Allocated</p>

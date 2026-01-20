@@ -52,7 +52,7 @@ export default function SETAManagementSystem() {
   
   const [agreements, setAgreements] = useState([]);
   const [profiles, setProfiles] = useState([]);
-  const [fundingWindows, setFundingWindows] = useLocalStorage('seta-windows', []);
+  const [fundingWindows, setFundingWindows] = useState([]);
   const [allocatedLearners, setAllocatedLearners] = useLocalStorage('allocated-learners', []);
   const [allStudents, setAllStudents] = useLocalStorage('all-students', []);
   
@@ -104,6 +104,21 @@ export default function SETAManagementSystem() {
     }
 
     fetchProfiles();
+
+    const fetchFundingWindows = async () => {
+      try{
+        const res = await axios.get(
+          `${API_BASE}/api/administrators/getFundingWindows/`,
+          { withCredentials: true}
+        );
+
+        setFundingWindows(res.data?.getFundingWindows ?? []);
+      } catch (err) {
+        console.error("Failed to load Funding Windows:", err);
+      }
+    }
+
+    fetchFundingWindows();
 
     return () => {
       window.removeEventListener('globalSearchChange', handleGlobalSearch);
@@ -157,15 +172,15 @@ export default function SETAManagementSystem() {
     if (!searchTerm) return fundingWindows;
     const search = searchTerm.toLowerCase();
     return fundingWindows.filter(window => {
-      const agreement = agreements.find(a => a.id === window.agreementId);
-      const windowLearners = allocatedLearners.filter(l => l.fundingWindowId === window.id);
+      const agreement = agreements.find(a => a.id === window.agreement_id);
+      const windowLearners = allocatedLearners.filter(l => l.fundingWindowId === window.funding_window_id);
       return (
-        window.windowName?.toLowerCase().includes(search) ||
+        window.name?.toLowerCase().includes(search) ||
         window.programmeName?.toLowerCase().includes(search) ||
-        window.startDate?.toLowerCase().includes(search) ||
-        window.endDate?.toLowerCase().includes(search) ||
-        agreement?.setaName?.toLowerCase().includes(search) ||
-        agreement?.agreementRef?.toLowerCase().includes(search) ||
+        window.start_data?.toLowerCase().includes(search) ||
+        window.end_date?.toLowerCase().includes(search) ||
+        agreement?.name?.toLowerCase().includes(search) ||
+        agreement?.reference_number?.toLowerCase().includes(search) ||
         windowLearners.some(l => 
           l.firstName?.toLowerCase().includes(search) ||
           l.lastName?.toLowerCase().includes(search) ||
@@ -291,9 +306,9 @@ export default function SETAManagementSystem() {
   const handleDeleteWindow = (window) => {
     setConfirmDialog({
       title: 'Delete Funding Window',
-      message: `Are you sure you want to delete ${window.windowName}?`,
+      message: `Are you sure you want to delete ${window.name}?`,
       onConfirm: () => {
-        setFundingWindows(fundingWindows.filter(w => w.id !== window.id));
+        setFundingWindows(fundingWindows.filter(w => w.id !== window.funding_window_id));
         setConfirmDialog(null);
         showToast('Funding window deleted successfully!');
       },
