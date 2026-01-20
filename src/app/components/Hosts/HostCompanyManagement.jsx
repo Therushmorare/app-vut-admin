@@ -66,9 +66,9 @@ export default function HostCompanyManagement({ allStudents = [] }) {
       );
 
       if (res.status === 200 && res.data?.agreements) {
-        setAgreements(res.data.agreemens);
+        setAgreements(res.data.agreements);
 
-        // Optional: Save to localStorage for offline use
+        // Optional: Save to localStorage for line use
         if (typeof window !== 'undefined') {
           localStorage.setItem('seta-agreements', JSON.stringify(res.data.agreements));
         }
