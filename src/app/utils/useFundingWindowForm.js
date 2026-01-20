@@ -157,20 +157,16 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
             ? prog.requiredDocs.split("\n").map(d => d.trim()).filter(Boolean)
             : prog.requiredDocs || [];
 
-        const duration =
-          prog.programmeDuration
-            ? `${prog.programmeDuration} months` // <-- ensure backend-friendly string
-            : "0 months";
-
         const payload = {
           administrator_id: adminId,
           agreement_id: String(formData.agreementId),
           funding_window_id: fundingWindowId,
           programme_name: prog.programmeName.trim(),
-          duration: duration,
+          duration: Number(prog.programmeDuration) || 0, // <-- numeric now
           required_num_students: Number(prog.requiredNumStudents || 0),
           programme_budget: Number(prog.budgetAllocation || 0),
           documents_arr: documentsArr,
+          time_sheet_template: null, // or file object if you have one
           notes: prog.notes?.trim() || ""
         };
 
