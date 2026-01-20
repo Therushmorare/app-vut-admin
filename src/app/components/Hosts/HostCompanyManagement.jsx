@@ -61,22 +61,20 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   const fetchAgreements = async () => {
     try {
       const res = await axios.get(
-        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/setaAgreements', // replace with API_BASE if needed
+        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/setaAgreements',
         { withCredentials: true }
       );
 
-      if (res.status === 200 && res.data?.agreements) {
-        setAgreements(res.data.agreements);
+      if (res.status === 200 && Array.isArray(res.data)) {
+        setAgreements(res.data);
 
-        // Optional: Save to localStorage for line use
         if (typeof window !== 'undefined') {
-          localStorage.setItem('seta-agreements', JSON.stringify(res.data.agreements));
+          localStorage.setItem('seta-agreements', JSON.stringify(res.data));
         }
 
-        // Optionally show a success toast
-        setToast({ type: 'success', message: 'Seta agreements loaded successfully' });
+        setToast({ type: 'success', message: 'SETA agreements loaded successfully' });
       } else {
-        console.warn('Unexpected API response', res);
+        console.warn('Unexpected agreements response:', res.data);
       }
     } catch (err) {
       console.error('Failed to load SETA Agreements:', err);
