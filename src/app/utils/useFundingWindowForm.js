@@ -148,7 +148,7 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
         throw new Error(fwData.message || "Failed to create funding window");
       }
 
-      const fundingWindowId = fwData.id;
+      const fundingWindowId = fwData.funding_window_id;
 
       // 2️⃣ CREATE PROGRAMMES
       for (const prog of formData.programmes) {
