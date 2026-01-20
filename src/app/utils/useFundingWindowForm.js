@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export default function useFundingWindowForm(initialWindow, agreementId) {
   const [formData, setFormData] = useState({
@@ -82,16 +82,19 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
     }));
   };
 
+  // ✅ FIXED: no stale closure
   const removeProgramme = id => {
-    if (formData.programmes.length === 1) return;
-    setFormData(prev => ({
-      ...prev,
-      programmes: prev.programmes.filter(p => p.id !== id)
-    }));
+    setFormData(prev => {
+      if (prev.programmes.length === 1) return prev;
+      return {
+        ...prev,
+        programmes: prev.programmes.filter(p => p.id !== id)
+      };
+    });
   };
 
   /* ---------- SUBMIT ---------- */
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     const errs = validate();
     if (Object.keys(errs).length) {
       setErrors(errs);
@@ -109,7 +112,6 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
     }
 
     try {
-      /* ---------- CREATE FUNDING WINDOW ---------- */
       const fwPayload = {
         administrator_id: adminId,
         agreement_id: String(formData.agreementId),
@@ -132,13 +134,7 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
         }
       );
 
-      let fwData;
-      try {
-        fwData = await fwRes.json();
-      } catch {
-        throw new Error("Funding window API did not return JSON");
-      }
-
+      const fwData = await fwRes.json();
       if (!fwRes.ok) {
         throw new Error(fwData?.message || "Failed to create funding window");
       }
@@ -152,10 +148,8 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
         throw new Error("Funding window ID missing from response");
       }
 
-      /* ---------- CREATE PROGRAMMES ---------- */
       for (const prog of formData.programmes) {
         const fd = new FormData();
-
         fd.append("administrator_id", adminId);
         fd.append("agreement_id", String(formData.agreementId));
         fd.append("funding_window_id", fundingWindowId);
@@ -181,15 +175,9 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
           }
         );
 
-        let progData;
-        try {
-          progData = await progRes.json();
-        } catch {
-          throw new Error(`Programme ${prog.programmeName} returned invalid JSON`);
-        }
-
+        const progData = await progRes.json();
         if (!progRes.ok) {
-          throw new Error(progData?.message || `Failed to create programme`);
+          throw new Error(progData?.message || "Failed to create programme");
         }
       }
 
@@ -200,7 +188,7 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [formData]);
 
   return {
     formData,
