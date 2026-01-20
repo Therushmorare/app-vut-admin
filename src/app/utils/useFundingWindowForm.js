@@ -162,7 +162,7 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
           agreement_id: String(formData.agreementId),
           funding_window_id: fundingWindowId,
           programme_name: prog.programmeName.trim(),
-          duration: Number(prog.programmeDuration) || 0, // <-- numeric now
+          duration: prog.programmeDuration,
           required_num_students: Number(prog.requiredNumStudents || 0),
           programme_budget: Number(prog.budgetAllocation || 0),
           documents_arr: documentsArr,
