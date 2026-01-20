@@ -39,7 +39,7 @@ export default function PlacementTable({
         const search = searchTerm.toLowerCase();
         const learnerName = learner ? `${learner.firstName} ${learner.lastName}`.toLowerCase() : '';
         const studentId = learner?.studentId?.toLowerCase() || '';
-        const companyName = company?.companyName?.toLowerCase() || '';
+        const companyName = company?.company_name?.toLowerCase() || '';
         
         if (!learnerName.includes(search) && 
             !studentId.includes(search) && 
@@ -177,7 +177,7 @@ export default function PlacementTable({
             >
               <option value="">All Companies</option>
               {companies.map(company => (
-                <option key={company.id} value={company.id}>
+                <option key={company.company_id} value={company.company_id}>
                   {company.companyName}
                 </option>
               ))}

@@ -18,8 +18,8 @@ export default function HostCompanyForm({ company, agreements, onSubmit, onCance
   });
 
   const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false); // 🔥 ADDED
-  const [apiError, setApiError] = useState(''); // 🔥 ADDED
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiError, setApiError] = useState('');
 
   const industrySectors = [
     'Manufacturing',
@@ -143,8 +143,8 @@ export default function HostCompanyForm({ company, agreements, onSubmit, onCance
               {agreements
                 .filter(agreement => agreement.status === 'Active')
                 .map(agreement => (
-                  <option key={agreement.id} value={agreement.id}>
-                    {agreement.setaName} - {agreement.agreementRef}
+                  <option key={agreement.agreement_id} value={agreement.agreement_id}>
+                    {agreement.name} - {agreement.reference_number}
                   </option>
                 ))}
             </select>
