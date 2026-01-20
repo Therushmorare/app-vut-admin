@@ -166,7 +166,7 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
           required_num_students: Number(prog.requiredNumStudents || 0),
           programme_budget: Number(prog.budgetAllocation || 0),
           documents_arr: documentsArr,
-          time_sheet_template: null, // or file object if you have one
+          time_sheet_template: prog.timesheetTemplate,
           notes: prog.notes?.trim() || ""
         };
 
