@@ -106,17 +106,18 @@ export default function SETAManagementSystem() {
     fetchProfiles();
 
     const fetchFundingWindows = async () => {
-      try{
+      try {
         const res = await axios.get(
           `${API_BASE}/api/administrators/getFundingWindows/`,
-          { withCredentials: true}
+          { withCredentials: true }
         );
 
-        setFundingWindows(res.data?.getFundingWindows ?? []);
+        // res.data is already the array of funding windows
+        setFundingWindows(res.data ?? []);
       } catch (err) {
         console.error("Failed to load Funding Windows:", err);
       }
-    }
+    };
 
     fetchFundingWindows();
 
