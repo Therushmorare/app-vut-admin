@@ -128,7 +128,7 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
             administrator_id: adminId,
             agreement_id: String(formData.agreementId),
             funding_window_name: formData.windowName,
-            start_date: formData.startDate,
+            start_data: formData.startDate,
             end_date: formData.endDate,
             num_of_learners: Number(formData.numLearners),
             financial_year: formData.financialYear,
