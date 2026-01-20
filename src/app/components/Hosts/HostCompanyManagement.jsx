@@ -558,7 +558,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                           Current Placements ({companyPlacements.length})
                         </h4>
                         <span className="text-xs" style={{ color: COLORS.text }}>
-                          {expandedCompanies.includes(company.id) ? '▼ Hide' : '▶ View'}
+                          {expandedCompanies.includes(company.company_id) ? '▼ Hide' : '▶ View'}
                         </span>
                       </button>
                       
@@ -672,17 +672,17 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                       <div className="col-span-2">
                         <p className="text-sm text-gray-600 mb-1">SETA Agreement</p>
                         <p className="font-semibold" style={{ color: COLORS.primary }}>
-                          {agreements.find(a => a.id === selectedItem.agreementId)?.setaName || 'N/A'} - 
-                          {agreements.find(a => a.id === selectedItem.agreementId)?.agreementRef || 'N/A'}
+                          {agreements.find(a => a.id === selectedItem.agreement_id)?.name || 'N/A'} - 
+                          {agreements.find(a => a.id === selectedItem.agreement_id)?.reference_number || 'N/A'}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 mb-1">Company Name</p>
-                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.companyName}</p>
+                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.company_name}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 mb-1">Registration Number</p>
-                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.registrationNumber}</p>
+                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.registration_number}</p>
                       </div>
                       <div className="col-span-2">
                         <p className="text-sm text-gray-600 mb-1">Address</p>
@@ -690,23 +690,23 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 mb-1">Industry Sector</p>
-                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.industrySector}</p>
+                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.industryor}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 mb-1">Learner Capacity</p>
-                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.learnerCapacity}</p>
+                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.student_capacity}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 mb-1">Contact Person</p>
-                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.contactPerson}</p>
+                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.contact_person}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 mb-1">Email</p>
-                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.contactEmail}</p>
+                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.email}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 mb-1">Phone</p>
-                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.contactPhone}</p>
+                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.phone}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 mb-1">Confirmation Letter</p>
