@@ -119,7 +119,7 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
     }
 
     try {
-      // 1️⃣ CREATE FUNDING WINDOW
+      //CREATE FUNDING WINDOW
       const fwPayload = {
         administrator_id: adminId,
         agreement_id: String(formData.agreementId),
@@ -147,7 +147,7 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
 
       const fundingWindowId = fwData.funding_window_id;
 
-      // 2️⃣ CREATE PROGRAMMES
+      //CREATE PROGRAMMES
       for (const prog of formData.programmes) {
         const documentsArr =
           typeof prog.requiredDocs === "string"

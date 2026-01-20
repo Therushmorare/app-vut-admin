@@ -7,6 +7,7 @@ import LearnerPlacementForm from './LearnerPlacement';
 import Toast from '../ToastNotifications';
 import ConfirmDialog from '../ConfirmDialogue';
 import PlacementTable, { PlacementStats } from './Table';
+import axios from 'axios';
 
 export default function HostCompanyManagement({ allStudents = [] }) {
   const [companies, setCompanies] = useState([]);
@@ -27,7 +28,61 @@ export default function HostCompanyManagement({ allStudents = [] }) {
 //locl storage load and save
   useEffect(() => {
     loadData();
+    fetchCompanies();
+    fetchAgreements();
   }, []);
+
+    const fetchCompanies = async () => {
+    try {
+      const res = await axios.get(
+        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/host-companies', // replace with API_BASE if needed
+        { withCredentials: true }
+      );
+
+      if (res.status === 200 && res.data?.companies) {
+        setCompanies(res.data.companies);
+
+        // Optional: Save to localStorage for offline use
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('host-companies', JSON.stringify(res.data.companies));
+        }
+
+        // Optionally show a success toast
+        setToast({ type: 'success', message: 'Host companies loaded successfully' });
+      } else {
+        console.warn('Unexpected API response', res);
+      }
+    } catch (err) {
+      console.error('Failed to load host companies:', err);
+      setToast({ type: 'error', message: 'Failed to load host companies' });
+    }
+  };
+
+  const fetchAgreements = async () => {
+    try {
+      const res = await axios.get(
+        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/setaAgreements', // replace with API_BASE if needed
+        { withCredentials: true }
+      );
+
+      if (res.status === 200 && res.data?.agreements) {
+        setAgreements(res.data.agreemens);
+
+        // Optional: Save to localStorage for offline use
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('seta-agreements', JSON.stringify(res.data.agreements));
+        }
+
+        // Optionally show a success toast
+        setToast({ type: 'success', message: 'Seta agreements loaded successfully' });
+      } else {
+        console.warn('Unexpected API response', res);
+      }
+    } catch (err) {
+      console.error('Failed to load SETA Agreements:', err);
+      setToast({ type: 'error', message: 'Failed to load SETA Agreements' });
+    }
+  };
 
   const loadData = () => {
     try {
@@ -218,11 +273,11 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   const filteredCompanies = useMemo(() => {
     return companies.filter(company => {
       const matchesSearch = searchTerm === '' || 
-        company.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        company.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        company.contactPerson.toLowerCase().includes(searchTerm.toLowerCase());
+        company.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        company.registration_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        company.contact_person.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesSector = filterSector === '' || company.industrySector === filterSector;
+      const matchesSector = filterSector === '' || company.industry === filterSector;
       const matchesSETA = filterSETA === '' || company.agreementId === filterSETA;
       
       return matchesSearch && matchesSector && matchesSETA;
@@ -346,8 +401,8 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                   >
                     <option value="">All SETAs</option>
                     {agreements.filter(a => a.status === 'Active').map(agreement => (
-                      <option key={agreement.id} value={agreement.id}>
-                        {agreement.setaName}
+                      <option key={agreement.agreement_id} value={agreement.agreement_id}>
+                        {agreement.name}
                       </option>
                     ))}
                   </select>
@@ -414,17 +469,17 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                   const agreement = agreements.find(a => a.id === company.agreementId);
                   
                   return (
-                    <div key={company.id} className="rounded-lg p-6 shadow-sm border hover:shadow-md transition-shadow" style={{ backgroundColor: COLORS.bgWhite, borderColor: COLORS.border }}>
+                    <div key={company.company_id} className="rounded-lg p-6 shadow-sm border hover:shadow-md transition-shadow" style={{ backgroundColor: COLORS.bgWhite, borderColor: COLORS.border }}>
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
                           <h3 className="text-xl font-bold mb-1" style={{ color: COLORS.primary }}>
-                            {company.companyName}
+                            {company.company_name}
                           </h3>
-                          <p className="text-sm text-gray-600 mb-2">{company.registrationNumber}</p>
+                          <p className="text-sm text-gray-600 mb-2">{company.registration_number}</p>
                           <div className="flex flex-wrap gap-2 mb-2">
                             {agreement && (
                               <span className="inline-block px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: COLORS.primary, color: 'white' }}>
-                                {agreement.setaName}
+                                {agreement.name}
                               </span>
                             )}
                           </div>
@@ -460,7 +515,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                       <div className="space-y-3 mb-4">
                         <div className="flex items-center gap-2 text-sm">
                           <Briefcase className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-600">{company.industrySector}</span>
+                          <span className="text-gray-600">{company.industry}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <MapPin className="w-4 h-4 text-gray-400" />
@@ -468,11 +523,11 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <Users className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-600">{company.contactPerson}</span>
+                          <span className="text-gray-600">{company.contact_person}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <Mail className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-600">{company.contactEmail}</span>
+                          <span className="text-gray-600">{company.email}</span>
                         </div>
                       </div>
 
@@ -480,14 +535,14 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                         <div>
                           <p className="text-xs text-gray-600">Capacity / Active</p>
                           <p className="text-lg font-bold" style={{ color: COLORS.primary }}>
-                            {company.learnerCapacity} / {activePlacements}
+                            {company.student_capacity} / {activePlacements}
                           </p>
                         </div>
                         <button
                           onClick={() => openModal('createPlacement', company)}
                           className="px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90"
                           style={{ backgroundColor: COLORS.info, color: 'white' }}
-                          disabled={activePlacements >= parseInt(company.learnerCapacity)}
+                          disabled={activePlacements >= parseInt(company.student_capacity)}
                         >
                           Place Learner
                         </button>
@@ -496,7 +551,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                       {companyPlacements.length > 0 && (
                     <div className="mt-4 pt-4 border-t" style={{ borderColor: COLORS.border }}>
                       <button
-                        onClick={() => toggleCompanyExpanded(company.id)}
+                        onClick={() => toggleCompanyExpanded(company.company_id)}
                         className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
                       >
                         <h4 className="text-sm font-semibold" style={{ color: COLORS.primary }}>
@@ -507,7 +562,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                         </span>
                       </button>
                       
-                      {expandedCompanies.includes(company.id) && (
+                      {expandedCompanies.includes(company.company_id) && (
                         <div className="mt-2 space-y-2">
                           {companyPlacements.map(placement => {
                             const learner = allocatedLearners.find(l => l.id === placement.learnerId);
