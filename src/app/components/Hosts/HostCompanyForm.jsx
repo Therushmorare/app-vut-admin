@@ -66,7 +66,7 @@ export default function HostCompanyForm({ company, agreements, onSubmit, onCance
       setApiError("");
 
       const payload = {
-        administrator_id: Number(sessionStorage.getItem("admin_id")),
+        administrator_id: sessionStorage.getItem("admin_id"),
         agreement_id: formData.agreementId,
         company_name: formData.companyName.trim(),
         registration_number: formData.registrationNumber.trim(),
