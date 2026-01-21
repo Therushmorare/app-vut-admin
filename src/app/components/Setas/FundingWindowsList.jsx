@@ -81,7 +81,7 @@ export default function FundingWindowsList({
             {windowLearners.length > 0 && (
               <div className="border-t pt-4 mt-4" style={{ borderColor: COLORS.border }}>
                 <button
-                  onClick={() => onToggleExpand(window.id)}
+                  onClick={() => onToggleExpand(window.funding_window_id)}
                   className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <h4 className="text-sm font-semibold" style={{ color: COLORS.primary }}>
