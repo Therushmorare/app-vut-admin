@@ -179,7 +179,9 @@ export default function AdminManagement() {
   }
 
   return (
-    <div className="space-y-4">
+   <div className="min-h-screen bg-gray-50 p-8">
+    <div className="max-w-7xl mx-auto">
+
       {/* ADD ADMIN BUTTON */}
       <div className="flex justify-end">
         <button
@@ -238,20 +240,30 @@ export default function AdminManagement() {
           <table className="w-full">
           <thead className="bg-[#201c52] bg-opacity-5 border-b border-gray-200">
             <tr>
-              <th onClick={() => handleSort("name")} className="px-6 py-3 cursor-pointer">
-                <div className="flex items-center gap-2">
-                  Name <SortIcon field="name" />
+              <th onClick={() => handleSort("name")} className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+                <div className="flex items-center space-x-1">
+                  <span>Name <SortIcon field="name" /></span>
                 </div>
               </th>
-              <th className="px-6 py-3">Contact</th>
-              <th onClick={() => handleSort("role")} className="px-6 py-3 cursor-pointer">
-                Role <SortIcon field="role" />
+              <th className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+                <div className="flex items-center space-x-1">
+                <span>Contact</span>
+                </div>
               </th>
-              <th onClick={() => handleSort("status")} className="px-6 py-3 cursor-pointer">
-                Status <SortIcon field="status" />
+              <th onClick={() => handleSort("role")} className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+                <div className="flex items-center space-x-1">
+                  <span>Role <SortIcon field="role" /></span>
+                </div>
               </th>
-              <th onClick={() => handleSort("joined")} className="px-6 py-3 cursor-pointer">
-                Joined <SortIcon field="joined" />
+              <th onClick={() => handleSort("status")} className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+                <div className="flex items-center space-x-1">
+                  Status <SortIcon field="status" />
+                </div>
+              </th>
+              <th onClick={() => handleSort("joined")} className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+                <div className="flex items-center space-x-1">
+                  Joined <SortIcon field="joined" />
+                </div>
               </th>
             </tr>
           </thead>
@@ -344,5 +356,6 @@ export default function AdminManagement() {
         </div>
       )}
     </div>
+  </div>
   );
 }
