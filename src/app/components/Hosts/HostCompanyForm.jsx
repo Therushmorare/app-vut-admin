@@ -76,7 +76,7 @@ export default function HostCompanyForm({ company, agreements, onSubmit, onCance
         company_phone: formData.contactPhone.trim(),
         industry: formData.industrySector,
         capacity_of_required_learners: Number(formData.learnerCapacity),
-        confirmation: Boolean(formData.confirmationLetter),
+        confirmation: formData.confirmationLetter,
         notes: formData.notes?.trim() || "",
         status: formData.mouStatus
       };
