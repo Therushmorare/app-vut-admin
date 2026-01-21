@@ -145,11 +145,12 @@ export default function AdminManagement() {
     status === "Active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
 
   /* ---------------- ADD ADMIN ---------------- */
-  const handleAddAdmin = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
+    const handleAddAdmin = async (e) => {
+      e.preventDefault();
 
-    try {
+      setSubmitting(true);
+      setApiError("");
+
       const payload = {
         administrator_id: sessionStorage.getItem("admin_id"),
         first_name: newAdmin.first_name.trim(),
@@ -160,41 +161,44 @@ export default function AdminManagement() {
         role: newAdmin.role.trim(),
       };
 
-      const res = await fetch(ADD_ADMIN_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
+      try {
+        const url = ADD_ADMIN_API_URL; // or dynamically set if editing
 
-      // IMPORTANT: always read response body
-      const data = await res.json().catch(() => null);
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-      if (!res.ok) {
-        console.error("Backend error:", data);
-        throw new Error(data?.message || "Failed to add admin");
+        let data;
+        const contentType = response.headers.get("content-type");
+
+        if (contentType?.includes("application/json")) {
+          data = await response.json();
+        } else {
+          throw new Error(await response.text());
+        }
+
+        if (!response.ok) throw new Error(data?.message || data?.error || "Request failed");
+
+        alert("Admin added successfully!");
+        setShowModal(false);
+        setNewAdmin({
+          first_name: "",
+          last_name: "",
+          email: "",
+          phone: "",
+          employee_number: "",
+          role: "",
+        });
+
+      } catch (err) {
+        console.error("Add admin failed:", err);
+        setApiError(err.message || "Failed to add admin");
+      } finally {
+        setSubmitting(false);
       }
-
-      alert("Admin added successfully!");
-
-      setShowModal(false);
-      setNewAdmin({
-        first_name: "",
-        last_name: "",
-        email: "",
-        phone: "",
-        employee_number: "",
-        role: "",
-      });
-    } catch (err) {
-      console.error("Add admin failed:", err);
-      alert(err.message || "Failed to add admin");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    };
 
   if (loading) {
     return <div className="py-10 text-center text-gray-500">Loading admins…</div>;
