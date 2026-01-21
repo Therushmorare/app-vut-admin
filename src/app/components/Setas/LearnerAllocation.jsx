@@ -26,17 +26,17 @@ export default function LearnerAllocationForm({
   const availableStudents = useMemo(() => {
     return allStudents.filter(student => {
       if (student.status !== 'Active') return false;
-      if (allocatedStudentIds.includes(student.studentNr)) return false;
+      if (allocatedStudentIds.includes(student.student_number)) return false;
       
 
       if (searchTerm) {
         const search = searchTerm.toLowerCase();
         const matchesSearch = 
-          student.name?.toLowerCase().includes(search) ||
-          student.studentNr?.toLowerCase().includes(search) ||
-          student.studentNumber?.toLowerCase().includes(search) ||
+          student.first_name?.toLowerCase().includes(search) ||
+          student.id?.toLowerCase().includes(search) ||
+          student.student_number?.toLowerCase().includes(search) ||
           student.email?.toLowerCase().includes(search) ||
-          student.idNumber?.toLowerCase().includes(search);
+          student.ID_number?.toLowerCase().includes(search);
         
         if (!matchesSearch) return false;
       }
@@ -50,8 +50,8 @@ export default function LearnerAllocationForm({
   }, [allStudents, searchTerm, filterFaculty, filterProgramme, allocatedStudentIds]);
 
   const handleToggleStudent = (student) => {
-    if (selectedStudents.find(s => s.studentNr === student.studentNr)) {
-      setSelectedStudents(selectedStudents.filter(s => s.studentNr !== student.studentNr));
+    if (selectedStudents.find(s => s.id === student.id)) {
+      setSelectedStudents(selectedStudents.filter(s => s.id !== student.id));
     } else {
       if (selectedStudents.length >= remainingSlots) {
         alert(`You can only allocate ${remainingSlots} more learner(s)`);
@@ -68,12 +68,12 @@ export default function LearnerAllocationForm({
     }
 
     const allocations = selectedStudents.map(student => ({
-      id: `${fundingWindow.id}-${student.studentNr}`,
-      fundingWindowId: fundingWindow.id,
-      agreementId: agreement.id,
-      studentId: student.studentNr,
-      firstName: student.name.split(' ')[0],
-      lastName: student.name.split(' ').slice(1).join(' '),
+      id: `${fundingWindow.funding_window_id}-${student.id}`,
+      fundingWindowId: fundingWindow.funding_window_id,
+      agreementId: agreement.agreement_id,
+      studentId: student.id,
+      firstName: student.first_name.split(' ')[0],
+      lastName: student.last_name.split(' ').slice(1).join(' '),
       programme: student.programme,
       faculty: student.faculty,
       email: student.email,
@@ -89,9 +89,9 @@ export default function LearnerAllocationForm({
       {/* Window Info */}
       <div className="p-4 rounded-lg" style={{ backgroundColor: COLORS.bgLight }}>
         <h3 className="font-semibold mb-2" style={{ color: COLORS.primary }}>
-          {fundingWindow.windowName}
+          {fundingWindow.funding_window_name}
         </h3>
-        <p className="text-sm text-gray-600">{agreement.setaName} - {agreement.agreementRef}</p>
+        <p className="text-sm text-gray-600">{agreement.name} - {agreement.reference_number}</p>
         <div className="mt-2 flex gap-4 text-sm">
           <span>
             <strong>Available Slots:</strong> {remainingSlots}
@@ -166,10 +166,10 @@ export default function LearnerAllocationForm({
         {availableStudents.length > 0 ? (
           <div className="divide-y" style={{ divideColor: COLORS.border }}>
             {availableStudents.map(student => {
-              const isSelected = selectedStudents.find(s => s.studentNr === student.studentNr);
+              const isSelected = selectedStudents.find(s => s.id === student.id);
               return (
                 <div
-                  key={student.studentNr}
+                  key={student.id}
                   onClick={() => handleToggleStudent(student)}
                   className={`p-4 cursor-pointer transition-colors ${
                     isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'
@@ -185,10 +185,10 @@ export default function LearnerAllocationForm({
                       <User className="w-8 h-8 text-gray-400" />
                       <div>
                         <p className="font-semibold" style={{ color: COLORS.primary }}>
-                          {student.name}
+                          {student.first_name}
                         </p>
                         <p className="text-xs text-gray-600">
-                          {student.studentNr} • {student.email}
+                          {student.id} • {student.email}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
                           {student.programme}
