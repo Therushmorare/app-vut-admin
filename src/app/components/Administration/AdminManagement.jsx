@@ -233,9 +233,10 @@ export default function AdminManagement() {
       </div>
 
       {/* TABLE */}
-      <div className="rounded-lg border overflow-hidden" style={{ borderColor: COLORS.border }}>
-        <table className="w-full">
-          <thead style={{ backgroundColor: COLORS.bgLight }}>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+          <thead className="bg-[#201c52] bg-opacity-5 border-b border-gray-200">
             <tr>
               <th onClick={() => handleSort("name")} className="px-6 py-3 cursor-pointer">
                 <div className="flex items-center gap-2">
@@ -254,8 +255,7 @@ export default function AdminManagement() {
               </th>
             </tr>
           </thead>
-
-          <tbody className="divide-y">
+            <tbody className="divide-y">
             {paginatedAdmins.map((admin) => (
               <tr key={admin.admin_id} className="hover:bg-gray-50">
                 <td className="px-6 py-4">
@@ -296,8 +296,18 @@ export default function AdminManagement() {
               </tr>
             ))}
           </tbody>
-        </table>
-      </div>
+          </table>
+        </div>
+        {admins.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-gray-500 mb-4">No Admins found matching your criteria</p>
+          <button onClick={onClearFilters} className="text-[#5F9BEA] hover:text-[#201c52] font-medium">
+            Clear filters to see all admins
+          </button>
+        </div>
+        )}
+        </div>
+
 
       {/* ---------------- MODAL ---------------- */}
       {showModal && (
