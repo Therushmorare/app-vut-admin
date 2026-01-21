@@ -41,11 +41,13 @@ export const generateStudents = async () => {
   const biographicsData = await safeGet("/api/administrators/biographics");
   const setasData = await safeGet("/api/administrators/setas");
   const companiesData = await safeGet("/api/administrators/host-companies");
+  const bankingData = await safeGet("/api/administrators/bankingDetails");
 
   const students = studentsData.students ?? [];
   const biographics = biographicsData.biographics ?? [];
   const setas = setasData.setas ?? [];
   const companies = companiesData.companies ?? [];
+  const banking = bankingData.banking ?? [];
 
   //Index related data
   const bioMap = Object.fromEntries(
@@ -60,11 +62,16 @@ export const generateStudents = async () => {
     companies.map((c) => [c.id, c])
   );
 
+  const bankMap = Object.fromEntries(
+    banking.map((e) => [e.id, e])
+  );
+
   //Normalize student records
   return students.map((student) => {
     const bio = bioMap[student.id] || {};
     const seta = setaMap[student.seta_id] || {};
     const company = companyMap[student.company_id] || {};
+    const bank = bankMap[student.user_id] || {};
 
     const attendance = Math.floor(Math.random() * 40) + 60;
 
@@ -81,6 +88,15 @@ export const generateStudents = async () => {
       programme: student.programme,
       faculty: student.faculty,
       status: student.status,
+
+      bankName: bank.bank_name,
+      accountNumber: bank.account_number,
+
+      physicalAddress: bio.address,
+      postalAddress: bio.address,
+
+      dateOfBirth: bio.date_of_birth,
+      gender: bio.gender,
 
       seta: seta.name || "N/A",
       setaName: seta.name || "N/A",
