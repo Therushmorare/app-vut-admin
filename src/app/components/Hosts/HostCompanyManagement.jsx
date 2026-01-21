@@ -670,8 +670,8 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                       <div className="col-span-2">
                         <p className="text-sm text-gray-600 mb-1">SETA Agreement</p>
                         <p className="font-semibold" style={{ color: COLORS.primary }}>
-                          {agreements.find(a => a.id === selectedItem.agreement_id)?.name || 'N/A'} - 
-                          {agreements.find(a => a.id === selectedItem.agreement_id)?.reference_number || 'N/A'}
+                          {agreements.find(a => a.agreement_id === selectedItem.agreement_id)?.name || 'N/A'} - 
+                          {agreements.find(a => a.agreement_id === selectedItem.agreement_id)?.reference_number || 'N/A'}
                         </p>
                       </div>
                       <div>
@@ -688,7 +688,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 mb-1">Industry Sector</p>
-                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.industryor}</p>
+                        <p className="font-semibold" style={{ color: COLORS.primary }}>{selectedItem.industry}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 mb-1">Learner Capacity</p>
@@ -708,8 +708,8 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 mb-1">Confirmation Letter</p>
-                        <p className="font-semibold" style={{ color: selectedItem.confirmationLetter ? COLORS.success : COLORS.danger }}>
-                          {selectedItem.confirmationLetter ? 'Received' : 'Not Received'}
+                        <p className="font-semibold" style={{ color: selectedItem.confirmation ? COLORS.success : COLORS.danger }}>
+                          {selectedItem.confirmation ? 'Received' : 'Not Received'}
                         </p>
                       </div>
                     </div>
