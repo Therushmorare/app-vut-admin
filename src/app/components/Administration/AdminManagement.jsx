@@ -17,7 +17,6 @@ import { COLORS, formatDate } from "../../utils/helpers";
 
 // API endpoints
 const TABLE_API_URL = "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/allAdmins"; // GET for table
-const ADD_ADMIN_API_URL = "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/add"; // POST for form
 
 export default function AdminManagement() {
   const [admins, setAdmins] = useState([]);
@@ -145,7 +144,7 @@ export default function AdminManagement() {
     status === "Active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
 
   /* ---------------- ADD ADMIN ---------------- */
-  const handleAddAdmin = async (e) => {
+    const handleAddAdmin = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
@@ -160,15 +159,16 @@ export default function AdminManagement() {
         role: newAdmin.role.trim(),
       };
 
-      const res = await fetch(ADD_ADMIN_API_URL, {
+      const url = "/api/administrators/administrator/addAdministrator"; // backend endpoint
+      const response = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
+        credentials: "include", // include session cookies if required
       });
+
       let data;
-      const contentType = Response.headers.get("content-type");
+      const contentType = response.headers.get("content-type");
 
       if (contentType?.includes("application/json")) {
         data = await response.json();
@@ -179,7 +179,6 @@ export default function AdminManagement() {
       if (!response.ok) throw new Error(data?.message || data?.error || "Request failed");
 
       alert("Admin added successfully!");
-
       setShowModal(false);
       setNewAdmin({
         first_name: "",
@@ -189,6 +188,7 @@ export default function AdminManagement() {
         employee_number: "",
         role: "",
       });
+
     } catch (err) {
       console.error("Add admin failed:", err);
       alert(err.message || "Failed to add admin");
