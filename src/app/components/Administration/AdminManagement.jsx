@@ -38,6 +38,7 @@ export default function AdminManagement() {
     role: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const itemsPerPage = 10;
 
@@ -375,6 +376,7 @@ export default function AdminManagement() {
 
           {/* Body */}
           <form onSubmit={handleAddAdmin} className="space-y-4 px-6 py-5">
+            {apiError && <div className="text-red-600 text-sm">{apiError}</div>}
             {[
               { key: "first_name", label: "First Name" },
               { key: "last_name", label: "Last Name" },
