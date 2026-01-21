@@ -24,7 +24,7 @@ export default function FundingWindowsList({
           <div key={window.funding_window_id} className="rounded-lg p-6 shadow-sm border" style={{ backgroundColor: COLORS.bgWhite, borderColor: COLORS.border }}>
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="text-lg font-bold mb-1" style={{ color: COLORS.primary }}>{window.windowName}</h3>
+                <h3 className="text-lg font-bold mb-1" style={{ color: COLORS.primary }}>{window.funding_window_name}</h3>
                 {agreement && (
                   <p className="text-sm text-gray-600">{agreement.name} - {agreement.reference_number}</p>
                 )}
