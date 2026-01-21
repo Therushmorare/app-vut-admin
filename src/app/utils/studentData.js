@@ -68,7 +68,7 @@ export const generateStudents = async () => {
 
   //Normalize student records
   return students.map((student) => {
-    const bio = bioMap[student.id] || {};
+    const bioData = bioMap[student.id] || {};
     const seta = setaMap[student.seta_id] || {};
     const company = companyMap[student.company_id] || {};
     const bank = bankMap[student.user_id] || {};
@@ -119,12 +119,11 @@ export const generateStudents = async () => {
       )}&background=0245A3&color=ffffff&size=128`,
 
       //Biographics
-      dateOfBirth: bio.date_of_birth ?? null,
-      gender: bio.gender ?? null,
-      physicalAddress: bio.address ?? null,
-      postalAddress: bio.address ?? null,
+      dateOfBirth: bioData.date_of_birth ?? null,
+      gender: bioData.gender ?? null,
+      physicalAddress: bioData.address ?? null,
+      postalAddress: bioData.address ?? null,
 
-      // UI extras
       nationality: "South African",
       learnerships: student.programme
         ? `${student.programme} Learnership`
@@ -135,4 +134,5 @@ export const generateStudents = async () => {
       nextPayment: null,
     };
   });
+  
 };
