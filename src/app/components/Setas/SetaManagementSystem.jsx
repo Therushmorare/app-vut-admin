@@ -235,11 +235,11 @@ export default function SETAManagementSystem() {
   const handleDeleteAgreement = (agreement) => {
     setConfirmDialog({
       title: 'Delete Agreement',
-      message: `Are you sure you want to delete ${agreement.agreementRef}? This will also delete all associated profiles and funding windows.`,
+      message: `Are you sure you want to delete ${agreement.reference_id}? This will also delete all associated profiles and funding windows.`,
       onConfirm: () => {
-        setAgreements(agreements.filter(a => a.id !== agreement.id));
-        setProfiles(profiles.filter(p => p.agreementId !== agreement.id));
-        setFundingWindows(fundingWindows.filter(w => w.agreementId !== agreement.id));
+        setAgreements(agreements.filter(a => a.agreement_id !== agreement.agreement_id));
+        setProfiles(profiles.filter(p => p.agreementId !== agreement.agreement_id));
+        setFundingWindows(fundingWindows.filter(w => w.agreementId !== agreement.agreement_id));
         setConfirmDialog(null);
         showToast('Agreement deleted successfully!');
       },
@@ -275,9 +275,9 @@ export default function SETAManagementSystem() {
       message: 'Are you sure you want to delete this profile? This will also delete all associated funding windows.',
       onConfirm: () => {
         setProfiles(profiles.filter(p => p.id !== profile.id));
-        setFundingWindows(fundingWindows.filter(w => w.agreementId !== profile.agreementId));
+        setFundingWindows(fundingWindows.filter(w => w.agreement_id !== profile.agreementId));
         setAgreements(agreements.map(a =>
-          a.id === profile.agreement_id ? { ...a, hasProfile: false } : a
+          a.agreement_id === profile.agreement_id ? { ...a, hasProfile: false } : a
         ));
         setConfirmDialog(null);
         showToast('Profile deleted successfully!');
@@ -307,7 +307,7 @@ export default function SETAManagementSystem() {
   const handleDeleteWindow = (window) => {
     setConfirmDialog({
       title: 'Delete Funding Window',
-      message: `Are you sure you want to delete ${window.name}?`,
+      message: `Are you sure you want to delete ${window.funding_window_name}?`,
       onConfirm: () => {
         setFundingWindows(fundingWindows.filter(w => w.id !== window.funding_window_id));
         setConfirmDialog(null);
