@@ -161,10 +161,10 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   const handleDeleteCompany = (company) => {
     setConfirmDialog({
       title: 'Delete Host Company',
-      message: `Are you sure you want to delete ${company.companyName}? This will also remove all learner placements at this company.`,
+      message: `Are you sure you want to delete ${company.company_name}? This will also remove all learner placements at this company.`,
       onConfirm: () => {
-        const updatedCompanies = companies.filter(c => c.id !== company.id);
-        const updatedPlacements = placements.filter(p => p.companyId !== company.id);
+        const updatedCompanies = companies.filter(c => c.id !== company.company_id);
+        const updatedPlacements = placements.filter(p => p.companyId !== company.company_id);
         
         setCompanies(updatedCompanies);
         setPlacements(updatedPlacements);
@@ -276,7 +276,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
         company.contact_person.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesSector = filterSector === '' || company.industry === filterSector;
-      const matchesSETA = filterSETA === '' || company.agreementId === filterSETA;
+      const matchesSETA = filterSETA === '' || company.agreement_id === filterSETA;
       
       return matchesSearch && matchesSector && matchesSETA;
     });
@@ -464,7 +464,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                 {filteredCompanies.map((company) => {
                   const companyPlacements = getPlacementsByCompany(company.id);
                   const activePlacements = companyPlacements.filter(p => p.status === 'Active').length;
-                  const agreement = agreements.find(a => a.id === company.agreementId);
+                  const agreement = agreements.find(a => a.id === company.agreement_id);
                   
                   return (
                     <div key={company.company_id} className="rounded-lg p-6 shadow-sm border hover:shadow-md transition-shadow" style={{ backgroundColor: COLORS.bgWhite, borderColor: COLORS.border }}>
