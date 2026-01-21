@@ -18,6 +18,7 @@ import { COLORS, formatDate } from "../../utils/helpers";
 // API endpoints
 const TABLE_API_URL = "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/allAdmins"; // GET for table
 const ADD_ADMIN_API_URL = "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/add"; // POST for form
+const [apiError, setApiError] = useState("");
 
 export default function AdminManagement() {
   const [admins, setAdmins] = useState([]);
@@ -145,59 +146,57 @@ export default function AdminManagement() {
     status === "Active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
 
   /* ---------------- ADD ADMIN ---------------- */
-    const handleAddAdmin = async (e) => {
-      e.preventDefault();
+      const handleAddAdmin = async (e) => {
+        e.preventDefault();
 
-      setSubmitting(true);
-      setApiError("");
+        setSubmitting(true);
+        setApiError(""); // reset error before API call
 
-      const payload = {
-        administrator_id: sessionStorage.getItem("admin_id"),
-        first_name: newAdmin.first_name.trim(),
-        last_name: newAdmin.last_name.trim(),
-        email: newAdmin.email.trim(),
-        phone: newAdmin.phone.trim(),
-        employee_number: newAdmin.employee_number.trim(),
-        role: newAdmin.role.trim(),
-      };
+        const payload = {
+          administrator_id: sessionStorage.getItem("admin_id"),
+          first_name: newAdmin.first_name.trim(),
+          last_name: newAdmin.last_name.trim(),
+          email: newAdmin.email.trim(),
+          phone: newAdmin.phone.trim(),
+          employee_number: newAdmin.employee_number.trim(),
+          role: newAdmin.role.trim(),
+        };
 
-      try {
-        const url = ADD_ADMIN_API_URL; // or dynamically set if editing
+        try {
+          const response = await fetch(ADD_ADMIN_API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
 
-        const response = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+          let data;
+          const contentType = response.headers.get("content-type");
 
-        let data;
-        const contentType = response.headers.get("content-type");
+          if (contentType?.includes("application/json")) {
+            data = await response.json();
+          } else {
+            throw new Error(await response.text());
+          }
 
-        if (contentType?.includes("application/json")) {
-          data = await response.json();
-        } else {
-          throw new Error(await response.text());
+          if (!response.ok) throw new Error(data?.message || data?.error || "Request failed");
+
+          alert("Admin added successfully!");
+          setShowModal(false);
+          setNewAdmin({
+            first_name: "",
+            last_name: "",
+            email: "",
+            phone: "",
+            employee_number: "",
+            role: "",
+          });
+
+        } catch (err) {
+          console.error("Add admin failed:", err);
+          setApiError(err.message || "Failed to add admin"); // <-- now works
+        } finally {
+          setSubmitting(false);
         }
-
-        if (!response.ok) throw new Error(data?.message || data?.error || "Request failed");
-
-        alert("Admin added successfully!");
-        setShowModal(false);
-        setNewAdmin({
-          first_name: "",
-          last_name: "",
-          email: "",
-          phone: "",
-          employee_number: "",
-          role: "",
-        });
-
-      } catch (err) {
-        console.error("Add admin failed:", err);
-        setApiError(err.message || "Failed to add admin");
-      } finally {
-        setSubmitting(false);
-      }
     };
 
   if (loading) {
