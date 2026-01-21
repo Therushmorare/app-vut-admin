@@ -254,7 +254,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
     const placedLearnerIds = placements.map(p => p.learnerId);
 
     return allocatedLearners.filter(l => 
-      l.agreementId === company.agreementId && 
+      l.agreement_id === company.agreement_id && 
       !placedLearnerIds.includes(l.id)
     );
   };
@@ -733,8 +733,8 @@ export default function HostCompanyManagement({ allStudents = [] }) {
 
                 {modalType === 'createPlacement' && selectedItem && (
                   <LearnerPlacementForm
-                    companyId={selectedItem.id}
-                    availableLearners={getAvailableLearners(selectedItem.id)}
+                    companyId={selectedItem.company_id}
+                    availableLearners={getAvailableLearners(selectedItem.company_id)}
                     onSubmit={handleCreatePlacement}
                     onCancel={closeModal}
                   />
@@ -742,8 +742,8 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                 {modalType === 'editPlacement' && selectedItem && (
                   <LearnerPlacementForm
                     placement={selectedItem}
-                    companyId={selectedItem.companyId}
-                    availableLearners={getAvailableLearners(selectedItem.companyId)}
+                    companyId={selectedItem.company_id}
+                    availableLearners={getAvailableLearners(selectedItem.company_id)}
                     onSubmit={handleUpdatePlacement}
                     onCancel={closeModal}
                   />

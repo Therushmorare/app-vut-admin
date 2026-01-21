@@ -54,7 +54,7 @@ export default function SETAManagementSystem() {
   const [profiles, setProfiles] = useState([]);
   const [fundingWindows, setFundingWindows] = useState([]);
   const [allocatedLearners, setAllocatedLearners] = useLocalStorage('allocated-learners', []);
-  const [allStudents, setAllStudents] = useLocalStorage('all-students', []);
+  const [allStudents, setAllStudents] = useState([]);
   
   const [activeTab, setActiveTab] = useState('agreements');
   const [searchTerm, setSearchTerm] = useState('');
@@ -120,6 +120,22 @@ export default function SETAManagementSystem() {
     };
 
     fetchFundingWindows();
+
+    const fetchStudents = async () => {
+      try {
+        const res = await axios.get(
+          `${API_BASE}/api/administrators/students`,
+          { withCredentials: true }
+        );
+
+        // res.data is already the array of funding windows
+        setAllStudents(res.data ?? []);
+      } catch (err) {
+        console.error("Failed to load Students:", err);
+      }
+    };
+
+    fetchStudents();
 
     return () => {
       window.removeEventListener('globalSearchChange', handleGlobalSearch);
