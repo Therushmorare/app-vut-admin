@@ -254,7 +254,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
     const placedLearnerIds = placements.map(p => p.learnerId);
 
     return allocatedLearners.filter(l => 
-      l.agreement_id === company.agreement_id && 
+      l.id === company.agreement_id && 
       !placedLearnerIds.includes(l.id)
     );
   };
