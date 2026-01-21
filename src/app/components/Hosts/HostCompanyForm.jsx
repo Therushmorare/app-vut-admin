@@ -58,49 +58,59 @@ export default function HostCompanyForm({ company, agreements, onSubmit, onCance
   };
 
   //UPDATED: API + existing onSubmit support
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      if (!validateForm()) return;
 
-    setIsSubmitting(true);
-    setApiError('');
+      setIsSubmitting(true);
+      setApiError("");
 
-    //Backend payload mapping
-    const payload = {
-      administrator_id: sessionStorage.getItem("admin_id"),
-      company_name: formData.companyName,
-      registration_number: formData.registrationNumber,
-      address: formData.address,
-      contact_person: formData.contactPerson,
-      company_email: formData.contactEmail,
-      company_phone: formData.contactPhone,
-      industry: formData.industrySector,
-      capacity_of_required_learners: Number(formData.learnerCapacity)
-    };
-    try {
+      const payload = {
+        administrator_id: Number(sessionStorage.getItem("admin_id")),
+        agreement_id: formData.agreementId,
+        company_name: formData.companyName.trim(),
+        registration_number: formData.registrationNumber.trim(),
+        address: formData.address.trim(),
+        contact_person: formData.contactPerson.trim(),
+        company_email: formData.contactEmail.trim(),
+        company_phone: formData.contactPhone.trim(),
+        industry: formData.industrySector,
+        capacity_of_required_learners: Number(formData.learnerCapacity),
+        confirmation: Boolean(formData.confirmationLetter),
+        notes: formData.notes?.trim() || "",
+        status: formData.mouStatus
+      };
+
+      try {
         const url = company
           ? `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/editHostCompany/${company.company_id}`
-          : 'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/addHostCompany';
+          : `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/addHostCompany`;
 
         const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
 
-        const data = await response.json();
+        let data;
+        const contentType = response.headers.get("content-type");
 
-        if (!response.ok) throw new Error(data?.message || 'API request failed');
+        if (contentType?.includes("application/json")) {
+          data = await response.json();
+        } else {
+          throw new Error(await response.text());
+        }
 
-        // Call existing onSubmit callback
-        onSubmit?.(formData);
+        if (!response.ok) throw new Error(data?.message || data?.error || "Request failed");
 
-      } catch (error) {
-        setApiError(error.message);
+        onSubmit?.(data);
+
+      } catch (err) {
+        setApiError(err.message);
       } finally {
         setIsSubmitting(false);
       }
-  };
+    };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
