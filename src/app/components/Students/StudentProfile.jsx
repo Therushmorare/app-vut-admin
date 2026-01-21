@@ -15,7 +15,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
     idNumber: student?.idNumber || '9501234567089',
     passportNumber: student?.passportNumber || 'N/A',
     dateOfBirth: student?.dateOfBirth || '1995-01-15',
-    gender: bio?.gender || 'Male',
+    gender: student?.gender || 'Male',
     race: student?.race || 'African',
     nationality: student?.nationality || 'South African',
     disability: student?.disability || 'None',
