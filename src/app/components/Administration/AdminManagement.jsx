@@ -285,7 +285,7 @@ export default function AdminManagement() {
                     <Mail className="w-4 h-4 text-gray-400" /> {admin.email}
                   </div>
                   <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-gray-400" /> {admin.phone}
+                    <Phone className="w-4 h-4 text-gray-400" /> {admin.phone_number}
                   </div>
                 </td>
 
@@ -303,7 +303,7 @@ export default function AdminManagement() {
 
                 <td className="px-6 py-4 text-sm">
                   <Calendar className="inline w-4 h-4 mr-1 text-gray-400" />
-                  {formatDate(admin.joined_at || admin.Joined_at)}
+                  {formatDate(admin.Joined_at)}
                 </td>
               </tr>
             ))}
@@ -322,39 +322,89 @@ export default function AdminManagement() {
 
 
       {/* ---------------- MODAL ---------------- */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg w-full max-w-md p-6 relative">
+    {showModal && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="relative w-full max-w-lg rounded-2xl bg-white shadow-xl">
+          
+          {/* Header */}
+          <div className="flex items-center justify-between border-b px-6 py-4">
+            <h2 className="text-lg font-semibold text-gray-800">
+              Add New Admin
+            </h2>
             <button
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
               onClick={() => setShowModal(false)}
+              className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
             </button>
-            <h2 className="text-lg font-semibold mb-4">Add New Admin</h2>
-            <form className="space-y-3" onSubmit={handleAddAdmin}>
-              {["first_name","last_name","email","phone","employee_number","role"].map(field => (
+          </div>
+
+          {/* Body */}
+          <form onSubmit={handleAddAdmin} className="space-y-4 px-6 py-5">
+            {[
+              { key: "first_name", label: "First Name" },
+              { key: "last_name", label: "Last Name" },
+              { key: "email", label: "Email", type: "email" },
+              { key: "phone", label: "Phone Number" },
+              { key: "employee_number", label: "Employee Number" }
+            ].map(({ key, label, type = "text" }) => (
+              <div key={key}>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  {label}
+                </label>
                 <input
-                  key={field}
-                  type={field === "email" ? "email" : "text"}
-                  placeholder={field.replace("_"," ").toUpperCase()}
-                  value={newAdmin[field]}
-                  onChange={e => setNewAdmin({...newAdmin, [field]: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  type={type}
+                  value={newAdmin[key]}
+                  onChange={e =>
+                    setNewAdmin({ ...newAdmin, [key]: e.target.value })
+                  }
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
                   required
                 />
-              ))}
+              </div>
+            ))}
+
+            {/* Role */}
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">
+                Role
+              </label>
+              <select
+                value={newAdmin.role}
+                onChange={e =>
+                  setNewAdmin({ ...newAdmin, role: e.target.value })
+                }
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
+                required
+              >
+                <option value="">Select role</option>
+                <option value="ADMIN">Admin</option>
+                <option value="SUPER_ADMIN">Super Admin</option>
+              </select>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 pt-4">
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="rounded-lg border px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg mt-2"
+                className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
               >
                 {submitting ? "Adding…" : "Add Admin"}
               </button>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
-      )}
+      </div>
+    )}
     </div>
   </div>
   );
