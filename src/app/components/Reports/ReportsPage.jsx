@@ -34,8 +34,75 @@ const ReportsPage = () =>{
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
+    fetchCompanies();
+    fetchAgreements();
+    fetchFundingWindows();
     loadData();
   }, []);
+
+    const fetchCompanies = async () => {
+    try {
+      const res = await axios.get(
+        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/host-companies', // replace with API_BASE if needed
+        { withCredentials: true }
+      );
+
+      if (res.status === 200 && res.data?.companies) {
+        setCompanies(res.data.companies);
+
+        // Optional: Save to localStorage for offline use
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('host-companies', JSON.stringify(res.data.companies));
+        }
+
+        // Optionally show a success toast
+        setToast({ type: 'success', message: 'Host companies loaded successfully' });
+      } else {
+        console.warn('Unexpected API response', res);
+      }
+    } catch (err) {
+      console.error('Failed to load host companies:', err);
+      setToast({ type: 'error', message: 'Failed to load host companies' });
+    }
+  };
+  
+  const fetchAgreements = async () => {
+    try {
+      const res = await axios.get(
+        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/setaAgreements',
+        { withCredentials: true }
+      );
+
+      if (res.status === 200 && Array.isArray(res.data)) {
+        setAgreements(res.data);
+
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('seta-agreements', JSON.stringify(res.data));
+        }
+
+        setToast({ type: 'success', message: 'SETA agreements loaded successfully' });
+      } else {
+        console.warn('Unexpected agreements response:', res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load SETA Agreements:', err);
+      setToast({ type: 'error', message: 'Failed to load SETA Agreements' });
+    }
+  };
+  
+  const fetchFundingWindows = async () => {
+    try {
+      const res = await axios.get(
+        `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/getFundingWindows/`,
+        { withCredentials: true }
+      );
+
+      // res.data is already the array of funding windows
+      setFundingWindows(res.data ?? []);
+    } catch (err) {
+      console.error("Failed to load Funding Windows:", err);
+    }
+  };
 
   const loadData = () => {
     try {
