@@ -37,8 +37,8 @@ export default function ReportsDashboard({
     
     // SETA Distribution
     const setaDistribution = allocatedLearners.reduce((acc, learner) => {
-      const agreement = agreements.find(a => a.id === learner.agreementId);
-      const setaName = agreement?.setaName || 'Unknown';
+      const agreement = agreements.find(a => a.agreement_id === learner.agreement_id);
+      const setaName = agreement?.name || 'Unknown';
       acc[setaName] = (acc[setaName] || 0) + 1;
       return acc;
     }, {});
@@ -50,8 +50,8 @@ export default function ReportsDashboard({
     // Funding Window Stats
     const activeFundingWindows = fundingWindows.filter(w => {
       const now = new Date();
-      const start = new Date(w.startDate);
-      const end = new Date(w.endDate);
+      const start = new Date(w.start_data);
+      const end = new Date(w.end_date);
       return now >= start && now <= end;
     }).length;
     

@@ -28,7 +28,7 @@ export default function AdvancedFilters({
     const faculties = [...new Set(allocatedLearners.map(l => l.faculty).filter(Boolean))];
     const programmes = [...new Set(allocatedLearners.map(l => l.programme).filter(Boolean))];
     const years = [...new Set(fundingWindows.map(w => {
-      const year = new Date(w.startDate).getFullYear();
+      const year = new Date(w.start_data).getFullYear();
       return year;
     }).filter(Boolean))].sort((a, b) => b - a);
 
@@ -128,8 +128,8 @@ export default function AdvancedFilters({
               >
                 <option value="">All SETAs</option>
                 {agreements.filter(a => a.status === 'Active').map(agreement => (
-                  <option key={agreement.id} value={agreement.id}>
-                    {agreement.setaName}
+                  <option key={agreement.agreement_id} value={agreement.agreement_id}>
+                    {agreement.name}
                   </option>
                 ))}
               </select>
@@ -166,8 +166,8 @@ export default function AdvancedFilters({
               >
                 <option value="">All Windows</option>
                 {fundingWindows.map(window => (
-                  <option key={window.id} value={window.id}>
-                    {window.windowName}
+                  <option key={window.funding_window_id} value={window.funding_window_id}>
+                    {window.funding_window_name}
                   </option>
                 ))}
               </select>
@@ -242,8 +242,8 @@ export default function AdvancedFilters({
               >
                 <option value="">All Companies</option>
                 {companies.map(company => (
-                  <option key={company.id} value={company.id}>
-                    {company.companyName}
+                  <option key={company.company_id} value={company.company_id}>
+                    {company.company_name}
                   </option>
                 ))}
               </select>
