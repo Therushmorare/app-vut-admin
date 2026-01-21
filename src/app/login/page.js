@@ -8,7 +8,7 @@ export default function LoginPage() {
 
   const handleLogin = (data) => {
     console.log("Login successful:", data);
-    router.push("/mfa");
+    router.push("/pages/students");
   };
 
   const switchToForgotPassword = () => {
