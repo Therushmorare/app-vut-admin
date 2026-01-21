@@ -1,18 +1,18 @@
 import axios from "axios";
 
-//API base (client-safe)
+// API base (client-safe)
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ??
   "https://seta-management-api-fvzc9.ondigitalocean.app";
 
-//Shared axios instance
+// Shared axios instance
 const api = axios.create({
   baseURL: API_BASE,
-  withCredentials: true, // ONLY keep if backend supports cookies correctly
-  timeout: 15000, // prevent 504 hanging forever
+  withCredentials: true,
+  timeout: 15000,
 });
 
-//Safe request helper (never throws)
+// Safe request helper
 const safeGet = async (url) => {
   try {
     const res = await api.get(url);
@@ -26,9 +26,18 @@ const safeGet = async (url) => {
   }
 };
 
+// Document type → frontend key mapping
+const DOC_TYPE_MAP = {
+  ID_DOCUMENT: "idDocument",
+  PASSPORT: "idDocument",
+  PROOF_OF_RESIDENCE: "proofOfResidence",
+  ACADEMIC_TRANSCRIPT: "academicTranscript",
+  CV: "cv",
+  BANK_STATEMENT: "bankStatement",
+};
+
 /**
  * Fetch students data safely
- * CALL ONLY inside useEffect / event handlers / SSR
  */
 export const generateStudents = async () => {
   if (!API_BASE) {
@@ -36,20 +45,21 @@ export const generateStudents = async () => {
     return [];
   }
 
-  //Fetch endpoints safely (no Promise.all crash)
   const studentsData = await safeGet("/api/administrators/students");
   const biographicsData = await safeGet("/api/administrators/biographics");
   const setasData = await safeGet("/api/administrators/setas");
   const companiesData = await safeGet("/api/administrators/host-companies");
   const bankingData = await safeGet("/api/administrators/bankingDetails");
+  const documentsData = await safeGet("/api/administrators/studentDocuments");
 
   const students = studentsData.students ?? [];
   const biographics = biographicsData.biographics ?? [];
   const setas = setasData.setas ?? [];
   const companies = companiesData.companies ?? [];
   const banking = bankingData.banking ?? [];
+  const docs = documentsData.docs ?? [];
 
-  //Index related data
+  // Index maps
   const bioMap = Object.fromEntries(
     biographics.map((b) => [b.user_id, b])
   );
@@ -63,15 +73,29 @@ export const generateStudents = async () => {
   );
 
   const bankMap = Object.fromEntries(
-    banking.map((e) => [e.id, e])
+    banking.map((b) => [b.user_id, b])
   );
 
-  //Normalize student records
+  // Documents grouped per user
+  const docMap = {};
+  docs.forEach((d) => {
+    const key = DOC_TYPE_MAP[d.doc_type];
+    if (!key) return;
+
+    if (!docMap[d.user_id]) {
+      docMap[d.user_id] = {};
+    }
+
+    docMap[d.user_id][key] = "Uploaded - Verified";
+  });
+
+  // Normalize students
   return students.map((student) => {
     const bioData = bioMap[student.id] || {};
     const seta = setaMap[student.seta_id] || {};
     const company = companyMap[student.company_id] || {};
-    const bank = bankMap[student.user_id] || {};
+    const bank = bankMap[student.id] || {};
+    const studentDocs = docMap[student.id] || {};
 
     const attendance = Math.floor(Math.random() * 40) + 60;
 
@@ -91,6 +115,13 @@ export const generateStudents = async () => {
 
       bankName: bank.bank_name,
       accountNumber: bank.account_number,
+
+      learnerAgreement: "Uploaded - Verified",
+      idCopy: studentDocs.idDocument || "Not Uploaded",
+      proofOfResidence: studentDocs.proofOfResidence || "Not Uploaded",
+      priorQualifications:
+        studentDocs.academicTranscript || "Not Uploaded",
+      cv: studentDocs.cv || "Not Uploaded",
 
       seta: seta.name || "N/A",
       setaName: seta.name || "N/A",
@@ -118,7 +149,6 @@ export const generateStudents = async () => {
         student.first_name + " " + student.last_name
       )}&background=0245A3&color=ffffff&size=128`,
 
-      //Biographics
       dateOfBirth: bioData.date_of_birth ?? null,
       gender: bioData.gender ?? null,
       physicalAddress: bioData.address ?? null,
@@ -134,5 +164,4 @@ export const generateStudents = async () => {
       nextPayment: null,
     };
   });
-  
 };
