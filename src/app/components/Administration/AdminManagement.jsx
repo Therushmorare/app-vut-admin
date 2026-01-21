@@ -364,6 +364,10 @@ export default function AdminManagement() {
             </button>
           </div>
 
+          {apiError && (
+            <p className="text-red-500 text-sm mt-1">{apiError}</p>
+          )}
+
           {/* Body */}
           <form onSubmit={handleAddAdmin} className="space-y-4 px-6 py-5">
             {[
