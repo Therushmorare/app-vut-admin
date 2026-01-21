@@ -18,7 +18,7 @@ export default function LearnerAllocationForm({
 
   const allocatedStudentIds = allocatedLearners.map(l => l.studentId);
   
-  const remainingSlots = fundingWindow.slotsAvailable - allocatedLearners.filter(l => l.fundingWindowId === fundingWindow.id).length;
+  const remainingSlots = fundingWindow.slots_available - allocatedLearners.filter(l => l.fundingWindowId === fundingWindow.funding_window_id).length;
 
   const faculties = [...new Set(allStudents.map(s => s.faculty).filter(Boolean))];
   const programmes = [...new Set(allStudents.map(s => s.programme).filter(Boolean))];
@@ -26,7 +26,7 @@ export default function LearnerAllocationForm({
   const availableStudents = useMemo(() => {
     return allStudents.filter(student => {
       if (student.status !== 'Active') return false;
-      if (allocatedStudentIds.includes(student.student_number)) return false;
+      if (allocatedStudentIds.includes(student.id)) return false;
       
 
       if (searchTerm) {
