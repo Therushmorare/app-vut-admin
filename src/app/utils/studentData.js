@@ -70,7 +70,7 @@ export const generateStudents = async () => {
 
     return {
       id: student.id,
-      studentNr: student.student_number,
+      studentNr: student.id,
       studentNumber: student.student_number,
 
       name: `${student.first_name} ${student.last_name}`,

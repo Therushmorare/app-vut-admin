@@ -15,7 +15,7 @@ export default function FundingWindowsList({
   return (
     <div className="space-y-6">
       {windows.map(window => {
-        const agreement = agreements.find(a => a.id === window.agreement_id);
+        const agreement = agreements.find(a => a.funding_window_id === window.agreement_id);
         const windowLearners = allocatedLearners.filter(l => l.fundingWindowId === window.funding_window_id);
         const remainingSlots = window.slots_available - windowLearners.length;
         const isExpanded = expandedWindows.includes(window.funding_window_id);
