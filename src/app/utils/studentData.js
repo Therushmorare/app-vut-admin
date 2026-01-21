@@ -92,12 +92,6 @@ export const generateStudents = async () => {
       bankName: bank.bank_name,
       accountNumber: bank.account_number,
 
-      physicalAddress: bio.address,
-      postalAddress: bio.address,
-
-      dateOfBirth: bio.date_of_birth,
-      gender: bio.gender,
-
       seta: seta.name || "N/A",
       setaName: seta.name || "N/A",
 
@@ -128,6 +122,7 @@ export const generateStudents = async () => {
       dateOfBirth: bio.date_of_birth ?? null,
       gender: bio.gender ?? null,
       physicalAddress: bio.address ?? null,
+      postalAddress: bio.address ?? null,
 
       // UI extras
       nationality: "South African",
