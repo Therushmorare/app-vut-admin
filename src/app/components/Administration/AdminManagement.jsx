@@ -148,15 +148,37 @@ export default function AdminManagement() {
   const handleAddAdmin = async (e) => {
     e.preventDefault();
     setSubmitting(true);
+
     try {
+      const payload = {
+        administrator_id: sessionStorage.getItem("admin_id"),
+        first_name: newAdmin.first_name.trim(),
+        last_name: newAdmin.last_name.trim(),
+        email: newAdmin.email.trim(),
+        phone: newAdmin.phone.trim(),
+        employee_number: newAdmin.employee_number.trim(),
+        role: newAdmin.role.trim(),
+      };
+
       const res = await fetch(ADD_ADMIN_API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
-        body: JSON.stringify(newAdmin),
+        body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("Failed to add admin");
+
+      // IMPORTANT: always read response body
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        console.error("Backend error:", data);
+        throw new Error(data?.message || "Failed to add admin");
+      }
+
       alert("Admin added successfully!");
+
       setShowModal(false);
       setNewAdmin({
         first_name: "",
@@ -167,8 +189,8 @@ export default function AdminManagement() {
         role: "",
       });
     } catch (err) {
-      console.error(err);
-      alert("Failed to add admin");
+      console.error("Add admin failed:", err);
+      alert(err.message || "Failed to add admin");
     } finally {
       setSubmitting(false);
     }
@@ -303,7 +325,7 @@ export default function AdminManagement() {
 
                 <td className="px-6 py-4 text-sm">
                   <Calendar className="inline w-4 h-4 mr-1 text-gray-400" />
-                  {formatDate(admin.Joined_at)}
+                  {formatDate(admin.joined_at)}
                 </td>
               </tr>
             ))}
