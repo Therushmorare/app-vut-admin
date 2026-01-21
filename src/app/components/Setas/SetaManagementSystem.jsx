@@ -128,10 +128,14 @@ export default function SETAManagementSystem() {
           { withCredentials: true }
         );
 
-        // res.data is already the array of funding windows
-        setAllStudents(res.data ?? []);
+        const students = Array.isArray(res.data)
+          ? res.data
+          : res.data?.students ?? [];
+
+        setAllStudents(students);
       } catch (err) {
         console.error("Failed to load Students:", err);
+        setAllStudents([]);
       }
     };
 
