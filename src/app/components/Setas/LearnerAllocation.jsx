@@ -91,11 +91,9 @@ export default function LearnerAllocationForm({
         <h3 className="font-semibold mb-2" style={{ color: COLORS.primary }}>
           {fundingWindow.funding_window_name}
         </h3>
-        {agreement && (
           <p className="text-sm text-gray-600">
             {agreement.name} - {agreement.reference_number}
           </p>
-        )}
         <div className="mt-2 flex gap-4 text-sm">
           <span>
             <strong>Available Slots:</strong> {remainingSlots}
