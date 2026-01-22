@@ -560,7 +560,7 @@ export default function SETAManagementSystem() {
         return (
           <LearnerAllocationForm
             fundingWindow={selectedItem.window}
-            agreement={selectedItem.agreement}
+            agreement={agreements}
             allStudents={allStudents}
             allocatedLearners={allocatedLearners}
             onSubmit={handleAllocateLearners}
