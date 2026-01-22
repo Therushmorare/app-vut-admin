@@ -248,23 +248,24 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
               {renderField('University Email', formData.universityEmail, 'universityEmail', 'email')}
               {renderField('Personal Email', formData.personalEmail, 'personalEmail', 'email')}
               {renderField('Cell Phone', formData.cellPhone, 'cellPhone', 'tel')}
-              {renderField('Alternative Phone', formData.altPhone, 'altPhone', 'tel')}
+              {renderField('Alternative Phone', formData.cellPhone, 'altPhone', 'tel')}
             </div>
             
+            {/*
             <h4 className="text-md font-semibold text-[#0245A3] mt-6 mb-3">Emergency Contact</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderField('Next of Kin Name', formData.nextOfKinName, 'nextOfKinName')}
               {renderField('Relationship', formData.nextOfKinRelation, 'nextOfKinRelation')}
               {renderField('Phone Number', formData.nextOfKinPhone, 'nextOfKinPhone', 'tel')}
               {renderField('Email Address', formData.nextOfKinEmail, 'nextOfKinEmail', 'email')}
-            </div>
+            </div> */}
           </div>
         );
       
       case 'academic':
         return (
           <div>
-            <h3 className="text-lg font-semibold text-[#0245A3] mb-4">Academic Progress</h3>
+            <h3 className="text-lg font-semibold text-[#0245A3] mb-4">Academic</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderField('Highest Qualification', formData.highestQualification, 'highestQualification')}
               {renderField('NQF Level', formData.nqfLevel, 'nqfLevel')}

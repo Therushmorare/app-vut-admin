@@ -30,7 +30,6 @@ const Navbar = () => {
 
   const userAvatar = "";
 
-  // ✅ Fix sessionStorage SSR issue
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
 

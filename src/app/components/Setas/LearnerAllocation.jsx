@@ -25,7 +25,7 @@ export default function LearnerAllocationForm({
 
   const availableStudents = useMemo(() => {
     return allStudents.filter(student => {
-      if (student.status !== 'Active') return false;
+      if (student.status !== 'Pending') return false;
       if (allocatedStudentIds.includes(student.id)) return false;
       
 
