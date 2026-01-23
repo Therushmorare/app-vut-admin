@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Search, User, CheckCircle } from 'lucide-react';
 import { COLORS } from '../../utils/helpers';
+import axios from 'axios';
 
 export default function LearnerAllocationForm({ 
   fundingWindow, 
@@ -61,27 +62,45 @@ export default function LearnerAllocationForm({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (selectedStudents.length === 0) {
       alert('Please select at least one learner');
       return;
     }
 
-    const allocations = selectedStudents.map(student => ({
-      id: `${fundingWindow.funding_window_id}-${student.id}`,
-      fundingWindowId: fundingWindow.funding_window_id,
-      agreementId: agreement.agreement_id,
-      studentId: student.id,
-      firstName: student.first_name.split(' ')[0],
-      lastName: student.last_name.split(' ').slice(1).join(' '),
-      programme: student.programme,
-      faculty: student.faculty,
-      email: student.email,
-      phone: student.phone,
-      allocatedDate: new Date().toISOString()
-    }));
+    try {
+      const payload = {
+        administrator_id: agreement.administrator_id, // or from auth context
+        students: selectedStudents.map(s => ({
+          student_id: s.id
+        }))
+      };
 
-    onSubmit(allocations);
+      await axios.post(
+        `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/programmes/${fundingWindow.programme_id}/allocate-learners`,
+        payload,
+        { withCredentials: true }
+      );
+
+      // optional: update UI cache
+      const allocations = selectedStudents.map(student => ({
+        fundingWindowId: fundingWindow.funding_window_id,
+        agreementId: agreement.agreement_id,
+        programmeId: fundingWindow.programme_id,
+        studentId: student.id,
+        firstName: student.first_name,
+        lastName: student.last_name,
+        programme: student.programme
+      }));
+
+      onSubmit(allocations);
+    } catch (err) {
+      console.error("Allocation failed:", err);
+      alert(
+        err.response?.data?.message ||
+        "Failed to allocate learners"
+      );
+    }
   };
 
   return (
