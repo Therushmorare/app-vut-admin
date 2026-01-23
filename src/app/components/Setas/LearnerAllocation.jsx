@@ -1,38 +1,48 @@
-"use client"
-import React, { useState, useMemo } from 'react';
-import { Search, User, CheckCircle } from 'lucide-react';
-import { COLORS } from '../../utils/helpers';
-import axios from 'axios';
+"use client";
+import React, { useState, useMemo } from "react";
+import { Search, User, CheckCircle } from "lucide-react";
+import { COLORS } from "../../utils/helpers";
+import axios from "axios";
 
-export default function LearnerAllocationForm({ 
-  fundingWindow, 
-  agreement, 
-  programmes,            // ⬅️ ARRAY
-  allStudents, 
-  allocatedLearners, 
-  onSubmit, 
-  onCancel 
+export default function LearnerAllocationForm({
+  fundingWindow,
+  agreement,
+  programmes, // ✅ programmes FOR THIS funding window
+  allStudents,
+  allocatedLearners,
+  onSubmit,
+  onCancel,
 }) {
-  const [selectedProgrammeId, setSelectedProgrammeId] = useState('');
+  const [selectedProgrammeId, setSelectedProgrammeId] = useState("");
   const [selectedStudents, setSelectedStudents] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterFaculty, setFilterFaculty] = useState('');
-  const [filterProgramme, setFilterProgramme] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterFaculty, setFilterFaculty] = useState("");
+  const [filterProgramme, setFilterProgramme] = useState("");
 
-  const allocatedStudentIds = allocatedLearners.map(l => l.studentId);
+  // ✅ SAFE DEFAULTS (prevents undefined.map crashes)
+  const safeProgrammes = Array.isArray(programmes) ? programmes : [];
+  const safeStudents = Array.isArray(allStudents) ? allStudents : [];
+  const safeAllocations = Array.isArray(allocatedLearners) ? allocatedLearners : [];
+
+  const allocatedStudentIds = safeAllocations.map(l => l.studentId);
 
   const remainingSlots =
     fundingWindow.slots_available -
-    allocatedLearners.filter(
+    safeAllocations.filter(
       l => l.fundingWindowId === fundingWindow.funding_window_id
     ).length;
 
-  const faculties = [...new Set(allStudents.map(s => s.faculty).filter(Boolean))];
-  const programmesFilter = [...new Set(allStudents.map(s => s.programme).filter(Boolean))];
+  const faculties = [
+    ...new Set(safeStudents.map(s => s.faculty).filter(Boolean)),
+  ];
+
+  const programmeFilters = [
+    ...new Set(safeStudents.map(s => s.programme).filter(Boolean)),
+  ];
 
   const availableStudents = useMemo(() => {
-    return allStudents.filter(student => {
-      if (student.status !== 'Pending') return false;
+    return safeStudents.filter(student => {
+      if (student.status !== "Pending") return false;
       if (allocatedStudentIds.includes(student.id)) return false;
 
       if (searchTerm) {
@@ -52,9 +62,15 @@ export default function LearnerAllocationForm({
 
       return true;
     });
-  }, [allStudents, searchTerm, filterFaculty, filterProgramme, allocatedStudentIds]);
+  }, [
+    safeStudents,
+    searchTerm,
+    filterFaculty,
+    filterProgramme,
+    allocatedStudentIds,
+  ]);
 
-  const handleToggleStudent = (student) => {
+  const handleToggleStudent = student => {
     if (selectedStudents.find(s => s.id === student.id)) {
       setSelectedStudents(selectedStudents.filter(s => s.id !== student.id));
     } else {
@@ -68,21 +84,21 @@ export default function LearnerAllocationForm({
 
   const handleSubmit = async () => {
     if (!selectedProgrammeId) {
-      alert('Please select a programme');
+      alert("Please select a programme");
       return;
     }
 
     if (selectedStudents.length === 0) {
-      alert('Please select at least one learner');
+      alert("Please select at least one learner");
       return;
     }
 
     try {
       const payload = {
-        administrator_id: sessionStorage.getItem('admin_id'),
+        administrator_id: sessionStorage.getItem("admin_id"),
         students: selectedStudents.map(s => ({
-          student_id: s.id
-        }))
+          student_id: s.id,
+        })),
       };
 
       await axios.post(
@@ -98,16 +114,13 @@ export default function LearnerAllocationForm({
         studentId: student.id,
         firstName: student.first_name,
         lastName: student.last_name,
-        programme: student.programme
+        programme: student.programme,
       }));
 
       onSubmit(allocations);
     } catch (err) {
       console.error("Allocation failed:", err);
-      alert(
-        err.response?.data?.message ||
-        "Failed to allocate learners"
-      );
+      alert(err.response?.data?.message || "Failed to allocate learners");
     }
   };
 
@@ -125,9 +138,9 @@ export default function LearnerAllocationForm({
           className="w-full border px-3 py-2 rounded-lg text-sm"
         >
           <option value="">-- Select Programme --</option>
-          {programmes.map(p => (
+          {safeProgrammes.map(p => (
             <option key={p.programme_id} value={p.programme_id}>
-              {p.programme_name} ({p.duration} months)
+              {p.programme_name}
             </option>
           ))}
         </select>
@@ -146,133 +159,90 @@ export default function LearnerAllocationForm({
           <span><strong>Selected:</strong> {selectedStudents.length}</span>
         </div>
       </div>
-      
-      {/* Search and Filters */}
+
+      {/* Search & Filters */}
       <div className="space-y-3">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <input
             type="text"
             placeholder="Search by name, student number, ID, email..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm"
-            style={{ borderColor: COLORS.border }}
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <select
             value={filterFaculty}
-            onChange={(e) => setFilterFaculty(e.target.value)}
+            onChange={e => setFilterFaculty(e.target.value)}
             className="px-3 py-2 border rounded-lg text-sm"
-            style={{ borderColor: COLORS.border }}
           >
             <option value="">All Faculties</option>
-            {faculties.map(faculty => (
-              <option key={faculty} value={faculty}>{faculty}</option>
+            {faculties.map(f => (
+              <option key={f} value={f}>{f}</option>
             ))}
           </select>
 
           <select
             value={filterProgramme}
-            onChange={(e) => setFilterProgramme(e.target.value)}
+            onChange={e => setFilterProgramme(e.target.value)}
             className="px-3 py-2 border rounded-lg text-sm"
-            style={{ borderColor: COLORS.border }}
           >
             <option value="">All Programmes</option>
-            {programmes.map(programme => (
-              <option key={programme} value={programme}>{programme}</option>
+            {programmeFilters.map(p => (
+              <option key={p} value={p}>{p}</option>
             ))}
           </select>
         </div>
-
-        {(searchTerm || filterFaculty || filterProgramme) && (
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">
-              Showing {availableStudents.length} student(s)
-            </span>
-            <button
-              onClick={() => {
-                setSearchTerm('');
-                setFilterFaculty('');
-                setFilterProgramme('');
-              }}
-              className="text-blue-600 hover:underline"
-            >
-              Clear filters
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Student List */}
-      <div className="border rounded-lg max-h-96 overflow-y-auto" style={{ borderColor: COLORS.border }}>
-        {availableStudents.length > 0 ? (
-          <div className="divide-y" style={{ divideColor: COLORS.border }}>
-            {availableStudents.map(student => {
-              const isSelected = selectedStudents.find(s => s.id === student.id);
-              return (
-                <div
-                  key={student.id}
-                  onClick={() => handleToggleStudent(student)}
-                  className={`p-4 cursor-pointer transition-colors ${
-                    isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                        isSelected ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
-                      }`}>
-                        {isSelected && <CheckCircle className="w-4 h-4 text-white" />}
-                      </div>
-                      <User className="w-8 h-8 text-gray-400" />
-                      <div>
-                        <p className="font-semibold" style={{ color: COLORS.primary }}>
-                          {student.first_name}
-                        </p>
-                        <p className="text-xs text-gray-600">
-                          {student.id} • {student.email}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {student.programme}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right text-xs text-gray-500">
-                      <p>{student.faculty}</p>
-                    </div>
+      <div className="border rounded-lg max-h-96 overflow-y-auto">
+        {availableStudents.length ? (
+          availableStudents.map(student => {
+            const isSelected = selectedStudents.some(s => s.id === student.id);
+            return (
+              <div
+                key={student.id}
+                onClick={() => handleToggleStudent(student)}
+                className={`p-4 cursor-pointer ${
+                  isSelected ? "bg-blue-50" : "hover:bg-gray-50"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-5 h-5 border-2 rounded flex items-center justify-center ${
+                    isSelected ? "bg-blue-600 border-blue-600" : "border-gray-300"
+                  }`}>
+                    {isSelected && <CheckCircle className="w-4 h-4 text-white" />}
+                  </div>
+                  <User className="w-8 h-8 text-gray-400" />
+                  <div>
+                    <p className="font-semibold">{student.first_name}</p>
+                    <p className="text-xs text-gray-600">{student.email}</p>
+                    <p className="text-xs text-gray-500">{student.programme}</p>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })
         ) : (
-          <div className="p-8 text-center text-gray-500">
-            <User className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-            <p>No available students found</p>
-            {(searchTerm || filterFaculty || filterProgramme) && (
-              <p className="text-sm mt-1">Try adjusting your filters</p>
-            )}
-          </div>
+          <p className="p-6 text-center text-gray-500">
+            No available students found
+          </p>
         )}
       </div>
 
       {/* Actions */}
       <div className="flex gap-3 pt-4">
-        <button
-          onClick={onCancel}
-          className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
-          style={{ borderColor: COLORS.border, color: COLORS.text }}
-        >
+        <button onClick={onCancel} className="flex-1 border px-4 py-2 rounded-lg">
           Cancel
         </button>
         <button
           onClick={handleSubmit}
-          disabled={selectedStudents.length === 0}
-          className="flex-1 px-4 py-2 rounded-lg text-white font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ backgroundColor: COLORS.success }}
+          disabled={!selectedStudents.length}
+          className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg"
         >
           Allocate {selectedStudents.length} Learner(s)
         </button>

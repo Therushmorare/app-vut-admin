@@ -600,17 +600,18 @@ export default function SETAManagementSystem() {
         return <p className="text-center text-gray-500">Missing allocation data</p>;
         }
         return (
-        <LearnerAllocationForm
-          fundingWindow={selectedItem.window}
-          agreement={selectedItem.agreement}
-          windowProgrammes={selectedItem.windowProgrammes}
-          allStudents={allStudents}
-          allocatedLearners={allocatedLearners}
-          onSubmit={handleAllocateLearners}
-          onCancel={closeModal}
-        />
-        );
-      
+          <LearnerAllocationForm
+            fundingWindow={selectedItem.window}
+            agreement={selectedItem.agreement}
+            programmes={selectedItem.windowProgrammes.filter(
+              p => p.funding_window_id === selectedItem.window.funding_window_id
+            )}
+            allStudents={allStudents}
+            allocatedLearners={allocatedLearners}
+            onSubmit={handleAllocateLearners}
+            onCancel={closeModal}
+          />
+        );      
       default:
         return null;
     }

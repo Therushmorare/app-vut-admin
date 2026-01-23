@@ -24,6 +24,7 @@ export default function FundingWindowsList({
           l => l.fundingWindowId === window.funding_window_id
         );
 
+        // Filter only programmes for this funding window
         const windowProgrammes = programmes.filter(
           p => p.funding_window_id === window.funding_window_id
         );
@@ -64,7 +65,11 @@ export default function FundingWindowsList({
               <div className="flex gap-2">
                 <button
                   onClick={() =>
-                    onAllocate({ window, agreement, windowProgrammes })
+                    onAllocate({
+                      window,
+                      agreement,
+                      programmes: windowProgrammes // pass correct prop name
+                    })
                   }
                   disabled={
                     remainingSlots === 0 || windowProgrammes.length === 0
@@ -103,7 +108,7 @@ export default function FundingWindowsList({
                   className="text-sm font-medium"
                   style={{ color: COLORS.primary }}
                 >
-                  {window.start_data} to {window.end_date}
+                  {window.start_date} to {window.end_date}
                 </p>
               </div>
 
