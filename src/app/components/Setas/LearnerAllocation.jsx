@@ -7,6 +7,7 @@ import axios from 'axios';
 export default function LearnerAllocationForm({ 
   fundingWindow, 
   agreement, 
+  program,
   allStudents, 
   allocatedLearners, 
   onSubmit, 
@@ -77,7 +78,7 @@ export default function LearnerAllocationForm({
       };
 
       await axios.post(
-        `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/programmes/${fundingWindow.programme_id}/allocate-learners`,
+        `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/programmes/${program.programme_id}/allocate-learners`,
         payload,
         { withCredentials: true }
       );
@@ -86,7 +87,7 @@ export default function LearnerAllocationForm({
       const allocations = selectedStudents.map(student => ({
         fundingWindowId: fundingWindow.funding_window_id,
         agreementId: agreement.agreement_id,
-        programmeId: fundingWindow.programme_id,
+        programmeId: program.programme_id,
         studentId: student.id,
         firstName: student.first_name,
         lastName: student.last_name,

@@ -160,6 +160,8 @@ export default function SETAManagementSystem() {
       }
     };
 
+    fetchAllocatedLearners();
+
     const fetchSetaProgrammes = async () => {
       try {
         const res = await axios.get(
@@ -594,13 +596,14 @@ export default function SETAManagementSystem() {
         return <FundingWindowForm window={selectedItem} agreementId={selectedItem.agreement_id} onSubmit={handleUpdateWindow} onCancel={closeModal} />;
       
       case 'allocateLearners':
-        if (!selectedItem?.agreement || !selectedItem?.window) {
+        if (!selectedItem?.agreement || !selectedItem?.window || !selectedItem?.program) {
         return <p className="text-center text-gray-500">Missing allocation data</p>;
         }
         return (
           <LearnerAllocationForm
             fundingWindow={selectedItem.window}
             agreement={selectedItem.agreement}
+            program={selectedItem.program}
             allStudents={allStudents}
             allocatedLearners={allocatedLearners}
             onSubmit={handleAllocateLearners}
