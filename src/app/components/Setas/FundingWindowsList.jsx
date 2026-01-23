@@ -118,21 +118,26 @@ export default function FundingWindowsList({
             )}
 
             {/* Programme Details */}
-            {windowProgrammes.map(program => (
-              <div key={program.programme_id} className="border-t pt-4 mt-4" style={{ borderColor: COLORS.border }}>
-                <h4 className="font-semibold mb-2" style={{ color: COLORS.primary }}>Programme Details</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="text-gray-500">Programme Name</p>
-                    <p className="font-medium" style={{ color: COLORS.primary }}>{program.programme_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500">Duration</p>
-                    <p className="font-medium" style={{ color: COLORS.primary }}>{program.duration} months</p>
-                  </div>
-                </div>
+            {windowProgrammes.length > 0 && (
+              <div className="border-t pt-4 mt-4" style={{ borderColor: COLORS.border }}>
+                <h4 className="font-semibold mb-2" style={{ color: COLORS.primary }}>Select Programme</h4>
+                <select
+                  className="w-full border px-3 py-2 rounded-lg text-sm"
+                  style={{ borderColor: COLORS.border }}
+                  onChange={e => onAllocate({ 
+                    window, 
+                    agreement, 
+                    selectedProgrammeId: e.target.value 
+                  })}
+                >
+                  {windowProgrammes.map(p => (
+                    <option key={p.programme_id} value={p.programme_id}>
+                      {p.programme_name} ({p.duration} months)
+                    </option>
+                  ))}
+                </select>
               </div>
-            ))}
+            )}
 
           </div>
         );
