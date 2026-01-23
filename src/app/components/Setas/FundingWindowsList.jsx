@@ -4,6 +4,7 @@ import { COLORS } from '../../utils/helpers';
 
 export default function FundingWindowsList({ 
   windows, 
+  programmes,
   agreements, 
   allocatedLearners,
   expandedWindows,
@@ -17,6 +18,7 @@ export default function FundingWindowsList({
       {windows.map(window => {
         const agreement = agreements.find(a => a.agreement_id === window.agreement_id);
         const windowLearners = allocatedLearners.filter(l => l.fundingWindowId === window.funding_window_id);
+        const windowProgrammes = programmes.filter(p => p.funding_window_id == window.funding_window_id);
         const remainingSlots = window.slots_available - windowLearners.length;
         const isExpanded = expandedWindows.includes(window.funding_window_id);
         
@@ -107,21 +109,21 @@ export default function FundingWindowsList({
               </div>
             )}
 
-            {window.programmeName && (
-              <div className="border-t pt-4 mt-4" style={{ borderColor: COLORS.border }}>
+            {windowProgrammes.map(program => (
+              <div  key={program.programme_id} className="border-t pt-4 mt-4" style={{ borderColor: COLORS.border }}>
                 <h4 className="font-semibold mb-2" style={{ color: COLORS.primary }}>Programme Details</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-gray-500">Programme Name</p>
-                    <p className="font-medium" style={{ color: COLORS.primary }}>{window.programmeName}</p>
+                    <p className="font-medium" style={{ color: COLORS.primary }}>{program.programme_name}</p>
                   </div>
                   <div>
                     <p className="text-gray-500">Duration</p>
-                    <p className="font-medium" style={{ color: COLORS.primary }}>{window.programmeDuration} months</p>
+                    <p className="font-medium" style={{ color: COLORS.primary }}>{program.duration} months</p>
                   </div>
                 </div>
               </div>
-            )}
+            ))}
           </div>
         );
       })}

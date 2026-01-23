@@ -53,8 +53,9 @@ export default function SETAManagementSystem() {
   const [agreements, setAgreements] = useState([]);
   const [profiles, setProfiles] = useState([]);
   const [fundingWindows, setFundingWindows] = useState([]);
-  const [allocatedLearners, setAllocatedLearners] = useLocalStorage('allocated-learners', []);
+  const [allocatedLearners, setAllocatedLearners] = useState([]);
   const [allStudents, setAllStudents] = useState([]);
+  const [allProgrammes, setAllProgrammes] = useState([]);
   
   const [activeTab, setActiveTab] = useState('agreements');
   const [searchTerm, setSearchTerm] = useState('');
@@ -141,6 +142,44 @@ export default function SETAManagementSystem() {
 
     fetchStudents();
 
+    const fetchAllocatedLearners = async () => {
+      try {
+        const res = await axios.get(
+          `${API_BASE}/api/administrators/learner-allocations`,
+          { withCredentials: true }
+        );
+
+        const allocations = Array.isArray(res.data)
+          ? res.data
+          : res.data?.allocations ?? [];
+
+        setAllocatedLearners(allocations);
+      } catch (err) {
+        console.error("Failed to load Allocated Learners:", err);
+        setAllocatedLearners([]);
+      }
+    };
+
+    const fetchSetaProgrammes = async () => {
+      try {
+        const res = await axios.get(
+          `${API_BASE}/api/administrators/getProgrammes/`,
+          { withCredentials: true }
+        );
+
+        const programmes = Array.isArray(res.data)
+          ? res.data
+          : res.data?.programmes ?? [];
+
+        setAllProgrammes(programmes);
+      } catch (err) {
+        console.error("Failed to load Programmes:", err);
+        setAllProgrammes([]);
+      }
+    };
+
+    fetchSetaProgrammes();
+
     return () => {
       window.removeEventListener('globalSearchChange', handleGlobalSearch);
     };
@@ -194,7 +233,7 @@ export default function SETAManagementSystem() {
     const search = searchTerm.toLowerCase();
     return fundingWindows.filter(window => {
       const agreement = agreements.find(a => a.id === window.agreement_id);
-      const windowLearners = allocatedLearners.filter(l => l.fundingWindowId === window.funding_window_id);
+      const windowLearners = allocatedLearners.filter(l => l.agreement_id === window.agreement_id);
       return (
         window.name?.toLowerCase().includes(search) ||
         window.programmeName?.toLowerCase().includes(search) ||
@@ -203,9 +242,7 @@ export default function SETAManagementSystem() {
         agreement?.name?.toLowerCase().includes(search) ||
         agreement?.reference_number?.toLowerCase().includes(search) ||
         windowLearners.some(l => 
-          l.firstName?.toLowerCase().includes(search) ||
-          l.lastName?.toLowerCase().includes(search) ||
-          l.studentId?.toLowerCase().includes(search)
+          l.student_id?.toLowerCase().includes(search)
         )
       );
     });
@@ -652,6 +689,7 @@ export default function SETAManagementSystem() {
           filteredFundingWindows.length > 0 ? (
             <FundingWindowsList
               windows={filteredFundingWindows}
+              programmes={allProgrammes}
               agreements={agreements}
               allocatedLearners={allocatedLearners}
               expandedWindows={expandedWindows}
