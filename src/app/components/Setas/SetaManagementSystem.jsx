@@ -603,7 +603,7 @@ export default function SETAManagementSystem() {
           <LearnerAllocationForm
             fundingWindow={selectedItem.window}
             agreement={selectedItem.agreement}
-            windowProgrammes={selectedItem.programme}  // updated prop name
+            programme={selectedItem.programme}  // updated prop name
             allStudents={allStudents}
             allocatedLearners={allocatedLearners}
             onSubmit={handleAllocateLearners}
