@@ -18,23 +18,29 @@ export default function FundingWindowsList({
       {windows.map(window => {
         const agreement = agreements.find(a => a.agreement_id === window.agreement_id);
         const windowLearners = allocatedLearners.filter(l => l.fundingWindowId === window.funding_window_id);
-        const windowProgrammes = programmes.filter(p => p.funding_window_id == window.funding_window_id);
+        const windowProgrammes = programmes.filter(p => p.funding_window_id === window.funding_window_id);
         const remainingSlots = window.slots_available - windowLearners.length;
         const isExpanded = expandedWindows.includes(window.funding_window_id);
-        
+
         return (
           <div key={window.funding_window_id} className="rounded-lg p-6 shadow-sm border" style={{ backgroundColor: COLORS.bgWhite, borderColor: COLORS.border }}>
+            
+            {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="text-lg font-bold mb-1" style={{ color: COLORS.primary }}>{window.funding_window_name}</h3>
+                <h3 className="text-lg font-bold mb-1" style={{ color: COLORS.primary }}>
+                  {window.funding_window_name}
+                </h3>
                 {agreement && (
-                  <p className="text-sm text-gray-600">{agreement.name} - {agreement.reference_number}</p>
+                  <p className="text-sm text-gray-600">
+                    {agreement.name} - {agreement.reference_number}
+                  </p>
                 )}
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => onAllocate({ window, agreement,  windowProgrammes})}
-                  disabled={remainingSlots === 0}
+                  onClick={() => onAllocate({ window, agreement, windowProgrammes })}
+                  disabled={remainingSlots === 0 || windowProgrammes.length === 0}
                   className="px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ backgroundColor: COLORS.success }}
                 >
@@ -56,7 +62,8 @@ export default function FundingWindowsList({
                 </button>
               </div>
             </div>
-            
+
+            {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4">
               <div>
                 <p className="text-xs text-gray-500 mb-1">Contract Period</p>
@@ -80,6 +87,7 @@ export default function FundingWindowsList({
               </div>
             </div>
 
+            {/* Allocated Learners */}
             {windowLearners.length > 0 && (
               <div className="border-t pt-4 mt-4" style={{ borderColor: COLORS.border }}>
                 <button
@@ -93,7 +101,7 @@ export default function FundingWindowsList({
                     {isExpanded ? '▼ Hide' : '▶ View'}
                   </span>
                 </button>
-                
+
                 {isExpanded && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
                     {windowLearners.map(learner => (
@@ -109,8 +117,9 @@ export default function FundingWindowsList({
               </div>
             )}
 
+            {/* Programme Details */}
             {windowProgrammes.map(program => (
-              <div  key={program.programme_id} className="border-t pt-4 mt-4" style={{ borderColor: COLORS.border }}>
+              <div key={program.programme_id} className="border-t pt-4 mt-4" style={{ borderColor: COLORS.border }}>
                 <h4 className="font-semibold mb-2" style={{ color: COLORS.primary }}>Programme Details</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
@@ -124,6 +133,7 @@ export default function FundingWindowsList({
                 </div>
               </div>
             ))}
+
           </div>
         );
       })}
