@@ -70,7 +70,7 @@ export default function LearnerAllocationForm({
 
     try {
       const payload = {
-        administrator_id: agreement.administrator_id, // or from auth context
+        administrator_id: sessionStorage.getItem('admin_id'), // or from auth context
         students: selectedStudents.map(s => ({
           student_id: s.id
         }))
