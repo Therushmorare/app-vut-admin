@@ -7,44 +7,47 @@ import axios from 'axios';
 export default function LearnerAllocationForm({ 
   fundingWindow, 
   agreement, 
-  program,
+  programmes,            // ⬅️ ARRAY
   allStudents, 
   allocatedLearners, 
   onSubmit, 
   onCancel 
 }) {
+  const [selectedProgrammeId, setSelectedProgrammeId] = useState('');
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterFaculty, setFilterFaculty] = useState('');
   const [filterProgramme, setFilterProgramme] = useState('');
 
   const allocatedStudentIds = allocatedLearners.map(l => l.studentId);
-  
-  const remainingSlots = fundingWindow.slots_available - allocatedLearners.filter(l => l.fundingWindowId === fundingWindow.funding_window_id).length;
+
+  const remainingSlots =
+    fundingWindow.slots_available -
+    allocatedLearners.filter(
+      l => l.fundingWindowId === fundingWindow.funding_window_id
+    ).length;
 
   const faculties = [...new Set(allStudents.map(s => s.faculty).filter(Boolean))];
-  const programmes = [...new Set(allStudents.map(s => s.programme).filter(Boolean))];
+  const programmesFilter = [...new Set(allStudents.map(s => s.programme).filter(Boolean))];
 
   const availableStudents = useMemo(() => {
     return allStudents.filter(student => {
       if (student.status !== 'Pending') return false;
       if (allocatedStudentIds.includes(student.id)) return false;
-      
 
       if (searchTerm) {
-        const search = searchTerm.toLowerCase();
-        const matchesSearch = 
-          student.first_name?.toLowerCase().includes(search) ||
-          student.id?.toLowerCase().includes(search) ||
-          student.student_number?.toLowerCase().includes(search) ||
-          student.email?.toLowerCase().includes(search) ||
-          student.ID_number?.toLowerCase().includes(search);
-        
-        if (!matchesSearch) return false;
+        const s = searchTerm.toLowerCase();
+        const match =
+          student.first_name?.toLowerCase().includes(s) ||
+          student.id?.toLowerCase().includes(s) ||
+          student.student_number?.toLowerCase().includes(s) ||
+          student.email?.toLowerCase().includes(s) ||
+          student.ID_number?.toLowerCase().includes(s);
+
+        if (!match) return false;
       }
 
       if (filterFaculty && student.faculty !== filterFaculty) return false;
-
       if (filterProgramme && student.programme !== filterProgramme) return false;
 
       return true;
@@ -56,7 +59,7 @@ export default function LearnerAllocationForm({
       setSelectedStudents(selectedStudents.filter(s => s.id !== student.id));
     } else {
       if (selectedStudents.length >= remainingSlots) {
-        alert(`You can only allocate ${remainingSlots} more learner(s)`);
+        alert(`You can only allocate ${remainingSlots} learner(s)`);
         return;
       }
       setSelectedStudents([...selectedStudents, student]);
@@ -64,6 +67,11 @@ export default function LearnerAllocationForm({
   };
 
   const handleSubmit = async () => {
+    if (!selectedProgrammeId) {
+      alert('Please select a programme');
+      return;
+    }
+
     if (selectedStudents.length === 0) {
       alert('Please select at least one learner');
       return;
@@ -71,23 +79,22 @@ export default function LearnerAllocationForm({
 
     try {
       const payload = {
-        administrator_id: sessionStorage.getItem('admin_id'), // or from auth context
+        administrator_id: sessionStorage.getItem('admin_id'),
         students: selectedStudents.map(s => ({
           student_id: s.id
         }))
       };
 
       await axios.post(
-        `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/programmes/${program.programme_id}/allocate-learners`,
+        `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/programmes/${selectedProgrammeId}/allocate-learners`,
         payload,
         { withCredentials: true }
       );
 
-      // optional: update UI cache
       const allocations = selectedStudents.map(student => ({
         fundingWindowId: fundingWindow.funding_window_id,
         agreementId: agreement.agreement_id,
-        programmeId: program.programme_id,
+        programmeId: selectedProgrammeId,
         studentId: student.id,
         firstName: student.first_name,
         lastName: student.last_name,
@@ -106,24 +113,40 @@ export default function LearnerAllocationForm({
 
   return (
     <div className="space-y-4">
-      {/* Window Info */}
+
+      {/* Programme Selector */}
       <div className="p-4 rounded-lg" style={{ backgroundColor: COLORS.bgLight }}>
-        <h3 className="font-semibold mb-2" style={{ color: COLORS.primary }}>
-          {fundingWindow.funding_window_name}
-        </h3>
-          <p className="text-sm text-gray-600">
-            {agreement.name} - {agreement.reference_number}
-          </p>
-        <div className="mt-2 flex gap-4 text-sm">
-          <span>
-            <strong>Available Slots:</strong> {remainingSlots}
-          </span>
-          <span>
-            <strong>Selected:</strong> {selectedStudents.length}
-          </span>
-        </div>
+        <label className="block text-sm font-semibold mb-1">
+          Select Programme
+        </label>
+        <select
+          value={selectedProgrammeId}
+          onChange={e => setSelectedProgrammeId(e.target.value)}
+          className="w-full border px-3 py-2 rounded-lg text-sm"
+        >
+          <option value="">-- Select Programme --</option>
+          {programmes.map(p => (
+            <option key={p.programme_id} value={p.programme_id}>
+              {p.programme_name} ({p.duration} months)
+            </option>
+          ))}
+        </select>
       </div>
 
+      {/* Window Info */}
+      <div className="p-4 rounded-lg" style={{ backgroundColor: COLORS.bgLight }}>
+        <h3 className="font-semibold" style={{ color: COLORS.primary }}>
+          {fundingWindow.funding_window_name}
+        </h3>
+        <p className="text-sm text-gray-600">
+          {agreement.name} – {agreement.reference_number}
+        </p>
+        <div className="mt-2 flex gap-4 text-sm">
+          <span><strong>Slots:</strong> {remainingSlots}</span>
+          <span><strong>Selected:</strong> {selectedStudents.length}</span>
+        </div>
+      </div>
+      
       {/* Search and Filters */}
       <div className="space-y-3">
         <div className="relative">
