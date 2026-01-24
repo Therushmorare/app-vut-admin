@@ -600,7 +600,9 @@ export default function SETAManagementSystem() {
           <LearnerAllocationForm
             fundingWindow={selectedItem.window}
             agreement={selectedItem.agreement}
-            programme={selectedItem.programme}  // updated prop name
+            programmes={selectedItem.programmes.filter(
+              p => p.funding_window_id === selectedItem.window.funding_window_id
+            )}
             allStudents={allStudents}
             allocatedLearners={allocatedLearners}
             onSubmit={handleAllocateLearners}

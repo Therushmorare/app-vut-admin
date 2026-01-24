@@ -6,7 +6,7 @@ import { COLORS } from '../../utils/helpers';
 export default function LearnerAllocationForm({ 
   fundingWindow, 
   agreement, 
-  programme,
+  programmes,
   allStudents, 
   allocatedLearners, 
   onSubmit, 
