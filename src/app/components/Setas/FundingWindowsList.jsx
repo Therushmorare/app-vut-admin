@@ -68,21 +68,21 @@ export default function FundingWindowsList({
               </div>
 
               <div className="flex gap-2">
-                <button
-                  onClick={() =>
-                    onAllocate({
-                      window,
-                      agreement,
-                      programmes: programme
-                    })
-                  }
-                  disabled={remainingSlots <= 0 || programme.length === 0}
-                  className="px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ backgroundColor: COLORS.success }}
-                >
-                  Allocate Learners
-                </button>
-
+              <button
+                onClick={() =>
+                  onAllocate({
+                    window: window,             // make sure it's `window`
+                    agreement: agreement || {}, // safe fallback
+                    programmes: programme || [] // plural `programmes` matches modal check
+                  })
+                }
+                disabled={remainingSlots <= 0 || (programme?.length ?? 0) === 0}
+                className="px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: COLORS.success }}
+              >
+                Allocate Learners
+              </button>
+              
                 <button
                   onClick={() => onEdit(window)}
                   className="p-2 rounded-lg hover:bg-gray-100"
