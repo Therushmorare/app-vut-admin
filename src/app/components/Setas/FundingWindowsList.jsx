@@ -17,10 +17,10 @@ export default function FundingWindowsList({
   return (
     <div className="space-y-6">
       {windows.map(window => {
-        const agreement = agreements.find(a => a.funding_window_id === window.agreement_id);
+        const agreement = agreements.find(a => a.agreement_id === window.agreement_id);
         const windowLearners = allocatedLearners.filter(l => l.fundingWindowId === window.funding_window_id);
         const remainingSlots = window.slots_available - windowLearners.length;
-        const programme = programmes.filter(p => p.agreement_id === window.agreement_id);
+        const programme = programmes.filter(p => p.funding_window === window.funding_window_id);
         const isExpanded = expandedWindows.includes(window.funding_window_id);
         
         return (
