@@ -30,6 +30,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
     loadData();
     fetchCompanies();
     fetchAgreements();
+    fetchAllocatedLearners();
   }, []);
 
     const fetchCompanies = async () => {
@@ -79,6 +80,30 @@ export default function HostCompanyManagement({ allStudents = [] }) {
     } catch (err) {
       console.error('Failed to load SETA Agreements:', err);
       setToast({ type: 'error', message: 'Failed to load SETA Agreements' });
+    }
+  };
+
+  const fetchAllocatedLearners = async () => {
+    try{
+      const res = await axios.get(
+        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/learner-allocations',
+        {withCredentials: true}
+      );
+
+      if (res.status === 200 && Array.isArray(res.data)){
+        setAllocatedLearners(res.data);
+
+        if (typeof window !== 'undefined'){
+          localStorage.setItem('allocated-learners', JSON.stringify(res.data));
+        }
+
+        setToast({ type: 'success', message: 'Allocated learners loaded successfully'});
+      } else {
+        console.warn('Unexpected allocated learners responnse:', res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load Allocated Learners:', err);
+      setToast({ type: 'error', message: 'Failed to load Allocated Learners'});
     }
   };
 
@@ -163,8 +188,8 @@ export default function HostCompanyManagement({ allStudents = [] }) {
       title: 'Delete Host Company',
       message: `Are you sure you want to delete ${company.company_name}? This will also remove all learner placements at this company.`,
       onConfirm: () => {
-        const updatedCompanies = companies.filter(c => c.id !== company.company_id);
-        const updatedPlacements = placements.filter(p => p.companyId !== company.company_id);
+        const updatedCompanies = companies.filter(c => c.company_id !== company.company_id);
+        const updatedPlacements = placements.filter(p => p.company_id !== company.company_id);
         
         setCompanies(updatedCompanies);
         setPlacements(updatedPlacements);
@@ -218,7 +243,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
 
   const handleUpdatePlacement = (data) => {
     const updated = placements.map(p =>
-      p.id === selectedItem.id ? { ...p, ...data } : p
+      p.placement_id === selectedItem.placement_id? { ...p, ...data } : p
     );
     setPlacements(updated);
     savePlacements(updated);
@@ -231,7 +256,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
       title: 'Delete Placement',
       message: `Are you sure you want to delete this learner placement?`,
       onConfirm: () => {
-        const updated = placements.filter(p => p.id !== placement.id);
+        const updated = placements.filter(p => p.placement_id !== placement.placement_id);
         setPlacements(updated);
         savePlacements(updated);
         setConfirmDialog(null);
@@ -243,19 +268,14 @@ export default function HostCompanyManagement({ allStudents = [] }) {
 
   //get lesrners in seta not yet placed
   const getAvailableLearners = (companyId) => {
-    const company = companies.find(c => c.id === companyId);
+    const company = companies.find(c => c.company_id === companyId);
     if (!company) return [];
     
-    if (!company.agreementId) {
-      console.warn('Company does not have a SETA agreement assigned');
-      return [];
-    }
-
-    const placedLearnerIds = placements.map(p => p.learnerId);
+    const placedLearnerIds = placements.map(p => p.student_id);
 
     return allocatedLearners.filter(l => 
-      l.id === company.agreement_id && 
-      !placedLearnerIds.includes(l.id)
+      l.company_id === company.company_id && 
+      !placedLearnerIds.includes(l.company_id)
     );
   };
 
@@ -292,7 +312,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   };
 
   const getPlacementsByCompany = (companyId) => {
-    return placements.filter(p => p.companyId === companyId);
+    return placements.filter(p => p.company_id === companyId);
   };
 
   return (
@@ -474,13 +494,13 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                             {company.company_name}
                           </h3>
                           <p className="text-sm text-gray-600 mb-2">{company.registration_number}</p>
-                          <div className="flex flex-wrap gap-2 mb-2">
+                          {/*<div className="flex flex-wrap gap-2 mb-2">
                             {agreement && (
                               <span className="inline-block px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: COLORS.primary, color: 'white' }}>
                                 {agreement.name}
                               </span>
                             )}
-                          </div>
+                          </div>*/}
                         </div>
                         <div className="flex gap-2">
                           <button
