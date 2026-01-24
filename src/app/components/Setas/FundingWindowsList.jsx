@@ -3,11 +3,11 @@ import { Edit, Trash2 } from 'lucide-react';
 import { COLORS } from '../../utils/helpers';
 
 export default function FundingWindowsList({ 
-  windows = [], 
-  agreements = [],
-  programmes = [],
-  allocatedLearners = [],
-  expandedWindows = [],
+  windows, 
+  agreements,
+  programmes,
+  allocatedLearners,
+  expandedWindows,
   onToggleExpand,
   onAllocate, 
   onEdit, 
