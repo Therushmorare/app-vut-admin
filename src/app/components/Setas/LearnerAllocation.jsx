@@ -72,7 +72,7 @@ export default function LearnerAllocationForm({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedProgrammeId) {
       alert('Please select a programme');
       return;
@@ -83,22 +83,33 @@ export default function LearnerAllocationForm({
       return;
     }
 
-    const allocations = selectedStudents.map(student => ({
-      id: `${selectedProgrammeId}-${student.id}`,
-      fundingWindowId: fundingWindow?.funding_window_id,
-      agreementId: agreement?.agreement_id,
-      programmeId: selectedProgrammeId,
-      studentId: student.id,
-      firstName: student.first_name?.split(' ')[0] || '',
-      lastName: student.last_name?.split(' ').slice(1).join(' ') || '',
-      programme: student.programme || '',
-      faculty: student.faculty || '',
-      email: student.email || '',
-      phone: student.phone || '',
-      allocatedDate: new Date().toISOString()
-    }));
+    const payload = {
+      administrator_id: 1,  // replace with real admin ID
+      students: selectedStudents.map(student => student.id)
+    };
 
-    onSubmit(allocations, selectedProgrammeId);
+    try {
+      const response = await fetch(`https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/allocate-learners/${selectedProgrammeId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Allocation failed:', data);
+        alert(data.message || 'Failed to allocate learners');
+        return;
+      }
+
+      alert('Learners successfully allocated!');
+      onSubmit(selectedStudents, selectedProgrammeId);
+      setSelectedStudents([]);
+    } catch (err) {
+      console.error('API error:', err);
+      alert('An error occurred while allocating learners');
+    }
   };
 
   return (
