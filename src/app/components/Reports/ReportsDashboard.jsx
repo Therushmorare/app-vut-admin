@@ -25,7 +25,7 @@ export default function ReportsDashboard({
     
     // Learner Status
     const placedLearnerIds = placements.map(p => p.learnerId);
-    const placedLearners = allocatedLearners.filter(l => placedLearnerIds.includes(l.id)).length;
+    const placedLearners = allocatedLearners.filter(l => placedLearnerIds.includes(l.student_id)).length;
     const unplacedLearners = totalLearners - placedLearners;
     
     // Faculty Distribution
