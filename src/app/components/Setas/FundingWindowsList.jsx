@@ -14,7 +14,7 @@ export default function FundingWindowsList({
   onDelete 
 }) {
 
-  // 🔐 sanitize once
+  // sanitize once
   const safeAllocatedLearners = Array.isArray(allocatedLearners)
     ? allocatedLearners.filter(Boolean)
     : [];
@@ -27,7 +27,7 @@ export default function FundingWindowsList({
         );
 
         const windowLearners = safeAllocatedLearners.filter(
-          l => l.fundingWindowId === window.funding_window_id
+          l => l.agreement_id === window.agreement_id
         );
 
         const programme = programmes.filter(
