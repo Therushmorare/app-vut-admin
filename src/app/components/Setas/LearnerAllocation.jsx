@@ -85,7 +85,7 @@ export default function LearnerAllocationForm({
 
     const payload = {
       administrator_id: sessionStorage.getItem('admin_id'),
-      students_arr: selectedStudents.map(student => student.id)
+      students: selectedStudents.map(student => student.id)
     };
 
     try {
