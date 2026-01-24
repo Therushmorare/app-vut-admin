@@ -596,9 +596,6 @@ export default function SETAManagementSystem() {
         return <FundingWindowForm window={selectedItem} agreementId={selectedItem.agreement_id} onSubmit={handleUpdateWindow} onCancel={closeModal} />;
       
       case 'allocateLearners':
-        if (!selectedItem?.agreement || !selectedItem?.window) {
-        return <p className="text-center text-gray-500">Missing allocation data</p>;
-        }
         return (
           <LearnerAllocationForm
             fundingWindow={selectedItem.window}
