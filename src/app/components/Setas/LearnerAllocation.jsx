@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState, useMemo } from 'react';
 import { Search, User, CheckCircle } from 'lucide-react';
 import { COLORS } from '../../utils/helpers';
@@ -6,9 +6,9 @@ import { COLORS } from '../../utils/helpers';
 export default function LearnerAllocationForm({ 
   fundingWindow, 
   agreement, 
-  windowProgrammes,  // <-- pass all programmes for this window
-  allStudents, 
-  allocatedLearners, 
+  windowProgrammes = [],  // <-- always default to empty array
+  allStudents = [], 
+  allocatedLearners = [], 
   onSubmit, 
   onCancel 
 }) {
@@ -20,15 +20,25 @@ export default function LearnerAllocationForm({
     windowProgrammes?.[0]?.programme_id || ''
   );
 
-  const allocatedStudentIds = allocatedLearners.map(l => l.studentId);
-  const remainingSlots = fundingWindow.slots_available - allocatedLearners.filter(l => l.fundingWindowId === fundingWindow.funding_window_id).length;
+  // Ensure allocatedLearners is safe
+  const safeAllocatedLearners = Array.isArray(allocatedLearners) 
+    ? allocatedLearners.filter(Boolean)
+    : [];
 
-  const faculties = [...new Set(allStudents.map(s => s.faculty).filter(Boolean))];
-  const programmes = [...new Set(allStudents.map(s => s.programme).filter(Boolean))];
+  const remainingSlots = (fundingWindow?.slots_available || 0) - 
+    safeAllocatedLearners.filter(
+      l => l?.fundingWindowId === fundingWindow?.funding_window_id
+    ).length;
+
+  const allocatedStudentIds = safeAllocatedLearners.map(l => l?.studentId).filter(Boolean);
+
+  // Extract unique faculties and programmes from allStudents safely
+  const faculties = [...new Set(allStudents.map(s => s?.faculty).filter(Boolean))];
+  const programmes = [...new Set(allStudents.map(s => s?.programme).filter(Boolean))];
 
   const availableStudents = useMemo(() => {
     return allStudents.filter(student => {
-      if (student.status !== 'Pending') return false;
+      if (!student || student.status !== 'Pending') return false;
       if (allocatedStudentIds.includes(student.id)) return false;
 
       if (searchTerm) {
@@ -50,6 +60,7 @@ export default function LearnerAllocationForm({
   }, [allStudents, searchTerm, filterFaculty, filterProgramme, allocatedStudentIds]);
 
   const handleToggleStudent = (student) => {
+    if (!student) return;
     if (selectedStudents.find(s => s.id === student.id)) {
       setSelectedStudents(selectedStudents.filter(s => s.id !== student.id));
     } else {
@@ -74,16 +85,16 @@ export default function LearnerAllocationForm({
 
     const allocations = selectedStudents.map(student => ({
       id: `${selectedProgrammeId}-${student.id}`,
-      fundingWindowId: fundingWindow.funding_window_id,
-      agreementId: agreement.agreement_id,
-      programmeId: selectedProgrammeId,  // <-- now included
+      fundingWindowId: fundingWindow?.funding_window_id,
+      agreementId: agreement?.agreement_id,
+      programmeId: selectedProgrammeId,
       studentId: student.id,
-      firstName: student.first_name.split(' ')[0],
-      lastName: student.last_name.split(' ').slice(1).join(' '),
-      programme: student.programme,
-      faculty: student.faculty,
-      email: student.email,
-      phone: student.phone,
+      firstName: student.first_name?.split(' ')[0] || '',
+      lastName: student.last_name?.split(' ').slice(1).join(' ') || '',
+      programme: student.programme || '',
+      faculty: student.faculty || '',
+      email: student.email || '',
+      phone: student.phone || '',
       allocatedDate: new Date().toISOString()
     }));
 
@@ -95,16 +106,20 @@ export default function LearnerAllocationForm({
       {/* Window Info */}
       <div className="p-4 rounded-lg" style={{ backgroundColor: COLORS.bgLight }}>
         <h3 className="font-semibold mb-2" style={{ color: COLORS.primary }}>
-          {fundingWindow.funding_window_name}
+          {fundingWindow?.funding_window_name || 'Unnamed Window'}
         </h3>
-        <p className="text-sm text-gray-600">{agreement.name} - {agreement.reference_number}</p>
+        {agreement ? (
+          <p className="text-sm text-gray-600">{agreement.name} - {agreement.reference_number}</p>
+        ) : (
+          <p className="text-sm text-gray-500">No agreement linked</p>
+        )}
         <div className="mt-2 flex gap-4 text-sm">
           <span><strong>Available Slots:</strong> {remainingSlots}</span>
           <span><strong>Selected:</strong> {selectedStudents.length}</span>
         </div>
 
         {/* Programme Selector */}
-        {windowProgrammes.length > 1 && (
+        {windowProgrammes.length > 0 && (
           <div className="mt-3">
             <label className="text-sm font-medium text-gray-700">Select Programme</label>
             <select
@@ -158,16 +173,14 @@ export default function LearnerAllocationForm({
           >
             <option value="">All Programmes</option>
             {programmes.map(programme => (
-              <option key={programme.name} value={programme.name}>{programme.name}</option>
+              <option key={programme} value={programme}>{programme}</option>
             ))}
           </select>
         </div>
 
         {(searchTerm || filterFaculty || filterProgramme) && (
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">
-              Showing {availableStudents.length} student(s)
-            </span>
+            <span className="text-gray-600">Showing {availableStudents.length} student(s)</span>
             <button
               onClick={() => {
                 setSearchTerm('');
@@ -205,20 +218,12 @@ export default function LearnerAllocationForm({
                       </div>
                       <User className="w-8 h-8 text-gray-400" />
                       <div>
-                        <p className="font-semibold" style={{ color: COLORS.primary }}>
-                          {student.first_name}
-                        </p>
-                        <p className="text-xs text-gray-600">
-                          {student.id} • {student.email}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {student.programme}
-                        </p>
+                        <p className="font-semibold" style={{ color: COLORS.primary }}>{student.first_name}</p>
+                        <p className="text-xs text-gray-600">{student.id} • {student.email}</p>
+                        <p className="text-xs text-gray-500 mt-1">{student.programme}</p>
                       </div>
                     </div>
-                    <div className="text-right text-xs text-gray-500">
-                      <p>{student.faculty}</p>
-                    </div>
+                    <div className="text-right text-xs text-gray-500"><p>{student.faculty}</p></div>
                   </div>
                 </div>
               );
@@ -228,9 +233,7 @@ export default function LearnerAllocationForm({
           <div className="p-8 text-center text-gray-500">
             <User className="w-12 h-12 mx-auto mb-2 text-gray-300" />
             <p>No available students found</p>
-            {(searchTerm || filterFaculty || filterProgramme) && (
-              <p className="text-sm mt-1">Try adjusting your filters</p>
-            )}
+            {(searchTerm || filterFaculty || filterProgramme) && <p className="text-sm mt-1">Try adjusting your filters</p>}
           </div>
         )}
       </div>
