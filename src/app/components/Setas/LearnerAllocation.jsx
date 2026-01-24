@@ -6,7 +6,7 @@ import { COLORS } from '../../utils/helpers';
 export default function LearnerAllocationForm({ 
   fundingWindow, 
   agreement, 
-  windowProgrammes,
+  windowProgrammes,  // <-- pass all programmes for this window
   allStudents, 
   allocatedLearners, 
   onSubmit, 
@@ -16,9 +16,11 @@ export default function LearnerAllocationForm({
   const [searchTerm, setSearchTerm] = useState('');
   const [filterFaculty, setFilterFaculty] = useState('');
   const [filterProgramme, setFilterProgramme] = useState('');
+  const [selectedProgrammeId, setSelectedProgrammeId] = useState(
+    windowProgrammes?.[0]?.programme_id || ''
+  );
 
   const allocatedStudentIds = allocatedLearners.map(l => l.studentId);
-  
   const remainingSlots = fundingWindow.slots_available - allocatedLearners.filter(l => l.fundingWindowId === fundingWindow.funding_window_id).length;
 
   const faculties = [...new Set(allStudents.map(s => s.faculty).filter(Boolean))];
@@ -26,9 +28,8 @@ export default function LearnerAllocationForm({
 
   const availableStudents = useMemo(() => {
     return allStudents.filter(student => {
-      if (student.status !== 'Active') return false;
+      if (student.status !== 'Pending') return false;
       if (allocatedStudentIds.includes(student.id)) return false;
-      
 
       if (searchTerm) {
         const search = searchTerm.toLowerCase();
@@ -38,12 +39,10 @@ export default function LearnerAllocationForm({
           student.student_number?.toLowerCase().includes(search) ||
           student.email?.toLowerCase().includes(search) ||
           student.ID_number?.toLowerCase().includes(search);
-        
         if (!matchesSearch) return false;
       }
 
       if (filterFaculty && student.faculty !== filterFaculty) return false;
-
       if (filterProgramme && student.programme !== filterProgramme) return false;
 
       return true;
@@ -63,15 +62,21 @@ export default function LearnerAllocationForm({
   };
 
   const handleSubmit = () => {
+    if (!selectedProgrammeId) {
+      alert('Please select a programme');
+      return;
+    }
+
     if (selectedStudents.length === 0) {
       alert('Please select at least one learner');
       return;
     }
 
     const allocations = selectedStudents.map(student => ({
-      id: `${fundingWindow.funding_window_id}-${student.id}`,
+      id: `${selectedProgrammeId}-${student.id}`,
       fundingWindowId: fundingWindow.funding_window_id,
       agreementId: agreement.agreement_id,
+      programmeId: selectedProgrammeId,  // <-- now included
       studentId: student.id,
       firstName: student.first_name.split(' ')[0],
       lastName: student.last_name.split(' ').slice(1).join(' '),
@@ -82,7 +87,7 @@ export default function LearnerAllocationForm({
       allocatedDate: new Date().toISOString()
     }));
 
-    onSubmit(allocations);
+    onSubmit(allocations, selectedProgrammeId);
   };
 
   return (
@@ -92,19 +97,30 @@ export default function LearnerAllocationForm({
         <h3 className="font-semibold mb-2" style={{ color: COLORS.primary }}>
           {fundingWindow.funding_window_name}
         </h3>
-        {agreement && (
-          <p className="text-sm text-gray-600">
-            {agreement.name} - {agreement.reference_number}
-          </p>
-        )}
+        <p className="text-sm text-gray-600">{agreement.name} - {agreement.reference_number}</p>
         <div className="mt-2 flex gap-4 text-sm">
-          <span>
-            <strong>Available Slots:</strong> {remainingSlots}
-          </span>
-          <span>
-            <strong>Selected:</strong> {selectedStudents.length}
-          </span>
+          <span><strong>Available Slots:</strong> {remainingSlots}</span>
+          <span><strong>Selected:</strong> {selectedStudents.length}</span>
         </div>
+
+        {/* Programme Selector */}
+        {windowProgrammes.length > 1 && (
+          <div className="mt-3">
+            <label className="text-sm font-medium text-gray-700">Select Programme</label>
+            <select
+              value={selectedProgrammeId}
+              onChange={(e) => setSelectedProgrammeId(e.target.value)}
+              className="w-full mt-1 px-3 py-2 border rounded-lg text-sm"
+              style={{ borderColor: COLORS.border }}
+            >
+              {windowProgrammes.map(p => (
+                <option key={p.programme_id} value={p.programme_id}>
+                  {p.programme_name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       {/* Search and Filters */}
@@ -141,8 +157,8 @@ export default function LearnerAllocationForm({
             style={{ borderColor: COLORS.border }}
           >
             <option value="">All Programmes</option>
-            {windowProgrammes.map(programme => (
-              <option key={programme.programme_id} value={programme.programme_id}>{programme.programme_name}</option>
+            {programmes.map(programme => (
+              <option key={programme.name} value={programme.name}>{programme.name}</option>
             ))}
           </select>
         </div>
