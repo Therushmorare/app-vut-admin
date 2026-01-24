@@ -6,7 +6,7 @@ import { COLORS } from '../../utils/helpers';
 export default function LearnerAllocationForm({ 
   fundingWindow, 
   agreement, 
-  programmes,
+  windowProgrammes,
   allStudents, 
   allocatedLearners, 
   onSubmit, 
@@ -141,8 +141,8 @@ export default function LearnerAllocationForm({
             style={{ borderColor: COLORS.border }}
           >
             <option value="">All Programmes</option>
-            {programmes.map(programme => (
-              <option key={programme} value={programme}>{programme}</option>
+            {windowProgrammes.map(programme => (
+              <option key={programme.programme_id} value={programme.programme_id}>{programme.programme_name}</option>
             ))}
           </select>
         </div>
