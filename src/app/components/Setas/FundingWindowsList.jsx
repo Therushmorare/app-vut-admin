@@ -13,6 +13,7 @@ export default function FundingWindowsList({
   onEdit, 
   onDelete 
 }) {
+
   return (
     <div className="space-y-6">
       {windows.map(window => {
@@ -37,11 +38,11 @@ export default function FundingWindowsList({
                     onAllocate({
                       window,
                       agreement,
-                      programmes: windowProgrammes
+                      programmes: programmes
                     })
                   }
                   disabled={
-                    remainingSlots <= 0 || windowProgrammes.length === 0
+                    remainingSlots <= 0 || programmes.length === 0
                   }
                   className="px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ backgroundColor: COLORS.success }}
