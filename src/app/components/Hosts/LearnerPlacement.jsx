@@ -72,7 +72,7 @@ const enrichedLearners = useMemo(() => {
       console.log("resolved studentId (raw):", studentId);
 
       if (!studentId) {
-        console.warn("❌ No studentId on allocation");
+        console.warn("No studentId on allocation");
         return null;
       }
 
@@ -83,7 +83,7 @@ const enrichedLearners = useMemo(() => {
       console.log("student lookup result:", student);
 
       if (!student) {
-        console.warn("❌ Missing studentInfo for allocation:", {
+        console.warn("Missing studentInfo for allocation:", {
           allocation,
           normalizedId,
           studentMapKeys: Object.keys(studentMap),
@@ -92,12 +92,12 @@ const enrichedLearners = useMemo(() => {
       }
 
       if (seen.has(student.id)) {
-        console.warn("⚠️ Duplicate student skipped:", student.id);
+        console.warn("Duplicate student skipped:", student.id);
         return null;
       }
 
       seen.add(student.id);
-      console.log("✅ Student accepted:", student);
+      console.log("Student accepted:", student);
 
       return {
         studentId: student.id,
@@ -234,81 +234,120 @@ const enrichedLearners = useMemo(() => {
 
   /* ---------------- UI ---------------- */
   return (
-    <div className="space-y-6">
+  <div className="flex flex-col md:flex-row gap-6">
 
-      {/* Learner Selection */}
+    {/* ---------------- LEFT: Learner Selection ---------------- */}
+    <div className="flex-1 flex flex-col">
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-sm font-semibold" style={{ color: COLORS.primary }}>
+          Select Learners {!placement && '*'}
+        </h3>
+        {!placement && (
+          <button
+            type="button"
+            onClick={handleSelectAll}
+            className="text-sm font-medium"
+            style={{ color: COLORS.primary }}
+          >
+            {allSelected ? 'Deselect All' : 'Select All'}
+          </button>
+        )}
+      </div>
+
+      <div className="relative mb-2">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <input
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          placeholder="Search learners..."
+          className="w-full pl-9 pr-4 py-2 border rounded-lg"
+        />
+      </div>
+
       {enrichedLearners.length === 0 ? (
-        <div className="rounded-lg p-6 text-center" style={{ backgroundColor: COLORS.bgLight }}>
-          <p className="text-gray-600 mb-2">No learners available for placement</p>
+        <div className="flex-1 rounded-lg p-6 text-center bg-gray-50">
+          <p className="text-gray-600 mb-1">No learners available for placement</p>
           <p className="text-sm text-gray-500">
             Learners must be allocated to the same SETA before placement.
           </p>
         </div>
       ) : (
-        <>
-          <div className="flex justify-between items-center">
-            <label className="text-sm font-medium" style={{ color: COLORS.primary }}>
-              Select Learners {!placement && '*'}
-            </label>
-
-            {!placement && (
-              <button
-                type="button"
-                onClick={handleSelectAll}
-                className="text-sm"
-                style={{ color: COLORS.primary }}
+        <div className="flex-1 border rounded-lg overflow-y-auto max-h-[300px]">
+          {filteredLearners.map(l => {
+            const selected = selectedLearners.includes(l.studentId);
+            return (
+              <div
+                key={l.studentId}
+                onClick={() => handleToggleLearner(l.studentId)}
+                className={`flex items-center justify-between p-3 cursor-pointer ${
+                  selected ? 'bg-blue-50' : 'hover:bg-gray-50'
+                }`}
               >
-                {allSelected ? 'Deselect All' : 'Select All'}
-              </button>
-            )}
-          </div>
-
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              placeholder="Search learners..."
-              className="w-full pl-9 pr-4 py-2 border rounded-lg"
-            />
-          </div>
-
-          <div className="border rounded-lg max-h-64 overflow-y-auto">
-            {filteredLearners.map(l => {
-              const selected = selectedLearners.includes(l.studentId);
-
-              return (
-                <div
-                  key={l.studentId}
-                  onClick={() => handleToggleLearner(l.studentId)}
-                  className={`p-3 cursor-pointer ${
-                    selected ? 'bg-blue-50' : 'hover:bg-gray-50'
-                  }`}
-                >
-                  <p className="font-semibold">
-                    {l.firstName} {l.lastName}
-                  </p>
+                <div>
+                  <p className="font-semibold">{l.firstName} {l.lastName}</p>
                   <p className="text-xs text-gray-600">
                     {l.studentId} • {l.programme || 'No programme'}
                   </p>
                 </div>
-              );
-            })}
-          </div>
-        </>
+                <input
+                  type="checkbox"
+                  checked={selected}
+                  readOnly
+                  className="w-4 h-4"
+                />
+              </div>
+            );
+          })}
+        </div>
       )}
+    </div>
 
-      {/* Placement Details */}
-      <div className="grid grid-cols-2 gap-4">
-        <input type="date" value={formData.startDate} onChange={e => handleChange('startDate', e.target.value)} />
-        <input type="date" value={formData.endDate} onChange={e => handleChange('endDate', e.target.value)} />
+    {/* ---------------- RIGHT: Placement Details ---------------- */}
+    <div className="flex-1 flex flex-col gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <input
+          type="date"
+          value={formData.startDate}
+          onChange={e => handleChange('startDate', e.target.value)}
+          className="border rounded-lg px-3 py-2"
+          placeholder="Start Date"
+        />
+        <input
+          type="date"
+          value={formData.endDate}
+          onChange={e => handleChange('endDate', e.target.value)}
+          className="border rounded-lg px-3 py-2"
+          placeholder="End Date"
+        />
       </div>
 
-      <input placeholder="Supervisor Name" value={formData.supervisorName} onChange={e => handleChange('supervisorName', e.target.value)} />
-      <input placeholder="Supervisor Email" value={formData.supervisorEmail} onChange={e => handleChange('supervisorEmail', e.target.value)} />
-      <input placeholder="Supervisor Phone" value={formData.supervisorPhone} onChange={e => handleChange('supervisorPhone', e.target.value)} />
+      <input
+        type="text"
+        placeholder="Supervisor Name"
+        value={formData.supervisorName}
+        onChange={e => handleChange('supervisorName', e.target.value)}
+        className="border rounded-lg px-3 py-2"
+      />
+      <input
+        type="email"
+        placeholder="Supervisor Email"
+        value={formData.supervisorEmail}
+        onChange={e => handleChange('supervisorEmail', e.target.value)}
+        className="border rounded-lg px-3 py-2"
+      />
+      <input
+        type="tel"
+        placeholder="Supervisor Phone"
+        value={formData.supervisorPhone}
+        onChange={e => handleChange('supervisorPhone', e.target.value)}
+        className="border rounded-lg px-3 py-2"
+      />
 
-      <select value={formData.status} onChange={e => handleChange('status', e.target.value)}>
+      <select
+        value={formData.status}
+        onChange={e => handleChange('status', e.target.value)}
+        className="border rounded-lg px-3 py-2"
+      >
         <option value="Active">Active</option>
         <option value="Completed">Completed</option>
         <option value="On Hold">On Hold</option>
@@ -319,11 +358,15 @@ const enrichedLearners = useMemo(() => {
         placeholder="Notes"
         value={formData.notes}
         onChange={e => handleChange('notes', e.target.value)}
+        className="border rounded-lg px-3 py-2 h-24 resize-none"
       />
 
       {/* Actions */}
-      <div className="flex gap-3 pt-4">
-        <button onClick={onCancel} className="flex-1 border rounded-lg px-4 py-2">
+      <div className="flex gap-3 pt-2">
+        <button
+          onClick={onCancel}
+          className="flex-1 border rounded-lg px-4 py-2 hover:bg-gray-50"
+        >
           Cancel
         </button>
         <button
@@ -335,5 +378,8 @@ const enrichedLearners = useMemo(() => {
         </button>
       </div>
     </div>
+
+  </div>
+
   );
 }
