@@ -92,11 +92,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
         { withCredentials: true }
       );
 
-      if (
-        res.status === 200 &&
-        res.data &&
-        Array.isArray(res.data.allocations)
-      ) {
+      if (res.status === 200 && Array.isArray(res.data.allocations)) {
         setAllocatedLearners(res.data.allocations);
 
         if (typeof window !== 'undefined') {
@@ -106,19 +102,13 @@ export default function HostCompanyManagement({ allStudents = [] }) {
           );
         }
 
-        setToast({
-          type: 'success',
-          message: 'Allocated learners loaded successfully'
-        });
+        setToast({ type: 'success', message: 'Allocated learners loaded successfully' });
       } else {
         console.warn('Unexpected allocated learners response:', res.data);
       }
     } catch (err) {
       console.error('Failed to load Allocated Learners:', err);
-      setToast({
-        type: 'error',
-        message: 'Failed to load Allocated Learners'
-      });
+      setToast({ type: 'error', message: 'Failed to load Allocated Learners' });
     }
   };
 
@@ -129,11 +119,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
         { withCredentials: true }
       );
 
-      if (
-        res.status === 200 &&
-        res.data &&
-        Array.isArray(res.data.students)
-      ) {
+      if (res.status === 200 && Array.isArray(res.data.students)) {
         setAllStudents(res.data.students);
 
         if (typeof window !== 'undefined') {
@@ -143,19 +129,13 @@ export default function HostCompanyManagement({ allStudents = [] }) {
           );
         }
 
-        setToast({
-          type: 'success',
-          message: 'Students loaded successfully'
-        });
+        setToast({ type: 'success', message: 'Students loaded successfully' });
       } else {
         console.warn('Unexpected Students response:', res.data);
       }
     } catch (err) {
       console.error('Failed to load Students:', err);
-      setToast({
-        type: 'error',
-        message: 'Failed to load Students'
-      });
+      setToast({ type: 'error', message: 'Failed to load Students' });
     }
   };
 
