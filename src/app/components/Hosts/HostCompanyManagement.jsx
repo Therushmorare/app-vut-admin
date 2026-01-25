@@ -301,33 +301,24 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   };
 
   //get learners in seta not yet placed
-const getAvailableLearners = (programmeId) => {
-  console.log("getAvailableLearners CALLED");
-  console.log("programmeId:", programmeId);
-  console.log("allocatedLearners:", allocatedLearners);
+  const getAvailableLearners = (agreementId) => {
+    if (!agreementId) return [];
 
-  if (!programmeId) {
-    console.warn("❌ No programmeId passed");
-    return [];
-  }
+    // Find allocations for this agreement
+    const allocationsForCompany = allocatedLearners.filter(
+      a => a.agreement_id === agreementId
+    );
 
-  const normalizedProgrammeId = programmeId.trim().toLowerCase();
-  console.log("normalizedProgrammeId:", normalizedProgrammeId);
+    // Learners already placed anywhere
+    const placedStudentIds = new Set(
+      placements.map(p => p.student_id?.trim().toLowerCase())
+    );
 
-  const result = allocatedLearners.filter(allocation => {
-    console.log("\nChecking allocation:", allocation);
-
-    const allocationProgrammeId =
-      allocation.programme_id?.trim().toLowerCase();
-
-    console.log("allocationProgrammeId:", allocationProgrammeId);
-
-    return allocationProgrammeId === normalizedProgrammeId;
-  });
-
-  console.log("getAvailableLearners RESULT:", result);
-  return result;
-};
+    return allocationsForCompany.filter(allocation => {
+      const studentId = allocation.student_id?.trim().toLowerCase();
+      return studentId && !placedStudentIds.has(studentId);
+    });
+  };
 
   const stats = useMemo(() => {
     const totalCompanies = companies.length;
@@ -811,10 +802,10 @@ const getAvailableLearners = (programmeId) => {
                   </div>
                 )}
 
-                {modalType === 'createPlacement' && selectedItem && (
+                {modalType === 'createPlacement' && showModal && selectedItem && (
                   <LearnerPlacementForm
                     companyId={selectedItem.company_id}
-                    availableLearners={getAvailableLearners(programmeId)}
+                    availableLearners={getAvailableLearners(selectedItem.agreement_id)}
                     studentInfo={aStudents}
                     onSubmit={handleCreatePlacement}
                     onCancel={closeModal}
