@@ -304,22 +304,11 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   const getAvailableLearners = (programmeId) => {
     if (!programmeId) return [];
 
-    // Normalize programmeId for comparison
     const normalizedProgrammeId = programmeId.trim().toLowerCase();
-
-    // learners already placed anywhere
-    const placedStudentIds = new Set(
-      placements.map(p => p.student_id?.trim().toLowerCase())
-    );
 
     return allocatedLearners.filter(allocation => {
       const allocationProgrammeId = allocation.programme_id?.trim().toLowerCase();
-      const studentId = allocation.student_id?.trim().toLowerCase();
-
-      return (
-        allocationProgrammeId === normalizedProgrammeId &&
-        !placedStudentIds.has(studentId)
-      );
+      return allocationProgrammeId === normalizedProgrammeId;
     });
   };
 
