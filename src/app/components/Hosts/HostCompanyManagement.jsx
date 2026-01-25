@@ -86,52 +86,78 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   };
 
   const fetchAllocatedLearners = async () => {
-    try{
+    try {
       const res = await axios.get(
         'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/learner-allocations',
-        {withCredentials: true}
+        { withCredentials: true }
       );
 
-      if (res.status === 200 && Array.isArray(res.data)){
-        setAllocatedLearners(res.data);
+      if (
+        res.status === 200 &&
+        res.data &&
+        Array.isArray(res.data.allocations)
+      ) {
+        setAllocatedLearners(res.data.allocations);
 
-        if (typeof window !== 'undefined'){
-          localStorage.setItem('allocated-learners', JSON.stringify(res.data));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(
+            'allocated-learners',
+            JSON.stringify(res.data.allocations)
+          );
         }
 
-        setToast({ type: 'success', message: 'Allocated learners loaded successfully'});
+        setToast({
+          type: 'success',
+          message: 'Allocated learners loaded successfully'
+        });
       } else {
-        console.warn('Unexpected allocated learners responnse:', res.data);
+        console.warn('Unexpected allocated learners response:', res.data);
       }
     } catch (err) {
       console.error('Failed to load Allocated Learners:', err);
-      setToast({ type: 'error', message: 'Failed to load Allocated Learners'});
+      setToast({
+        type: 'error',
+        message: 'Failed to load Allocated Learners'
+      });
     }
   };
 
   const fetchAllStudents = async () => {
-    try{
+    try {
       const res = await axios.get(
         'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/students',
-        {withCredentials: true}
+        { withCredentials: true }
       );
 
-      if (res.status === 200 && Array.isArray(res.data)){
-        setAllStudents(res.data);
+      if (
+        res.status === 200 &&
+        res.data &&
+        Array.isArray(res.data.students)
+      ) {
+        setAllStudents(res.data.students);
 
-        if (typeof window !== 'undefined'){
-          localStorage.setItem('all-students', JSON.stringify(res.data));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(
+            'all-students',
+            JSON.stringify(res.data.students)
+          );
         }
 
-        setToast({ type: 'success', message: 'Students loaded successfully'});
+        setToast({
+          type: 'success',
+          message: 'Students loaded successfully'
+        });
       } else {
-        console.warn('Unexpected Students responnse:', res.data);
+        console.warn('Unexpected Students response:', res.data);
       }
     } catch (err) {
       console.error('Failed to load Students:', err);
-      setToast({ type: 'error', message: 'Failed to load Students'});
+      setToast({
+        type: 'error',
+        message: 'Failed to load Students'
+      });
     }
-  }
+  };
 
   const loadData = () => {
     try {
