@@ -301,16 +301,33 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   };
 
   //get learners in seta not yet placed
-  const getAvailableLearners = (programmeId) => {
-    if (!programmeId) return [];
+const getAvailableLearners = (programmeId) => {
+  console.log("getAvailableLearners CALLED");
+  console.log("programmeId:", programmeId);
+  console.log("allocatedLearners:", allocatedLearners);
 
-    const normalizedProgrammeId = programmeId.trim().toLowerCase();
+  if (!programmeId) {
+    console.warn("❌ No programmeId passed");
+    return [];
+  }
 
-    return allocatedLearners.filter(allocation => {
-      const allocationProgrammeId = allocation.programme_id?.trim().toLowerCase();
-      return allocationProgrammeId === normalizedProgrammeId;
-    });
-  };
+  const normalizedProgrammeId = programmeId.trim().toLowerCase();
+  console.log("normalizedProgrammeId:", normalizedProgrammeId);
+
+  const result = allocatedLearners.filter(allocation => {
+    console.log("\nChecking allocation:", allocation);
+
+    const allocationProgrammeId =
+      allocation.programme_id?.trim().toLowerCase();
+
+    console.log("allocationProgrammeId:", allocationProgrammeId);
+
+    return allocationProgrammeId === normalizedProgrammeId;
+  });
+
+  console.log("getAvailableLearners RESULT:", result);
+  return result;
+};
 
   const stats = useMemo(() => {
     const totalCompanies = companies.length;
