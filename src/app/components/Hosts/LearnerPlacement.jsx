@@ -41,17 +41,20 @@ export default function LearnerPlacementForm({
 
   /* ---------------- STUDENT LOOKUP ---------------- */
   const studentMap = useMemo(() => {
-    return studentInfo.reduce((acc, s) => {
-      acc[s.id] = s;
+    const map = studentInfo.reduce((acc, s) => {
+      const key = normalizeId(s.id); // Normalize key here
+      acc[key] = s;
       return acc;
     }, {});
+    console.log('STUDENT MAP:', map);
+    return map;
   }, [studentInfo]);
 
   /* ---------------- ENRICH + DEDUPE ALLOCATIONS ---------------- */
   const enrichedLearners = useMemo(() => {
     const seen = new Set();
 
-    return availableLearners
+    const result = availableLearners
       .map(allocation => {
         const studentId =
           allocation.student_id ??
@@ -62,7 +65,6 @@ export default function LearnerPlacementForm({
 
         const student = studentMap[normalizeId(studentId)];
 
-        // TEMP FALLBACK (prevents silent failure)
         if (!student) {
           console.warn('Missing studentInfo for allocation:', allocation);
           return null;
@@ -84,6 +86,9 @@ export default function LearnerPlacementForm({
         };
       })
       .filter(Boolean);
+
+    console.log('ENRICHED LEARNERS:', result);
+    return result;
   }, [availableLearners, studentMap]);
 
   /* ---------------- FILTER ---------------- */
@@ -92,7 +97,7 @@ export default function LearnerPlacementForm({
 
     const search = searchTerm.toLowerCase();
 
-    return enrichedLearners.filter(l => {
+    const result = enrichedLearners.filter(l => {
       const fullName = `${l.firstName} ${l.lastName}`.toLowerCase();
       const studentId = String(l.studentId).toLowerCase();
       const programme = l.programme?.toLowerCase() || '';
@@ -103,6 +108,9 @@ export default function LearnerPlacementForm({
         programme.includes(search)
       );
     });
+
+    console.log('FILTERED LEARNERS:', result);
+    return result;
   }, [enrichedLearners, searchTerm]);
 
   /* ---------------- HANDLERS ---------------- */
@@ -168,6 +176,8 @@ export default function LearnerPlacementForm({
   /* ---------------- SUBMIT ---------------- */
   const handleSubmit = () => {
     if (!validate()) return;
+
+    console.log('SUBMITTING WITH SELECTED LEARNERS:', selectedLearners);
 
     if (placement) {
       if (!selectedLearners[0]) return;
