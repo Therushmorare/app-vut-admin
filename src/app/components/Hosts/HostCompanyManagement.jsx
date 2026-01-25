@@ -321,12 +321,17 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   };
 
   //get learners in seta not yet placed
-  const getAvailableLearners = (setaProgrammeId) => {
-    const placedStudentIds = placements.map(p => p.student_id);
+  const getAvailableLearners = (programmeId) => {
+    if (!programmeId) return [];
 
-    return allocatedLearners.filter(l =>
-      l.programme_id === setaProgrammeId &&
-      !placedStudentIds.includes(l.student_id)
+    // learners already placed anywhere
+    const placedStudentIds = new Set(
+      placements.map(p => p.student_id)
+    );
+
+    return allocatedLearners.filter(allocation =>
+      allocation.programme_id === programmeId &&
+      !placedStudentIds.has(allocation.student_id)
     );
   };
 
@@ -806,7 +811,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                   <LearnerPlacementForm
                     companyId={selectedItem.company_id}
                     availableLearners={getAvailableLearners(selectedItem.programme_id)}
-                    studentInfo={aStudents}
+                    studentInfo={allStudents}
                     onSubmit={handleCreatePlacement}
                     onCancel={closeModal}
                   />
