@@ -365,6 +365,12 @@ const getAvailableLearners = (programmeId) => {
     return placements.filter(p => p.company_id === companyId);
   };
 
+  const programmeId =
+  selectedItem?.programme_id ||
+  selectedItem?.programmeId ||
+  selectedItem?.programme?.id ||
+  selectedItem?.seta_programme_id;
+
   return (
     <div className="min-h-screen p-6" style={{ backgroundColor: COLORS.bgLight }}>
       <div className="max-w-7xl mx-auto">
@@ -804,12 +810,13 @@ const getAvailableLearners = (programmeId) => {
                 {modalType === 'createPlacement' && selectedItem && (
                   <LearnerPlacementForm
                     companyId={selectedItem.company_id}
-                    availableLearners={getAvailableLearners(selectedItem.programme_id)}
+                    availableLearners={getAvailableLearners(programmeId)}
                     studentInfo={aStudents}
                     onSubmit={handleCreatePlacement}
                     onCancel={closeModal}
                   />
-                  )}
+                    )}
+
                 {modalType === 'editPlacement' && selectedItem && (
                   <LearnerPlacementForm
                     placement={selectedItem}
