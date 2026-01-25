@@ -13,7 +13,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   const [companies, setCompanies] = useState([]);
   const [placements, setPlacements] = useState([]);
   const [allocatedLearners, setAllocatedLearners] = useState([]);
-  const [allStudents, setAllStudents] = useState([]);
+  const [aStudents, setAllStudents] = useState([]);
   const [agreements, setAgreements] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterSector, setFilterSector] = useState('');
@@ -780,7 +780,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                   <LearnerPlacementForm
                     companyId={selectedItem.company_id}
                     availableLearners={getAvailableLearners(selectedItem.programme_id)}
-                    studentInfo={allStudents}
+                    studentInfo={aStudents}
                     onSubmit={handleCreatePlacement}
                     onCancel={closeModal}
                   />
@@ -793,7 +793,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                       ...getAvailableLearners(selectedItem.programme_id),
                       selectedItem // ensure current learner stays selectable
                     ]}
-                    studentInfo={allStudents}
+                    studentInfo={aStudents}
                     onSubmit={handleUpdatePlacement}
                     onCancel={closeModal}
                   />
