@@ -365,6 +365,8 @@ const getAvailableLearners = (programmeId) => {
     return placements.filter(p => p.company_id === companyId);
   };
 
+  console.log("selectedItem content:", selectedItem);
+
   const programmeId =
   selectedItem?.programme_id ||
   selectedItem?.programmeId ||
