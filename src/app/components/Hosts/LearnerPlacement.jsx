@@ -51,45 +51,73 @@ export default function LearnerPlacementForm({
   }, [studentInfo]);
 
   /* ---------------- ENRICH + DEDUPE ALLOCATIONS ---------------- */
-  const enrichedLearners = useMemo(() => {
-    const seen = new Set();
+const enrichedLearners = useMemo(() => {
+  console.log("===== ENRICHMENT START =====");
+  console.log("availableLearners:", availableLearners);
+  console.log("studentMap:", studentMap);
+  console.log("studentMap keys:", Object.keys(studentMap));
 
-    const result = availableLearners
-      .map(allocation => {
-        const studentId =
-          allocation.student_id ??
-          allocation.studentId ??
-          allocation.learner_id;
+  const seen = new Set();
 
-        if (!studentId) return null;
+  const result = availableLearners
+    .map((allocation, index) => {
+      console.log(`\n--- Allocation [${index}] ---`);
+      console.log("allocation raw:", allocation);
 
-        const student = studentMap[normalizeId(studentId)];
+      const studentId =
+        allocation.student_id ??
+        allocation.studentId ??
+        allocation.learner_id;
 
-        if (!student) {
-          console.warn('Missing studentInfo for allocation:', allocation);
-          return null;
-        }
+      console.log("resolved studentId (raw):", studentId);
 
-        if (seen.has(student.id)) return null;
-        seen.add(student.id);
+      if (!studentId) {
+        console.warn("❌ No studentId on allocation");
+        return null;
+      }
 
-        return {
-          studentId: student.id,
-          firstName: student.first_name ?? '',
-          lastName: student.last_name ?? '',
-          email: student.email ?? '',
-          phone: student.phone ?? '',
-          programme: student.programme ?? '',
-          faculty: student.faculty ?? '',
-          setaProgrammeId: allocation.programme_id,
-          fundingWindowId: allocation.funding_window_id
-        };
-      })
-      .filter(Boolean);
+      const normalizedId = normalizeId(studentId);
+      console.log("normalized studentId:", normalizedId);
 
-    console.log('ENRICHED LEARNERS:', result);
-    return result;
-  }, [availableLearners, studentMap]);
+      const student = studentMap[normalizedId];
+      console.log("student lookup result:", student);
+
+      if (!student) {
+        console.warn("❌ Missing studentInfo for allocation:", {
+          allocation,
+          normalizedId,
+          studentMapKeys: Object.keys(studentMap),
+        });
+        return null;
+      }
+
+      if (seen.has(student.id)) {
+        console.warn("⚠️ Duplicate student skipped:", student.id);
+        return null;
+      }
+
+      seen.add(student.id);
+      console.log("✅ Student accepted:", student);
+
+      return {
+        studentId: student.id,
+        firstName: student.first_name ?? '',
+        lastName: student.last_name ?? '',
+        email: student.email ?? '',
+        phone: student.phone ?? '',
+        programme: student.programme ?? '',
+        faculty: student.faculty ?? '',
+        setaProgrammeId: allocation.programme_id,
+        fundingWindowId: allocation.funding_window_id
+      };
+    })
+    .filter(Boolean);
+
+  console.log("===== ENRICHMENT END =====");
+  console.log("ENRICHED LEARNERS RESULT:", result);
+
+  return result;
+}, [availableLearners, studentMap]);
 
   /* ---------------- FILTER ---------------- */
   const filteredLearners = useMemo(() => {
