@@ -365,11 +365,9 @@ const getAvailableLearners = (programmeId) => {
     return placements.filter(p => p.company_id === companyId);
   };
 
-  const programmeId =
-  selectedItem?.programme_id ||
-  selectedItem?.programmeId ||
-  selectedItem?.programme?.id ||
-  selectedItem?.seta_programme_id;
+  const programmeId = allocatedLearners.find(
+    a => a.agreement_id === selectedItem?.id
+  )?.programme_id;
 
   return (
     <div className="min-h-screen p-6" style={{ backgroundColor: COLORS.bgLight }}>
@@ -815,7 +813,7 @@ const getAvailableLearners = (programmeId) => {
                     onSubmit={handleCreatePlacement}
                     onCancel={closeModal}
                   />
-                    )}
+                )}
 
                 {modalType === 'editPlacement' && selectedItem && (
                   <LearnerPlacementForm
