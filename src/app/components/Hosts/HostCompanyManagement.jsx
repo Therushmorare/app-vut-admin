@@ -365,9 +365,13 @@ const getAvailableLearners = (programmeId) => {
     return placements.filter(p => p.company_id === companyId);
   };
 
-  const programmeId = allocatedLearners.find(
-    a => a.agreement_id === selectedItem?.id
-  )?.programme_id;
+  const programmeId =
+  selectedItem?.programme_id ||
+  selectedItem?.programmeId ||
+  selectedItem?.programme?.id ||
+  selectedItem?.seta_programme_id;
+
+  console.log("Resolved programmeId:", programmeId);
 
   return (
     <div className="min-h-screen p-6" style={{ backgroundColor: COLORS.bgLight }}>
