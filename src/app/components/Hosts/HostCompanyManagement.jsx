@@ -799,7 +799,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                   <LearnerPlacementForm
                     companyId={selectedItem.company_id}
                     availableLearners={getAvailableLearners(selectedItem.programme_id)}
-                    studentInfo={allStudents}
+                    studentInfo={aStudents}
                     onSubmit={handleCreatePlacement}
                     onCancel={closeModal}
                   />
