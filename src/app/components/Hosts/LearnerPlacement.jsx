@@ -3,6 +3,8 @@ import React, { useState, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import { COLORS } from '../../utils/helpers';
 
+const normalizeId = (id) => String(id).toLowerCase();
+
 export default function LearnerPlacementForm({ 
   placement = null,
   companyId, 
