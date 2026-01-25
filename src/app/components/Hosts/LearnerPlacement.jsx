@@ -51,20 +51,32 @@ export default function LearnerPlacementForm({
 
     return availableLearners
       .map(allocation => {
-        const student = studentMap[allocation.student_id];
-        if (!student) return null;
+        const studentId =
+          allocation.student_id ??
+          allocation.studentId ??
+          allocation.learner_id;
+
+        if (!studentId) return null;
+
+        const student = studentMap[normalizeId(studentId)];
+
+        // TEMP FALLBACK (prevents silent failure)
+        if (!student) {
+          console.warn('Missing studentInfo for allocation:', allocation);
+          return null;
+        }
 
         if (seen.has(student.id)) return null;
         seen.add(student.id);
 
         return {
           studentId: student.id,
-          firstName: student.first_name,
-          lastName: student.last_name,
-          email: student.email,
-          phone: student.phone,
-          programme: student.programme,
-          faculty: student.faculty,
+          firstName: student.first_name ?? '',
+          lastName: student.last_name ?? '',
+          email: student.email ?? '',
+          phone: student.phone ?? '',
+          programme: student.programme ?? '',
+          faculty: student.faculty ?? '',
           setaProgrammeId: allocation.programme_id,
           fundingWindowId: allocation.funding_window_id
         };
