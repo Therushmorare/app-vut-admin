@@ -39,22 +39,19 @@ export default function LearnerPlacementForm({
 
   const [errors, setErrors] = useState({});
 
-  /* ---------------- STUDENT LOOKUP ---------------- */
   const studentMap = useMemo(() => {
     const map = studentInfo.reduce((acc, s) => {
-      const key = normalizeId(s.id); // Normalize key here
-      acc[key] = s;
+      acc[normalizeId(s.id)] = s;  // normalize studentInfo IDs
       return acc;
     }, {});
     console.log('STUDENT MAP:', map);
     return map;
   }, [studentInfo]);
 
-  /* ---------------- ENRICH + DEDUPE ALLOCATIONS ---------------- */
   const enrichedLearners = useMemo(() => {
     const seen = new Set();
 
-    const result = availableLearners
+    return availableLearners
       .map(allocation => {
         const studentId =
           allocation.student_id ??
@@ -63,10 +60,10 @@ export default function LearnerPlacementForm({
 
         if (!studentId) return null;
 
-        const student = studentMap[normalizeId(studentId)];
+        const student = studentMap[normalizeId(studentId)];  // normalize allocation ID too
 
         if (!student) {
-          console.warn('Missing studentInfo for allocation:', allocation);
+          console.warn('Missing studentInfo for allocation:', allocation, 'Normalized ID:', normalizeId(studentId));
           return null;
         }
 
@@ -86,9 +83,6 @@ export default function LearnerPlacementForm({
         };
       })
       .filter(Boolean);
-
-    console.log('ENRICHED LEARNERS:', result);
-    return result;
   }, [availableLearners, studentMap]);
 
   /* ---------------- FILTER ---------------- */
