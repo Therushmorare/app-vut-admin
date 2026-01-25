@@ -13,6 +13,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   const [companies, setCompanies] = useState([]);
   const [placements, setPlacements] = useState([]);
   const [allocatedLearners, setAllocatedLearners] = useState([]);
+  const [allStudents, setAllStudents] = useSatate([]);
   const [agreements, setAgreements] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterSector, setFilterSector] = useState('');
@@ -31,6 +32,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
     fetchCompanies();
     fetchAgreements();
     fetchAllocatedLearners();
+    fetchAllStudents();
   }, []);
 
     const fetchCompanies = async () => {
@@ -107,6 +109,30 @@ export default function HostCompanyManagement({ allStudents = [] }) {
     }
   };
 
+  const fetchAllStudents = async () => {
+    try{
+      const res = await axios.get(
+        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/students',
+        {withCredentials: true}
+      );
+
+      if (res.status === 200 && Array.isArray(res.data)){
+        setAllStudents(res.data);
+
+        if (typeof window !== 'undefined'){
+          localStorage.setItem('all-students', JSON.stringify(res.data));
+        }
+
+        setToast({ type: 'success', message: 'Students loaded successfully'});
+      } else {
+        console.warn('Unexpected Students responnse:', res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load Students:', err);
+      setToast({ type: 'error', message: 'Failed to load Students'});
+    }
+  }
+
   const loadData = () => {
     try {
       if (typeof window === 'undefined') return;
@@ -115,11 +141,13 @@ export default function HostCompanyManagement({ allStudents = [] }) {
       const placementsData = localStorage.getItem('learner-placements');
       const learnersData = localStorage.getItem('allocated-learners');
       const agreementsData = localStorage.getItem('seta-agreements');
+      const studentData = localStorage.getItem('all-students');
 
       if (companiesData) setCompanies(JSON.parse(companiesData));
       if (placementsData) setPlacements(JSON.parse(placementsData));
       if (learnersData) setAllocatedLearners(JSON.parse(learnersData));
       if (agreementsData) setAgreements(JSON.parse(agreementsData));
+      if (studentData) setAllStudents(JSON.parse(studentData));
     } catch (error) {
       console.error('Error loading data:', error);
     }
@@ -266,16 +294,13 @@ export default function HostCompanyManagement({ allStudents = [] }) {
     });
   };
 
-  //get lesrners in seta not yet placed
-  const getAvailableLearners = (companyId) => {
-    const company = companies.find(c => c.company_id === companyId);
-    if (!company) return [];
-    
-    const placedLearnerIds = placements.map(p => p.student_id);
+  //get learners in seta not yet placed
+  const getAvailableLearners = (setaProgrammeId) => {
+    const placedStudentIds = placements.map(p => p.student_id);
 
-    return allocatedLearners.filter(l => 
-      l.company_id === company.company_id && 
-      !placedLearnerIds.includes(l.company_id)
+    return allocatedLearners.filter(l =>
+      l.programme_id === setaProgrammeId &&
+      !placedStudentIds.includes(l.student_id)
     );
   };
 
@@ -754,20 +779,25 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                 {modalType === 'createPlacement' && selectedItem && (
                   <LearnerPlacementForm
                     companyId={selectedItem.company_id}
-                    availableLearners={getAvailableLearners(selectedItem.company_id)}
+                    availableLearners={getAvailableLearners(selectedItem.programme_id)}
+                    studentInfo={allStudents}
                     onSubmit={handleCreatePlacement}
                     onCancel={closeModal}
                   />
-                )}
+                  )}
                 {modalType === 'editPlacement' && selectedItem && (
                   <LearnerPlacementForm
                     placement={selectedItem}
                     companyId={selectedItem.company_id}
-                    availableLearners={getAvailableLearners(selectedItem.company_id)}
+                    availableLearners={[
+                      ...getAvailableLearners(selectedItem.programme_id),
+                      selectedItem // ensure current learner stays selectable
+                    ]}
+                    studentInfo={allStudents}
                     onSubmit={handleUpdatePlacement}
                     onCancel={closeModal}
                   />
-                )}
+                  )}
               </div>
             </div>
           </div>
