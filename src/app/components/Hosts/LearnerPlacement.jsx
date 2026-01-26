@@ -204,79 +204,94 @@ const enrichedLearners = useMemo(() => {
   };
 
   /* ---------------- SUBMIT ---------------- */
-  const handleSubmit = async () => {
-    if (!validate()) return;
+const handleSubmit = async () => {
+  if (!validate()) return;
 
-    const adminId = sessionStorage.getItem('admin_id');
-    if (!adminId) {
-      setErrors({ api: 'Administrator session expired. Please log in again.' });
-      return;
-    }
+  const adminId = sessionStorage.getItem('admin_id');
+  if (!adminId) {
+    setErrors({ api: 'Administrator session expired. Please log in again.' });
+    return;
+  }
 
-    setLoading(true);
-    setErrors({});
-    setSuccessMessage('');
+  if (!companyId) {
+    setErrors({ api: 'Please select a valid company before placing learners.' });
+    return;
+  }
 
-    const learnersToSubmit = placement
-      ? [selectedLearners[0]]
-      : selectedLearners;
+  if (!selectedLearners || selectedLearners.length === 0) {
+    setErrors({ api: 'No learners selected for placement.' });
+    return;
+  }
 
-    const failed = [];
+  setLoading(true);
+  setErrors({});
+  setSuccessMessage('');
 
-    try {
-      for (const student_id of learnersToSubmit) {
-        const res = await fetch(
-          'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/place-learner',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              administrator_id: adminId,
-              student_id,
-              company_id: companyId,
-              start_date: formData.startDate,
-              end_date: formData.endDate,
-              supervisor: formData.supervisorName,
-              supervisor_email: formData.supervisorEmail,
-              supervisor_phone: formData.supervisorPhone,
-              status: formData.status,
-              comments: formData.notes
-            })
-          }
-        );
+  const learnersToSubmit = placement
+    ? [selectedLearners[0]]
+    : selectedLearners;
 
-        if (!res.ok) {
-          const contentType = res.headers.get('content-type');
-          const errorBody = contentType?.includes('application/json')
-            ? JSON.stringify(await res.json())
-            : await res.text();
+  const failed = [];
 
-          failed.push(`Student ${student_id}: HTTP ${res.status} - ${errorBody}`);
+  try {
+    for (const student_id of learnersToSubmit) {
+      if (!student_id) {
+        failed.push(`Invalid student ID.`);
+        continue;
+      }
 
-          // Optional: stop immediately on first failure
-          // break;
+      const res = await fetch(
+        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/place-learner',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            administrator_id: adminId,
+            student_id,
+            company_id: companyId,
+            start_date: formData.startDate,
+            end_date: formData.endDate,
+            supervisor: formData.supervisorName,
+            supervisor_email: formData.supervisorEmail,
+            supervisor_phone: formData.supervisorPhone,
+            status: formData.status,
+            comments: formData.notes
+          })
         }
+      );
+
+      if (!res.ok) {
+        const contentType = res.headers.get('content-type');
+        const errorBody = contentType?.includes('application/json')
+          ? JSON.stringify(await res.json(), null, 2)
+          : await res.text();
+
+        failed.push(`Student ${student_id}: HTTP ${res.status} - ${errorBody}`);
       }
 
-      if (failed.length > 0) {
-        setErrors({ api: failed.join(' | ') });
-      } else {
-        setSuccessMessage(
-          `Successfully placed ${learnersToSubmit.length} learner(s)`
-        );
-      }
-    } catch (err) {
-      setErrors({ api: err.message || 'Unexpected error occurred' });
-    } finally {
-      setLoading(false);
+      // Small delay to avoid rate limit (5/min)
+      await new Promise(r => setTimeout(r, 300));
     }
-  };
 
-  const allSelected =
-    filteredLearners.length > 0 &&
-    selectedLearners.length === filteredLearners.length;
+    if (failed.length > 0) {
+      setErrors({ api: failed.join(' | ') });
+    } else {
+      setSuccessMessage(
+        `Successfully placed ${learnersToSubmit.length} learner(s)`
+      );
+    }
+  } catch (err) {
+    setErrors({ api: err.message || 'Unexpected error occurred' });
+  } finally {
+    setLoading(false);
+  }
+};
+
+const allSelected =
+  filteredLearners.length > 0 &&
+  selectedLearners.length === filteredLearners.length;
 
   /* ---------------- UI ---------------- */
   return (
