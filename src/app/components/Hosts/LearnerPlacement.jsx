@@ -204,94 +204,105 @@ const enrichedLearners = useMemo(() => {
   };
 
   /* ---------------- SUBMIT ---------------- */
-const handleSubmit = async () => {
-  if (!validate()) return;
+  const handleSubmit = async () => {
+    if (!validate()) return;
 
-  const adminId = sessionStorage.getItem('admin_id');
-  if (!adminId) {
-    setErrors({ api: 'Administrator session expired. Please log in again.' });
-    return;
-  }
+    const adminId = sessionStorage.getItem('admin_id');
+    if (!adminId) {
+      setErrors({ api: 'Administrator session expired. Please log in again.' });
+      return;
+    }
 
-  if (!companyId) {
-    setErrors({ api: 'Please select a valid company before placing learners.' });
-    return;
-  }
+    if (!companyId) {
+      setErrors({ api: 'Please select a valid company before placing learners.' });
+      return;
+    }
 
-  if (!selectedLearners || selectedLearners.length === 0) {
-    setErrors({ api: 'No learners selected for placement.' });
-    return;
-  }
+    if (!selectedLearners || selectedLearners.length === 0) {
+      setErrors({ api: 'No learners selected for placement.' });
+      return;
+    }
 
-  setLoading(true);
-  setErrors({});
-  setSuccessMessage('');
+    setLoading(true);
+    setErrors({});
+    setSuccessMessage('');
 
-  const learnersToSubmit = placement
-    ? [selectedLearners[0]]
-    : selectedLearners;
+    // Ensure we submit only valid learners
+    const learnersToSubmit = placement
+      ? [selectedLearners[0]]
+      : selectedLearners;
 
-  const failed = [];
+    const failed = [];
+    const success = [];
 
-  try {
-    for (const student_id of learnersToSubmit) {
-      if (!student_id) {
-        failed.push(`Invalid student ID.`);
-        continue;
-      }
+    try {
+      console.log('Submitting learners with companyId:', companyId);
+      console.log('Learners to submit:', learnersToSubmit);
 
-      const res = await fetch(
-        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/place-learner',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            administrator_id: adminId,
-            student_id,
-            company_id: companyId,
-            start_date: formData.startDate,
-            end_date: formData.endDate,
-            supervisor: formData.supervisorName,
-            supervisor_email: formData.supervisorEmail,
-            supervisor_phone: formData.supervisorPhone,
-            status: formData.status,
-            comments: formData.notes
-          })
+      for (const student_id of learnersToSubmit) {
+        if (!student_id) {
+          failed.push('Invalid student ID.');
+          continue;
         }
-      );
 
-      if (!res.ok) {
-        const contentType = res.headers.get('content-type');
-        const errorBody = contentType?.includes('application/json')
-          ? JSON.stringify(await res.json(), null, 2)
-          : await res.text();
+        try {
+          const res = await fetch(
+            'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/place-learner',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                administrator_id: adminId,
+                student_id,
+                company_id: companyId,
+                start_date: formData.startDate || null,
+                end_date: formData.endDate || null,
+                supervisor: formData.supervisorName || '',
+                supervisor_email: formData.supervisorEmail || '',
+                supervisor_phone: formData.supervisorPhone || '',
+                status: formData.status || 'Pending',
+                comments: formData.notes || ''
+              })
+            }
+          );
 
-        failed.push(`Student ${student_id}: HTTP ${res.status} - ${errorBody}`);
+          if (!res.ok) {
+            const contentType = res.headers.get('content-type');
+            const errorBody = contentType?.includes('application/json')
+              ? JSON.stringify(await res.json(), null, 2)
+              : await res.text();
+
+            failed.push(`Student ${student_id}: HTTP ${res.status} - ${errorBody}`);
+          } else {
+            success.push(student_id);
+          }
+
+          // Small delay to avoid hitting rate limit
+          await new Promise(r => setTimeout(r, 300));
+
+        } catch (innerErr) {
+          failed.push(`Student ${student_id}: ${innerErr.message || 'Unexpected error'}`);
+        }
       }
 
-      // Small delay to avoid rate limit (5/min)
-      await new Promise(r => setTimeout(r, 300));
-    }
+      if (failed.length > 0) {
+        setErrors({ api: failed.join(' | ') });
+      }
 
-    if (failed.length > 0) {
-      setErrors({ api: failed.join(' | ') });
-    } else {
-      setSuccessMessage(
-        `Successfully placed ${learnersToSubmit.length} learner(s)`
-      );
-    }
-  } catch (err) {
-    setErrors({ api: err.message || 'Unexpected error occurred' });
-  } finally {
-    setLoading(false);
-  }
-};
+      if (success.length > 0) {
+        setSuccessMessage(`Successfully placed ${success.length} learner(s)`);
+      }
 
-const allSelected =
-  filteredLearners.length > 0 &&
-  selectedLearners.length === filteredLearners.length;
+    } catch (err) {
+      setErrors({ api: err.message || 'Unexpected error occurred' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const allSelected =
+    filteredLearners.length > 0 &&
+    selectedLearners.length === filteredLearners.length;
 
   /* ---------------- UI ---------------- */
   return (
