@@ -218,6 +218,7 @@ const enrichedLearners = useMemo(() => {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
+                administrator_id: sessionStorage.getItem('admin_id'),
                 student_id,
                 company_id: companyId,
                 start_date: formData.startDate,
