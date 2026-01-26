@@ -202,31 +202,50 @@ const enrichedLearners = useMemo(() => {
   };
 
   /* ---------------- SUBMIT ---------------- */
-  const handleSubmit = () => {
-    if (!validate()) return;
+    const handleSubmit = async () => {
+      if (!validate()) return;
+      setLoading(true);
+      setSuccessMessage('');
 
-    console.log('SUBMITTING WITH SELECTED LEARNERS:', selectedLearners);
+      const learnersToSubmit = placement ? [selectedLearners[0]] : selectedLearners;
 
-    if (placement) {
-      if (!selectedLearners[0]) return;
+      try {
+        const responses = await Promise.all(
+          learnersToSubmit.map(student_id =>
+            fetch('https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/place-learner', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                student_id,
+                company_id: companyId,
+                start_date: formData.startDate,
+                end_date: formData.endDate,
+                supervisor: formData.supervisorName,
+                supervisor_email: formData.supervisorEmail,
+                supervisor_phone: formData.supervisorPhone,
+                status: formData.status,
+                comments: formData.notes
+              })
+            })
+          )
+        );
 
-      onSubmit({
-        ...formData,
-        student_id: selectedLearners[0],
-        companyId
-      });
-    } else {
-      const uniqueLearners = [...new Set(selectedLearners)];
+        const failed = [];
+        for (const res of responses) {
+          if (!res.ok) failed.push(await res.text());
+        }
 
-      onSubmit(
-        uniqueLearners.map(student_id => ({
-          ...formData,
-          student_id,
-          companyId
-        }))
-      );
-    }
-  };
+        if (failed.length > 0) {
+          setErrors({ api: failed.join(', ') });
+        } else {
+          setSuccessMessage(`Successfully placed ${learnersToSubmit.length} learner(s)`);
+        }
+      } catch (err) {
+        setErrors({ api: err.message });
+      } finally {
+        setLoading(false);
+      }
+    };
 
   const allSelected =
     filteredLearners.length > 0 &&
