@@ -204,21 +204,32 @@ const enrichedLearners = useMemo(() => {
   };
 
   /* ---------------- SUBMIT ---------------- */
-    const handleSubmit = async () => {
-      if (!validate()) return;
-      setLoading(true);
-      setSuccessMessage('');
+  const handleSubmit = async () => {
+    if (!validate()) return;
 
-      const learnersToSubmit = placement ? [selectedLearners[0]] : selectedLearners;
+    const adminId = sessionStorage.getItem('admin_id');
+    if (!adminId) {
+      setErrors({ api: 'Administrator session expired. Please log in again.' });
+      return;
+    }
 
-      try {
-        const responses = await Promise.all(
-          learnersToSubmit.map(student_id =>
-            fetch('https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/place-learner', {
+    setLoading(true);
+    setSuccessMessage('');
+
+    const learnersToSubmit = placement
+      ? [selectedLearners[0]]
+      : selectedLearners;
+
+    try {
+      const responses = await Promise.all(
+        learnersToSubmit.map(student_id =>
+          fetch(
+            'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/place-learner',
+            {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                administrator_id: sessionStorage.getItem('admin_id'),
+                administrator_id: adminId,
                 student_id,
                 company_id: companyId,
                 start_date: formData.startDate,
@@ -229,26 +240,35 @@ const enrichedLearners = useMemo(() => {
                 status: formData.status,
                 comments: formData.notes
               })
-            })
+            }
           )
-        );
+        )
+      );
 
-        const failed = [];
-        for (const res of responses) {
-          if (!res.ok) failed.push(await res.text());
-        }
+      const failed = [];
 
-        if (failed.length > 0) {
-          setErrors({ api: failed.join(', ') });
-        } else {
-          setSuccessMessage(`Successfully placed ${learnersToSubmit.length} learner(s)`);
+      for (const res of responses) {
+        if (!res.ok) {
+          const contentType = res.headers.get('content-type');
+          const errorBody = contentType?.includes('application/json')
+            ? JSON.stringify(await res.json())
+            : await res.text();
+
+          failed.push(`HTTP ${res.status}: ${errorBody}`);
         }
-      } catch (err) {
-        setErrors({ api: err.message });
-      } finally {
-        setLoading(false);
       }
-    };
+
+      if (failed.length > 0) {
+        setErrors({ api: failed.join(' | ') });
+      } else {
+        setSuccessMessage(`Successfully placed ${learnersToSubmit.length} learner(s)`);
+      }
+    } catch (err) {
+      setErrors({ api: err.message });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const allSelected =
     filteredLearners.length > 0 &&
