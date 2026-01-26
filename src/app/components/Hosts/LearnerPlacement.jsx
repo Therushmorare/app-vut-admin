@@ -38,6 +38,8 @@ export default function LearnerPlacementForm({
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   /* ---------------- STUDENT LOOKUP ---------------- */
   const studentMap = useMemo(() => {
@@ -390,12 +392,18 @@ const enrichedLearners = useMemo(() => {
         </button>
         <button
           onClick={handleSubmit}
-          className="flex-1 rounded-lg px-4 py-2 text-white"
+          disabled={loading}
+          className="flex-1 rounded-lg px-4 py-2 text-white disabled:opacity-60"
           style={{ backgroundColor: COLORS.success }}
         >
-          {placement ? 'Update Placement' : `Place ${selectedLearners.length} Learner(s)`}
-        </button>
-      </div>
+          {loading
+            ? 'Placing...'
+            : placement
+              ? 'Update Placement'
+              : `Place ${selectedLearners.length} Learner(s)`
+          }
+        </button>      
+  </div>
     </div>
 
   </div>
