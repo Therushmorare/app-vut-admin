@@ -18,6 +18,7 @@ const ReportsPage = () =>{
   const [allocatedLearners, setAllocatedLearners] = useState([]);
   const [agreements, setAgreements] = useState([]);
   const [fundingWindows, setFundingWindows] = useState([]);
+  const [aStudents, setAllStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null); // ADD THIS
   const [showProfileModal, setShowProfileModal] = useState(false); // ADD THIS
   const [filters, setFilters] = useState({
@@ -198,12 +199,14 @@ const ReportsPage = () =>{
       const learnersData = localStorage.getItem('allocated-learners');
       const agreementsData = localStorage.getItem('seta-agreements');
       const windowsData = localStorage.getItem('funding-windows');
+      const studentData = localStorage.getItem('all-students');
 
       if (companiesData) setCompanies(JSON.parse(companiesData));
       if (placementsData) setPlacements(JSON.parse(placementsData));
       if (learnersData) setAllocatedLearners(JSON.parse(learnersData));
       if (agreementsData) setAgreements(JSON.parse(agreementsData));
       if (windowsData) setFundingWindows(JSON.parse(windowsData));
+      if (studentData) setAllStudents(JSON.parse(studentData));
     } catch (error) {
       console.error('Error loading data:', error);
     }
@@ -312,6 +315,7 @@ const ReportsPage = () =>{
               allocatedLearners={allocatedLearners}
               agreements={agreements}
               fundingWindows={fundingWindows}
+              students={aStudents}
             />
           )}
 
@@ -322,6 +326,7 @@ const ReportsPage = () =>{
               allocatedLearners={allocatedLearners}
               agreements={agreements}
               fundingWindows={fundingWindows}
+              students={aStudents}
             />
           )}
 
@@ -332,6 +337,7 @@ const ReportsPage = () =>{
                 agreements={agreements}
                 fundingWindows={fundingWindows}
                 allocatedLearners={allocatedLearners}
+                students={aStudents}
                 onFilterChange={handleFilterChange}
               />
               <LearnerSearch
@@ -340,6 +346,7 @@ const ReportsPage = () =>{
                 companies={companies}
                 agreements={agreements}
                 filters={filters}
+                students={aStudents}
                 onSearch={handleSearch}
                 onQuickAction={handleQuickAction}
             />
@@ -354,6 +361,7 @@ const ReportsPage = () =>{
               agreements={agreements}
               fundingWindows={fundingWindows}
               filters={filters}
+              students={aStudents}
               onExport={showToast}
             />
           )}

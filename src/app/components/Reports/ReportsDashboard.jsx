@@ -8,7 +8,8 @@ export default function ReportsDashboard({
   placements = [],
   allocatedLearners = [],
   agreements = [],
-  fundingWindows = []
+  fundingWindows = [],
+  students = []
 }) {
   
   const stats = useMemo(() => {
@@ -29,12 +30,15 @@ export default function ReportsDashboard({
     const unplacedLearners = totalLearners - placedLearners;
     
     // Faculty Distribution
-    const facultyDistribution = allocatedLearners.reduce((acc, learner) => {
-      const faculty = learner.faculty || 'Unknown';
-      acc[faculty] = (acc[faculty] || 0) + 1;
+    const facultyDistribution = allocatedLearners.reduce((acc, allocation) => {
+      const student = students.find(s => s.id === allocation.student_id);
+      if (student) {
+        const faculty = student.faculty || 'Unknown';
+        acc[faculty] = (acc[faculty] || 0) + 1;
+      }
       return acc;
     }, {});
-    
+
     // SETA Distribution
     const setaDistribution = allocatedLearners.reduce((acc, learner) => {
       const agreement = agreements.find(a => a.agreement_id === learner.agreement_id);
