@@ -33,6 +33,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
     fetchAgreements();
     fetchAllocatedLearners();
     fetchAllStudents();
+    fetchPlacements();
   }, []);
 
     const fetchCompanies = async () => {
@@ -136,6 +137,33 @@ export default function HostCompanyManagement({ allStudents = [] }) {
     } catch (err) {
       console.error('Failed to load Students:', err);
       setToast({ type: 'error', message: 'Failed to load Students' });
+    }
+  };
+
+  const fetchPlacements = async () => {
+    try {
+      const res = await axios.get(
+        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/learner-placements',
+        { withCredentials: true }
+      );
+
+      if (res.status === 200 && Array.isArray(res.data.placements)) {
+        setPlacements(res.data.placements);
+
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(
+            'learner-placements',
+            JSON.stringify(res.data.placements)
+          );
+        }
+
+        setToast({ type: 'success', message: 'Student Placements loaded successfully' });
+      } else {
+        console.warn('Unexpected Placements response:', res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load Placements:', err);
+      setToast({ type: 'error', message: 'Failed to load Placements' });
     }
   };
 
@@ -689,6 +717,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                 placements={placements}
                 allocatedLearners={allocatedLearners}
                 companies={companies}
+                students={aStudents}
                 onView={(placement) => openModal('viewPlacement', placement)}
                 onEdit={(placement) => openModal('editPlacement', placement)}
                 onDelete={handleDeletePlacement}
