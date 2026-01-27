@@ -192,10 +192,10 @@ export default function FundingWindowsList({
                           className="font-medium"
                           style={{ color: COLORS.primary }}
                         >
-                          {learner.firstName} {learner.lastName}
+                          {learner.first_name} {learner.last_name}
                         </p>
                         <p className="text-xs text-gray-600">
-                          {learner.studentId} • {learner.programme}
+                          {learner.id} • {learner.programme}
                         </p>
                       </div>
                     ))}
