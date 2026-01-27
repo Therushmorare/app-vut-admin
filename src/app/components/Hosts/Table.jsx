@@ -7,6 +7,7 @@ export default function PlacementTable({
   placements = [], 
   allocatedLearners = [], 
   companies = [],
+  students = [],
   onEdit,
   onDelete,
   onView
@@ -21,26 +22,45 @@ export default function PlacementTable({
 
   const enrichedPlacements = useMemo(() => {
     return placements.map(placement => {
-      const learner = allocatedLearners.find(l => l.id === placement.learnerId);
-      const company = companies.find(c => c.id === placement.companyId);
+      const learner = students.find(
+        s => s.id === placement.student_id
+      );
+
+      const company = companies.find(
+        c => c.company_id === placement.company_id || c.id === placement.company_id
+      );
+
       return {
         ...placement,
+
+        // normalize fields WITHOUT breaking existing usage
         learner,
-        company
+        company,
+
+        // keep camelCase aliases your UI already uses
+        learnerId: placement.student_id,
+        companyId: placement.company_id,
+        startDate: placement.start_date,
+        endDate: placement.end_date
       };
     });
-  }, [placements, allocatedLearners, companies]);
+  }, [placements, students, companies]);
 
   const filteredPlacements = useMemo(() => {
     return enrichedPlacements.filter(item => {
-      const { learner, company, placement } = item;
+      const { learner, company } = item;
 
       if (searchTerm) {
         const search = searchTerm.toLowerCase();
-        const learnerName = learner ? `${learner.firstName} ${learner.lastName}`.toLowerCase() : '';
-        const studentId = learner?.studentId?.toLowerCase() || '';
+        const learnerName = learner
+          ? `${learner.first_name ?? learner.firstName} ${learner.last_name ?? learner.lastName}`.toLowerCase()
+          : '';
+
+        const studentId =
+          learner?.student_number?.toLowerCase() ||
+          learner?.studentId?.toLowerCase() ||
+          '';
         const companyName = company?.company_name?.toLowerCase() || '';
-        
         if (!learnerName.includes(search) && 
             !studentId.includes(search) && 
             !companyName.includes(search)) {
@@ -50,7 +70,7 @@ export default function PlacementTable({
 
       if (filterStatus && item.status !== filterStatus) return false;
 
-      if (filterCompany && item.companyId !== filterCompany) return false;
+      if (filterCompany && item.company_id !== filterCompany) return false;
 
       return true;
     });
@@ -63,26 +83,29 @@ export default function PlacementTable({
       let aVal, bVal;
 
       switch (sortField) {
-        case 'learner':
-          aVal = a.learner ? `${a.learner.firstName} ${a.learner.lastName}` : '';
-          bVal = b.learner ? `${b.learner.firstName} ${b.learner.lastName}` : '';
-          break;
-        case 'company':
-          aVal = a.company?.companyName || '';
-          bVal = b.company?.companyName || '';
-          break;
-        case 'startDate':
-          aVal = new Date(a.startDate);
-          bVal = new Date(b.startDate);
-          break;
-        case 'endDate':
-          aVal = new Date(a.endDate);
-          bVal = new Date(b.endDate);
-          break;
-        case 'status':
-          aVal = a.status;
-          bVal = b.status;
-          break;
+      case 'learner':
+        aVal = a.learner
+          ? `${a.learner.first_name ?? a.learner.firstName} ${a.learner.last_name ?? a.learner.lastName}`
+          : '';
+        bVal = b.learner
+          ? `${b.learner.first_name ?? b.learner.firstName} ${b.learner.last_name ?? b.learner.lastName}`
+          : '';
+        break;
+
+      case 'company':
+        aVal = a.company?.company_name || a.company?.companyName || '';
+        bVal = b.company?.company_name || b.company?.companyName || '';
+        break;
+
+      case 'startDate':
+        aVal = new Date(a.start_date ?? a.startDate);
+        bVal = new Date(b.start_date ?? b.startDate);
+        break;
+
+      case 'endDate':
+        aVal = new Date(a.end_date ?? a.endDate);
+        bVal = new Date(b.end_date ?? b.endDate);
+        break;
         default:
           return 0;
       }
