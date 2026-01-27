@@ -26,6 +26,18 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   const [expandedCompanies, setExpandedCompanies] = useState([]);
   const [activeTab, setActiveTab] = useState('companies');
 
+  const activePlacementsByCompany = useMemo(() => {
+  return placements.reduce((acc, p) => {
+    if (p.status === 'Active') {
+      const companyId = p.company_id || p.companyId;
+      if (companyId) {
+        acc[companyId] = (acc[companyId] || 0) + 1;
+      }
+    }
+    return acc;
+  }, {});
+}, [placements]);
+
 //locl storage load and save
   useEffect(() => {
     loadData();
@@ -351,14 +363,9 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   const stats = useMemo(() => {
     const totalCompanies = companies.length;
     const totalPlacements = placements.length;
-    const activePlacements = placements.filter(
-      p =>
-        p.status === 'Active' &&
-        (p.company_id === company.company_id || p.companyId === company.company_id)
-    ).length;
     const totalCapacity = companies.reduce((sum, c) => sum + parseInt(c.learnerCapacity || 0), 0);
     
-    return { totalCompanies, totalPlacements, activePlacements, totalCapacity };
+    return { totalCompanies, totalPlacements, totalCapacity };
   }, [companies, placements]);
 
   const filteredCompanies = useMemo(() => {
@@ -636,7 +643,8 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                         <div>
                           <p className="text-xs text-gray-600">Capacity / Active</p>
                           <p className="text-lg font-bold" style={{ color: COLORS.primary }}>
-                            {company.student_capacity} / {activePlacements}
+                            {company.student_capacity} / {activePlacementsByCompany[company.company_id] || 0}
+                          </p>
                           </p>
                         </div>
                         <button
