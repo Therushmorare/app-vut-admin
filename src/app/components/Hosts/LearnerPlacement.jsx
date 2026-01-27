@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import { COLORS } from '../../utils/helpers';
 
-const normalizeId = (id) => id ? String(id).toLowerCase() : '';
+const normalizeId = (id) => String(id).toLowerCase();
 
 export default function LearnerPlacementForm({ 
   placement = null,
@@ -15,16 +15,18 @@ export default function LearnerPlacementForm({
 }) {
   const [searchTerm, setSearchTerm] = useState('');
 
-  // ---------------- SELECTED LEARNERS ----------------
-  const [selectedLearners, setSelectedLearners] = useState(() => {
-    if (placement) {
-      const id = placement.student_id ?? placement.learnerId ?? placement.studentId;
-      return id ? [normalizeId(id)] : [];
-    }
-    return [];
-  });
+  /* ---------------- SELECTED LEARNERS (NORMALIZED) ---------------- */
+  const [selectedLearners, setSelectedLearners] = useState(
+    placement
+      ? [
+          placement.student_id ??
+          placement.learnerId ??
+          placement.studentId
+        ]
+      : []
+  );
 
-  // ---------------- FORM DATA ----------------
+  /* ---------------- FORM DATA ---------------- */
   const [formData, setFormData] = useState({
     startDate: placement?.startDate || '',
     endDate: placement?.endDate || '',
@@ -39,156 +41,269 @@ export default function LearnerPlacementForm({
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  // ---------------- STUDENT LOOKUP ----------------
+  /* ---------------- STUDENT LOOKUP ---------------- */
   const studentMap = useMemo(() => {
-    return studentInfo.reduce((acc, s) => {
-      acc[normalizeId(s.id)] = s;
+    const map = studentInfo.reduce((acc, s) => {
+      const key = normalizeId(s.id); // Normalize key here
+      acc[key] = s;
       return acc;
     }, {});
+    console.log('STUDENT MAP:', map);
+    return map;
   }, [studentInfo]);
 
-  // ---------------- ENRICH + DEDUPE ALLOCATIONS ----------------
-  const enrichedLearners = useMemo(() => {
-    const seen = new Set();
-    return availableLearners
-      .map(allocation => {
-        const studentId = allocation.student_id ?? allocation.studentId ?? allocation.learner_id;
-        if (!studentId) return null;
+  /* ---------------- ENRICH + DEDUPE ALLOCATIONS ---------------- */
+const enrichedLearners = useMemo(() => {
+  console.log("===== ENRICHMENT START =====");
+  console.log("availableLearners:", availableLearners);
+  console.log("studentMap:", studentMap);
+  console.log("studentMap keys:", Object.keys(studentMap));
 
-        const normalizedId = normalizeId(studentId);
-        const student = studentMap[normalizedId];
-        if (!student || seen.has(student.id)) return null;
+  const seen = new Set();
 
-        seen.add(student.id);
+  const result = availableLearners
+    .map((allocation, index) => {
+      console.log(`\n--- Allocation [${index}] ---`);
+      console.log("allocation raw:", allocation);
 
-        return {
-          studentId: normalizeId(student.id),
-          firstName: student.first_name || '',
-          lastName: student.last_name || '',
-          email: student.email || '',
-          phone: student.phone || '',
-          programme: student.programme || '',
-          faculty: student.faculty || '',
-          setaProgrammeId: allocation.programme_id || null,
-          fundingWindowId: allocation.funding_window_id || null
-        };
-      })
-      .filter(Boolean);
-  }, [availableLearners, studentMap]);
+      const studentId =
+        allocation.student_id ??
+        allocation.studentId ??
+        allocation.learner_id;
 
-  // ---------------- FILTER ----------------
+      console.log("resolved studentId (raw):", studentId);
+
+      if (!studentId) {
+        console.warn("No studentId on allocation");
+        return null;
+      }
+
+      const normalizedId = normalizeId(studentId);
+      console.log("normalized studentId:", normalizedId);
+
+      const student = studentMap[normalizedId];
+      console.log("student lookup result:", student);
+
+      if (!student) {
+        console.warn("Missing studentInfo for allocation:", {
+          allocation,
+          normalizedId,
+          studentMapKeys: Object.keys(studentMap),
+        });
+        return null;
+      }
+
+      if (seen.has(student.id)) {
+        console.warn("Duplicate student skipped:", student.id);
+        return null;
+      }
+
+      seen.add(student.id);
+      console.log("Student accepted:", student);
+
+      return {
+        studentId: student.id,
+        firstName: student.first_name ?? '',
+        lastName: student.last_name ?? '',
+        email: student.email ?? '',
+        phone: student.phone ?? '',
+        programme: student.programme ?? '',
+        faculty: student.faculty ?? '',
+        setaProgrammeId: allocation.programme_id,
+        fundingWindowId: allocation.funding_window_id
+      };
+    })
+    .filter(Boolean);
+
+  console.log("===== ENRICHMENT END =====");
+  console.log("ENRICHED LEARNERS RESULT:", result);
+
+  return result;
+}, [availableLearners, studentMap]);
+
+  /* ---------------- FILTER ---------------- */
   const filteredLearners = useMemo(() => {
     if (!searchTerm) return enrichedLearners;
+
     const search = searchTerm.toLowerCase();
-    return enrichedLearners.filter(l => {
+
+    const result = enrichedLearners.filter(l => {
       const fullName = `${l.firstName} ${l.lastName}`.toLowerCase();
-      return fullName.includes(search) || l.studentId.includes(search) || l.programme.toLowerCase().includes(search);
+      const studentId = String(l.studentId).toLowerCase();
+      const programme = l.programme?.toLowerCase() || '';
+
+      return (
+        fullName.includes(search) ||
+        studentId.includes(search) ||
+        programme.includes(search)
+      );
     });
+
+    console.log('FILTERED LEARNERS:', result);
+    return result;
   }, [enrichedLearners, searchTerm]);
 
-  // ---------------- HANDLERS ----------------
+  /* ---------------- HANDLERS ---------------- */
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
   };
 
   const handleToggleLearner = (studentId) => {
     if (placement) return;
-    const normalized = normalizeId(studentId);
+
     setSelectedLearners(prev =>
-      prev.includes(normalized)
-        ? prev.filter(id => id !== normalized)
-        : [...prev, normalized]
+      prev.includes(studentId)
+        ? prev.filter(id => id !== studentId)
+        : [...prev, studentId]
     );
-    if (errors.learners) setErrors(prev => ({ ...prev, learners: '' }));
+
+    if (errors.learners) {
+      setErrors(prev => ({ ...prev, learners: '' }));
+    }
   };
 
   const handleSelectAll = () => {
     if (placement) return;
+
     if (selectedLearners.length === filteredLearners.length) {
       setSelectedLearners([]);
     } else {
-      setSelectedLearners(filteredLearners.map(l => l.studentId));
+      setSelectedLearners(
+        filteredLearners.map(l => l.studentId).filter(Boolean)
+      );
     }
   };
 
-  // ---------------- VALIDATION ----------------
+  /* ---------------- VALIDATION ---------------- */
   const validate = () => {
     const newErrors = {};
-    if (!placement && selectedLearners.length === 0) newErrors.learners = 'Please select at least one learner';
+
+    if (!placement && selectedLearners.length === 0) {
+      newErrors.learners = 'Please select at least one learner';
+    }
+
     if (!formData.startDate) newErrors.startDate = 'Start date is required';
     if (!formData.endDate) newErrors.endDate = 'End date is required';
     if (!formData.supervisorName) newErrors.supervisorName = 'Supervisor name is required';
     if (!formData.supervisorEmail) newErrors.supervisorEmail = 'Supervisor email is required';
     if (!formData.supervisorPhone) newErrors.supervisorPhone = 'Supervisor phone is required';
-    if (formData.startDate && formData.endDate && new Date(formData.endDate) <= new Date(formData.startDate)) {
+
+    if (
+      formData.startDate &&
+      formData.endDate &&
+      new Date(formData.endDate) <= new Date(formData.startDate)
+    ) {
       newErrors.endDate = 'End date must be after start date';
     }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // ---------------- SUBMIT ----------------
+  /* ---------------- SUBMIT ---------------- */
   const handleSubmit = async () => {
     if (!validate()) return;
 
     const adminId = sessionStorage.getItem('admin_id');
-    if (!adminId) return setErrors({ api: 'Administrator session expired. Please log in again.' });
-    if (!companyId) return setErrors({ api: 'Please select a valid company before placing learners.' });
+    if (!adminId) {
+      setErrors({ api: 'Administrator session expired. Please log in again.' });
+      return;
+    }
 
-    const learnersToSubmit = (placement ? [selectedLearners[0]] : selectedLearners).filter(Boolean);
-    if (learnersToSubmit.length === 0) return setErrors({ api: 'No learners selected for placement.' });
+    if (!companyId) {
+      setErrors({ api: 'Please select a valid company before placing learners.' });
+      return;
+    }
+
+    if (!selectedLearners || selectedLearners.length === 0) {
+      setErrors({ api: 'No learners selected for placement.' });
+      return;
+    }
 
     setLoading(true);
     setErrors({});
     setSuccessMessage('');
 
+    // Ensure we submit only valid learners
+    const learnersToSubmit = placement
+      ? [selectedLearners[0]]
+      : selectedLearners;
+
     const failed = [];
     const success = [];
 
-    for (const student_id of learnersToSubmit) {
-      try {
-        const learnerData = enrichedLearners.find(l => l.studentId === student_id);
-        const res = await fetch('https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/place-learner', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            administrator_id: adminId,
-            student_id,
-            company_id: companyId,
-            start_date: formData.startDate || null,
-            end_date: formData.endDate || null,
-            supervisor: formData.supervisorName || '',
-            supervisor_email: formData.supervisorEmail || '',
-            supervisor_phone: formData.supervisorPhone || '',
-            status: formData.status || 'Pending',
-            comments: formData.notes || '',
-            programme_id: learnerData?.setaProgrammeId || null
-          })
-        });
+    try {
+      console.log('Submitting learners with companyId:', companyId);
+      console.log('Learners to submit:', learnersToSubmit);
 
-        if (!res.ok) {
-          const contentType = res.headers.get('content-type');
-          const errorBody = contentType?.includes('application/json')
-            ? JSON.stringify(await res.json(), null, 2)
-            : await res.text();
-          failed.push(`Student ${student_id}: HTTP ${res.status} - ${errorBody}`);
-        } else {
-          success.push(student_id);
+      for (const student_id of learnersToSubmit) {
+        if (!student_id) {
+          failed.push('Invalid student ID.');
+          continue;
         }
 
-        await new Promise(r => setTimeout(r, 300));
-      } catch (err) {
-        failed.push(`Student ${student_id}: ${err.message || 'Unexpected error'}`);
-      }
-    }
+        try {
+          const res = await fetch(
+            'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/placeLearner',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                administrator_id: adminId,
+                student_id,
+                company_id: companyId,
+                start_date: formData.startDate || null,
+                end_date: formData.endDate || null,
+                supervisor: formData.supervisorName || '',
+                supervisor_email: formData.supervisorEmail || '',
+                supervisor_phone: formData.supervisorPhone || '',
+                status: formData.status || 'Pending',
+                comments: formData.notes || ''
+              })
+            }
+          );
 
-    if (failed.length > 0) setErrors({ api: failed.join(' | ') });
-    if (success.length > 0) setSuccessMessage(`Successfully placed ${success.length} learner(s)`);
-    setLoading(false);
+          if (!res.ok) {
+            const contentType = res.headers.get('content-type');
+            const errorBody = contentType?.includes('application/json')
+              ? JSON.stringify(await res.json(), null, 2)
+              : await res.text();
+
+            failed.push(`Student ${student_id}: HTTP ${res.status} - ${errorBody}`);
+          } else {
+            success.push(student_id);
+          }
+
+          // Small delay to avoid hitting rate limit
+          await new Promise(r => setTimeout(r, 300));
+
+        } catch (innerErr) {
+          failed.push(`Student ${student_id}: ${innerErr.message || 'Unexpected error'}`);
+        }
+      }
+
+      if (failed.length > 0) {
+        setErrors({ api: failed.join(' | ') });
+      }
+
+      if (success.length > 0) {
+        setSuccessMessage(`Successfully placed ${success.length} learner(s)`);
+      }
+
+    } catch (err) {
+      setErrors({ api: err.message || 'Unexpected error occurred' });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const allSelected = filteredLearners.length > 0 && selectedLearners.length === filteredLearners.length;
+  const allSelected =
+    filteredLearners.length > 0 &&
+    selectedLearners.length === filteredLearners.length;
+
   /* ---------------- UI ---------------- */
   return (
   <div className="flex flex-col md:flex-row gap-6">
