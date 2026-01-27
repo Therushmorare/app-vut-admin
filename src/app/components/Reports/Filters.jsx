@@ -8,6 +8,7 @@ export default function AdvancedFilters({
   agreements = [],
   fundingWindows = [],
   allocatedLearners = [],
+  students = [],
   onFilterChange
 }) {
   const [filters, setFilters] = useState({
@@ -25,15 +26,23 @@ export default function AdvancedFilters({
   const [showFilters, setShowFilters] = useState(true);
 
   const filterOptions = useMemo(() => {
-    const faculties = [...new Set(allocatedLearners.map(l => l.faculty).filter(Boolean))];
-    const programmes = [...new Set(allocatedLearners.map(l => l.programme).filter(Boolean))];
-    const years = [...new Set(fundingWindows.map(w => {
-      const year = new Date(w.start_data).getFullYear();
-      return year;
-    }).filter(Boolean))].sort((a, b) => b - a);
+    // Map allocatedLearners to full student data
+    const mappedLearners = allocatedLearners
+      .map(l => students.find(s => s.id === l.student_id))
+      .filter(Boolean); // remove undefined if student not found
+
+    const faculties = [...new Set(mappedLearners.map(s => s.faculty).filter(Boolean))];
+    const programmes = [...new Set(mappedLearners.map(s => s.programme).filter(Boolean))];
+
+    const years = [...new Set(
+      fundingWindows.map(w => {
+        const year = new Date(w.start_data).getFullYear();
+        return year;
+      }).filter(Boolean)
+    )].sort((a, b) => b - a);
 
     return { faculties, programmes, years };
-  }, [allocatedLearners, fundingWindows]);
+  }, [allocatedLearners, students, fundingWindows]);
 
   const handleFilterChange = (field, value) => {
     const newFilters = { ...filters, [field]: value };
