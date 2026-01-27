@@ -7,18 +7,19 @@ const Charts =({
   placements = [],
   allocatedLearners = [],
   agreements = [],
-  fundingWindows = []
+  fundingWindows = [],
+  students = []
 }) => {
 
   const chartData = useMemo(() => {
-    //monthly
+    // Monthly placements
     const monthlyPlacements = placements.reduce((acc, p) => {
       const month = new Date(p.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
       acc[month] = (acc[month] || 0) + 1;
       return acc;
     }, {});
 
-    // status distribution
+    // Status distribution
     const statusData = {
       Active: placements.filter(p => p.status === 'Active').length,
       Completed: placements.filter(p => p.status === 'Completed').length,
@@ -26,28 +27,36 @@ const Charts =({
       Terminated: placements.filter(p => p.status === 'Terminated').length
     };
 
+    // Top companies
     const companyPlacements = placements.reduce((acc, p) => {
-      acc[p.companyId] = (acc[p.companyId] || 0) + 1;
+      acc[p.company_id] = (acc[p.company_id] || 0) + 1;
       return acc;
     }, {});
-    
+
     const topCompanies = Object.entries(companyPlacements)
       .map(([id, count]) => ({
-        name: companies.find(c => c.id === id)?.companyName || 'Unknown',
+        name: companies.find(c => c.company_id === id)?.company_name || 'Unknown',
         count
       }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
 
-    const facultyData = allocatedLearners.reduce((acc, l) => {
-      const faculty = l.faculty || 'Unknown';
+    // Map allocatedLearners to students first
+    const mappedLearners = allocatedLearners
+      .map(l => students.find(s => s.id === l.student_id))
+      .filter(Boolean); // remove null/undefined if student not found
+
+    // Faculty distribution
+    const facultyData = mappedLearners.reduce((acc, student) => {
+      const faculty = student.faculty || 'Unknown';
       acc[faculty] = (acc[faculty] || 0) + 1;
       return acc;
     }, {});
 
+    // SETA distribution
     const setaData = allocatedLearners.reduce((acc, l) => {
-      const agreement = agreements.find(a => a.id === l.agreementId);
-      const seta = agreement?.setaName || 'Unknown';
+      const agreement = agreements.find(a => a.agreement_id === l.agreement_id);
+      const seta = agreement?.name || 'Unknown';
       acc[seta] = (acc[seta] || 0) + 1;
       return acc;
     }, {});
@@ -59,7 +68,7 @@ const Charts =({
       facultyData,
       setaData
     };
-  }, [companies, placements, allocatedLearners, agreements]);
+  }, [companies, placements, allocatedLearners, agreements, students]);
 
   const BarChart = ({ data, title, color }) => {
     const maxValue = Math.max(...Object.values(data));
