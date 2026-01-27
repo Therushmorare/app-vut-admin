@@ -201,7 +201,7 @@ export default function PlacementTable({
               <option value="">All Companies</option>
               {companies.map(company => (
                 <option key={company.company_id} value={company.company_id}>
-                  {company.companyName}
+                  {company.company_name || company.companyName}
                 </option>
               ))}
             </select>
