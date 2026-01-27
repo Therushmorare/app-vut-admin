@@ -294,10 +294,10 @@ export default function PlacementTable({
                             </div>
                             <div>
                               <p className="font-semibold" style={{ color: COLORS.primary }}>
-                                {learner ? `${learner.firstName} ${learner.lastName}` : 'Unknown'}
+                                {learner ? `${learner.first_name} ${learner.last_name}` : 'Unknown'}
                               </p>
                               <p className="text-sm text-gray-600">
-                                {learner?.studentId || 'N/A'}
+                                {learner?.id || 'N/A'}
                               </p>
                             </div>
                           </div>
@@ -307,10 +307,10 @@ export default function PlacementTable({
                             <Building2 className="w-4 h-4 text-gray-400" />
                             <div>
                               <p className="font-medium" style={{ color: COLORS.primary }}>
-                                {company?.companyName || 'Unknown'}
+                                {company?.company_name || 'Unknown'}
                               </p>
                               <p className="text-xs text-gray-500">
-                                {company?.industrySector || 'N/A'}
+                                {company?.industry || 'N/A'}
                               </p>
                             </div>
                           </div>
