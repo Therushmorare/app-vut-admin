@@ -8,6 +8,7 @@ export default function FundingWindowsList({
   programmes = [],
   allocatedLearners = [],
   expandedWindows = [],
+  students = [],
   onToggleExpand,
   onAllocate, 
   onEdit, 
@@ -26,9 +27,16 @@ export default function FundingWindowsList({
           a => a.agreement_id === window.agreement_id
         );
 
-        const windowLearners = safeAllocatedLearners.filter(
-          l => l.agreement_id === window.agreement_id
-        );
+        // Enrich allocations with student info
+        const windowLearners = safeAllocatedLearners
+          .filter(l => l.agreement_id === window.agreement_id)
+          .map(l => {
+            const student = students.find(s => s.id === l.student_id);
+            return student
+              ? { ...student, allocation_id: l.allocation_id }
+              : null;
+          })
+          .filter(Boolean);
 
         const programme = programmes.filter(
           p => p.funding_window_id === window.funding_window_id
@@ -68,21 +76,21 @@ export default function FundingWindowsList({
               </div>
 
               <div className="flex gap-2">
-              <button
-                onClick={() =>
-                  onAllocate({
-                    window: window,             // make sure it's `window`
-                    agreement: agreement || {}, // safe fallback
-                    programmes: programme || [] // plural `programmes` matches modal check
-                  })
-                }
-                disabled={remainingSlots <= 0 || (programme?.length ?? 0) === 0}
-                className="px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ backgroundColor: COLORS.success }}
-              >
-                Allocate Learners
-              </button>
-              
+                <button
+                  onClick={() =>
+                    onAllocate({
+                      window: window,             // make sure it's `window`
+                      agreement: agreement || {}, // safe fallback
+                      programmes: programme || [] // plural `programmes` matches modal check
+                    })
+                  }
+                  disabled={remainingSlots <= 0 || (programme?.length ?? 0) === 0}
+                  className="px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ backgroundColor: COLORS.success }}
+                >
+                  Allocate Learners
+                </button>
+
                 <button
                   onClick={() => onEdit(window)}
                   className="p-2 rounded-lg hover:bg-gray-100"
@@ -184,7 +192,7 @@ export default function FundingWindowsList({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
                     {windowLearners.map(learner => (
                       <div
-                        key={learner.studentId}
+                        key={learner.id} // fixed
                         className="p-3 rounded-lg"
                         style={{ backgroundColor: COLORS.bgLight }}
                       >

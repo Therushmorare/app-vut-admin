@@ -700,6 +700,7 @@ export default function SETAManagementSystem() {
               agreements={agreements}
               allocatedLearners={allocatedLearners}
               expandedWindows={expandedWindows}
+              students={allStudents}
               onToggleExpand={toggleWindowExpanded}
               onAllocate={(data) => openModal('allocateLearners', data)}
               onEdit={(w) => openModal('editWindow', w)}
