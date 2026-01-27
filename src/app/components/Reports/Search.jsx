@@ -17,15 +17,15 @@ export default function LearnerSearch({
   const itemsPerPage = 10;
 
   const filteredLearners = useMemo(() => {
-    let results = allocatedLearners;
+    let results = students;
 
     // --- Search filter ---
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
       results = results.filter(learner => {
-        const fullName = `${learner.firstName || ''} ${learner.lastName || ''}`.toLowerCase();
-        const studentId = (learner.studentId || '').toLowerCase();
-        const idNumber = (learner.idNumber || '').toLowerCase();
+        const fullName = `${learner.first_name || ''} ${learner.last_name || ''}`.toLowerCase();
+        const studentId = (learner.id || '').toLowerCase();
+        const idNumber = (learner.ID_number || '').toLowerCase();
         const email = (learner.email || '').toLowerCase();
         
         return (
@@ -211,7 +211,7 @@ export default function LearnerSearch({
                           </div>
                           <div>
                             <p className="font-semibold" style={{ color: COLORS.primary }}>
-                              {learner.firstName} {learner.lastName}
+                              {learner.first_name} {learner.last_name}
                             </p>
                             <p className="text-sm text-gray-600">{learner.studentId}</p>
                           </div>
