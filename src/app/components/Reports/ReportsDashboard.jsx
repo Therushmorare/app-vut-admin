@@ -24,7 +24,7 @@ export default function ReportsDashboard({
     const terminatedPlacements = placements.filter(p => p.status === 'Terminated').length;
     
     // Learner Status
-    const placedLearnerIds = placements.map(p => p.learnerId);
+    const placedLearnerIds = placements.map(p => p.student_id);
     const placedLearners = allocatedLearners.filter(l => placedLearnerIds.includes(l.student_id)).length;
     const unplacedLearners = totalLearners - placedLearners;
     
