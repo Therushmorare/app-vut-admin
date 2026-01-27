@@ -9,6 +9,7 @@ import LearnerSearch from '../../components/Reports/Search';
 import Charts from '../../components/Reports/Charts';
 import Toast from '../../components/ToastNotifications';
 import StudentProfileModal from '../../components/Students/StudentProfile';
+import axios from 'axios';
 
 const ReportsPage = () =>{
   const [activeTab, setActiveTab] = useState('dashboard');
