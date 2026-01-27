@@ -8,6 +8,7 @@ export default function LearnerSearch({
   allocatedLearners = [],
   companies = [],
   agreements = [],
+  students = [],
   filters = {},
   onQuickAction
 }) {
@@ -18,6 +19,7 @@ export default function LearnerSearch({
   const filteredLearners = useMemo(() => {
     let results = allocatedLearners;
 
+    // --- Search filter ---
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
       results = results.filter(learner => {
@@ -35,6 +37,7 @@ export default function LearnerSearch({
       });
     }
 
+    // --- Filters ---
     if (filters.faculty) {
       results = results.filter(l => l.faculty === filters.faculty);
     }
@@ -78,8 +81,18 @@ export default function LearnerSearch({
       });
     }
 
-    return results;
-  }, [allocatedLearners, searchTerm, filters, placements]);
+    // --- Map student details ---
+    const resultsWithStudentData = results.map(learner => {
+      const studentData = students.find(s => s.id === learner.studentId || s.studentId === learner.studentId);
+      return {
+        ...learner,
+        studentData // embeds full student object
+      };
+    });
+
+    return resultsWithStudentData;
+
+  }, [allocatedLearners, searchTerm, filters, placements, students]);
 
   const totalPages = Math.ceil(filteredLearners.length / itemsPerPage);
   const paginatedLearners = filteredLearners.slice(
