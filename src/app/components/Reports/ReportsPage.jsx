@@ -39,6 +39,8 @@ const ReportsPage = () =>{
     fetchAgreements();
     fetchFundingWindows();
     fetchAllocatedLearners();
+    fetchAllStudents();
+    fetchPlacements();
     loadData();
   }, []);
 
@@ -133,6 +135,60 @@ const ReportsPage = () =>{
     }
   };
 
+  const fetchAllStudents = async () => {
+    try {
+      const res = await axios.get(
+        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/students',
+        { withCredentials: true }
+      );
+
+      if (res.status === 200 && Array.isArray(res.data.students)) {
+        setAllStudents(res.data.students);
+
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(
+            'all-students',
+            JSON.stringify(res.data.students)
+          );
+        }
+
+        setToast({ type: 'success', message: 'Students loaded successfully' });
+      } else {
+        console.warn('Unexpected Students response:', res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load Students:', err);
+      setToast({ type: 'error', message: 'Failed to load Students' });
+    }
+  };
+  
+  const fetchPlacements = async () => {
+    try {
+      const res = await axios.get(
+        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/learner-placements',
+        { withCredentials: true }
+      );
+
+      if (res.status === 200 && Array.isArray(res.data.placements)) {
+        setPlacements(res.data.placements);
+
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(
+            'learner-placements',
+            JSON.stringify(res.data.placements)
+          );
+        }
+
+        setToast({ type: 'success', message: 'Student Placements loaded successfully' });
+      } else {
+        console.warn('Unexpected Placements response:', res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load Placements:', err);
+      setToast({ type: 'error', message: 'Failed to load Placements' });
+    }
+  };
+  
   const loadData = () => {
     try {
       if (typeof window === 'undefined') return;
