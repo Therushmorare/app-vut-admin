@@ -174,11 +174,17 @@ export default function AdvancedFilters({
                 style={{ borderColor: COLORS.border }}
               >
                 <option value="">All Windows</option>
-                {fundingWindows.map(window => (
-                  <option key={window.funding_window_id} value={window.funding_window_id}>
-                    {window.funding_window_name}
-                  </option>
-                ))}
+                {Array.isArray(fundingWindows) && fundingWindows.length > 0
+                  ? fundingWindows.map(window => (
+                      <option
+                        key={window.funding_window_id || window.id} // fallback if id is different
+                        value={window.funding_window_id || window.id}
+                      >
+                        {window.funding_window_name || window.name || 'Unnamed Window'}
+                      </option>
+                    ))
+                  : <option disabled>No funding windows available</option>
+                }
               </select>
             </div>
 
