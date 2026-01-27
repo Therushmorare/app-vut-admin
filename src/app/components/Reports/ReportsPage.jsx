@@ -105,30 +105,32 @@ const ReportsPage = () =>{
     }
   };
 
-    const fetchAllocatedLearners = async () => {
+  const fetchAllocatedLearners = async () => {
     try {
       const res = await axios.get(
         'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/learner-allocations',
         { withCredentials: true }
       );
 
-      if (res.status === 200 && Array.isArray(res.data)) {
-        setAgreements(res.data);
+      if (res.status === 200 && Array.isArray(res.data.allocations)) {
+        setAllocatedLearners(res.data.allocations);
 
         if (typeof window !== 'undefined') {
-          localStorage.setItem('allocated-learners', JSON.stringify(res.data));
+          localStorage.setItem(
+            'allocated-learners',
+            JSON.stringify(res.data.allocations)
+          );
         }
 
         setToast({ type: 'success', message: 'Allocated learners loaded successfully' });
       } else {
-        console.warn('Unexpected Allocation response:', res.data);
+        console.warn('Unexpected allocated learners response:', res.data);
       }
     } catch (err) {
       console.error('Failed to load Allocated Learners:', err);
       setToast({ type: 'error', message: 'Failed to load Allocated Learners' });
     }
   };
-
 
   const loadData = () => {
     try {
