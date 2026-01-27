@@ -27,16 +27,14 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   const [activeTab, setActiveTab] = useState('companies');
 
   const activePlacementsByCompany = useMemo(() => {
-  return placements.reduce((acc, p) => {
-    if (p.status === 'Active') {
-      const companyId = p.company_id || p.companyId;
-      if (companyId) {
-        acc[companyId] = (acc[companyId] || 0) + 1;
+    if (!placements?.length) return {};
+    return placements.reduce((acc, p) => {
+      if (p.status === 'Active') {
+        acc[p.company_id] = (acc[p.company_id] || 0) + 1;
       }
-    }
-    return acc;
-  }, {});
-}, [placements]);
+      return acc;
+    }, {});
+  }, [placements]);
 
 //locl storage load and save
   useEffect(() => {
@@ -644,7 +642,6 @@ export default function HostCompanyManagement({ allStudents = [] }) {
                           <p className="text-xs text-gray-600">Capacity / Active</p>
                           <p className="text-lg font-bold" style={{ color: COLORS.primary }}>
                             {company.student_capacity} / {activePlacementsByCompany[company.company_id] || 0}
-                          </p>
                           </p>
                         </div>
                         <button
