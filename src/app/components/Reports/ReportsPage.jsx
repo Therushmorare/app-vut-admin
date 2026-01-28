@@ -229,7 +229,7 @@ const ReportsPage = () =>{
 
     const mappedStudent = {
       name: `${learner.first_name} ${learner.last_name}`,
-      studentNumber: learner.id,
+      studentNumber: learner.student_number,
       idNumber: learner.ID_number,
       email: learner.email,
       phone: learner.phone_number || learner.phoneNumber,

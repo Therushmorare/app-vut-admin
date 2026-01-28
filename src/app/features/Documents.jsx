@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Search, FolderOpen, File, Flag, CheckCircle, Download, Eye, Filter, X, ChevronRight, AlertCircle } from 'lucide-react';
+import axios from "axios";
 
 const COLORS = {
   primary: '#201C52',
@@ -19,162 +20,122 @@ const COLORS = {
   border: '#B9B9B9'
 };
 
-const generateStudents = (count) => {
-  const programmes = [
-    'National Certificate: IT Systems Support', 
-    'National Diploma: Software Development', 
-    'Certificate: Data Analytics', 
-    'Diploma: Business Administration', 
-    'Certificate: Project Management'
-  ];
-  
-  const faculties = [
-    'Faculty of Information Technology',
-    'Faculty of Business & Management',
-    'Faculty of Engineering',
-    'Faculty of Commerce',
-    'Faculty of Applied Sciences'
-  ];
-  
-  const statuses = ['Active', 'Completed', 'On Hold', 'Withdrawn', 'Suspended'];
-  const setas = ['SERVICES SETA', 'ETDP SETA', 'MICT SETA', 'BANKSETA', 'FASSET'];
-  
-  const employers = [
-    'Tech Solutions Ltd', 'Business Dynamics', 'Innovation Hub',
-    'Digital Systems Corp', 'Enterprise Solutions', 'SmartTech SA',
-    'Global Industries', 'Future Ventures', 'Prime Consulting'
-  ];
-  
-  const firstNames = ['Thabo', 'Lerato', 'Sipho', 'Nomsa', 'Kwame', 'Zinhle', 'Bongani', 'Thandi', 'Mpho', 'Ayanda'];
-  const lastNames = ['Nkosi', 'Dlamini', 'Mokoena', 'Khumalo', 'Mthembu', 'Ndlovu', 'Zulu', 'Mahlangu', 'Molefe', 'Sithole'];
-  
-  const students = [];
-  
-  for (let i = 1; i <= count; i++) {
-    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const programme = programmes[Math.floor(Math.random() * programmes.length)];
-    const faculty = faculties[Math.floor(Math.random() * faculties.length)];
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
-    const seta = setas[Math.floor(Math.random() * setas.length)];
-    const employer = employers[Math.floor(Math.random() * employers.length)];
-    const attendance = Math.floor(Math.random() * 40) + 60;
-    const compliance = attendance >= 80 ? 'Compliant' : attendance >= 70 ? 'At Risk' : 'Non-Compliant';
-    
-    const year = Math.floor(Math.random() * 30) + 90;
-    const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
-    const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
-    const idNumber = `${year}${month}${day}${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}0${Math.floor(Math.random() * 10)}0`;
-    
-    students.push({
-      id: i,
-      studentNr: `STU${String(i).padStart(6, '0')}`,
-      firstName,
-      lastName,
-      name: `${firstName} ${lastName}`,
-      email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@university.ac.za`,
-      phone: `+27 ${Math.floor(Math.random() * 90) + 10} ${Math.floor(Math.random() * 900) + 100} ${Math.floor(Math.random() * 9000) + 1000}`,
-      programme,
-      faculty,
-      status,
-      seta,
-      employer,
-      attendance,
-      compliance,
-      idNumber
-    });
-  }
-  
-  return students;
-};
-
-const generateDocuments = (students) => {
-  const documentTypes = [
-    { type: 'ID Document', folder: 'Personal Documents', required: true },
-    { type: 'Proof of Residence', folder: 'Personal Documents', required: true },
-    { type: 'Matric Certificate', folder: 'Academic Records', required: true },
-    { type: 'CV', folder: 'Personal Documents', required: false },
-    { type: 'Employment Contract', folder: 'Employment Documents', required: true },
-    { type: 'SETA Agreement', folder: 'SETA Documents', required: true },
-    { type: 'Monthly Report', folder: 'Progress Reports', required: true },
-    { type: 'Assessment Results', folder: 'Academic Records', required: true },
-    { type: 'Timesheet', folder: 'Progress Reports', required: true },
-    { type: 'Medical Certificate', folder: 'Personal Documents', required: false },
-  ];
-
-  const documents = [];
-  let docId = 1;
-
-  students.forEach(student => {
-    const numDocs = Math.floor(Math.random() * 5) + 6; // 6-10 documents per student
-    const selectedTypes = [...documentTypes].sort(() => 0.5 - Math.random()).slice(0, numDocs);
-
-    selectedTypes.forEach(docType => {
-      const uploadDate = new Date(2024, Math.floor(Math.random() * 11), Math.floor(Math.random() * 28) + 1);
-      const status = Math.random() > 0.15 ? (Math.random() > 0.3 ? 'approved' : 'pending') : 'flagged';
-      
-      documents.push({
-        id: docId++,
-        studentId: student.id,
-        studentNr: student.studentNr,
-        studentName: student.name,
-        firstName: student.firstName,
-        lastName: student.lastName,
-        fileName: `${student.studentNr}_${student.firstName}_${student.lastName}_${docType.type.replace(/\s+/g, '_')}_${uploadDate.toISOString().split('T')[0]}.pdf`,
-        documentType: docType.type,
-        folder: docType.folder,
-        uploadDate: uploadDate.toISOString().split('T')[0],
-        status,
-        fileSize: `${Math.floor(Math.random() * 900) + 100} KB`,
-        programme: student.programme,
-        seta: student.seta,
-        faculty: student.faculty
-      });
-    });
-  });
-
-  return documents;
-};
-
 const StudentDocumentManager = () => {
-  const [students] = useState(() => generateStudents(50));
-  const [documents, setDocuments] = useState(() => generateDocuments(generateStudents(50)));
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFolder, setSelectedFolder] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [documentTypeFilter, setDocumentTypeFilter] = useState('all');
+  const [students, setStudents] = useState([]);
+  const [documents, setDocuments] = useState([]);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedFolder, setSelectedFolder] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [documentTypeFilter, setDocumentTypeFilter] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [studentsRes, documentsRes] = await Promise.all([
+          axios.get("/api/administrators/students"),
+          axios.get("/api/administrators/studentDocuments")
+        ]);
+
+        const studentsData = studentsRes.data.students || [];
+        const documentsData = documentsRes.data.result || [];
+
+        // map student id to student info
+        const studentMap = {};
+        studentsData.forEach(s => {
+          studentMap[s.id] = s;
+        });
+
+        // normalize documents using available fields only
+        const normalizedDocuments = documentsData.map(doc => {
+          const student = studentMap[doc.user_id];
+          return {
+            id: doc.document_id,
+            studentId: doc.user_id,
+            studentNr: student?.student_number || "",
+            studentName: student
+              ? `${student.first_name} ${student.last_name}`
+              : "",
+            documentType: doc.doc_type,
+            folder: null,       // API does not provide
+            uploadDate: null,   // API does not provide
+            status: null,       // API does not provide
+            fileName: doc.document,
+            programme: student?.programme,
+            faculty: student?.faculty
+          };
+        });
+
+        setStudents(studentsData);
+        setDocuments(normalizedDocuments);
+      } catch (err) {
+        console.error("Failed to fetch students/documents:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const folders = useMemo(() => {
-    const folderSet = new Set(documents.map(doc => doc.folder));
-    return ['all', ...Array.from(folderSet).sort()];
+    const folderSet = new Set(documents.map(doc => doc.folder).filter(Boolean));
+    return ["all", ...Array.from(folderSet).sort()];
   }, [documents]);
 
   const documentTypes = useMemo(() => {
-    const typeSet = new Set(documents.map(doc => doc.documentType));
-    return ['all', ...Array.from(typeSet).sort()];
+    const typeSet = new Set(
+      documents.map(doc => doc.documentType).filter(Boolean)
+    );
+    return ["all", ...Array.from(typeSet).sort()];
   }, [documents]);
 
   const filteredDocuments = useMemo(() => {
     return documents.filter(doc => {
-      const matchesSearch = searchTerm === '' || 
-        doc.fileName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.studentNr.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesFolder = selectedFolder === 'all' || doc.folder === selectedFolder;
-      const matchesStatus = statusFilter === 'all' || doc.status === statusFilter;
-      const matchesType = documentTypeFilter === 'all' || doc.documentType === documentTypeFilter;
-      const matchesStudent = !selectedStudent || doc.studentId === selectedStudent;
+      const matchesSearch =
+        searchTerm === "" ||
+        (doc.fileName &&
+          doc.fileName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (doc.studentName &&
+          doc.studentName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (doc.studentNr &&
+          doc.studentNr.toLowerCase().includes(searchTerm.toLowerCase()));
 
-      return matchesSearch && matchesFolder && matchesStatus && matchesType && matchesStudent;
+      const matchesFolder =
+        selectedFolder === "all" || doc.folder === selectedFolder;
+
+      const matchesStatus =
+        statusFilter === "all" || doc.status === statusFilter;
+
+      const matchesType =
+        documentTypeFilter === "all" ||
+        doc.documentType === documentTypeFilter;
+
+      const matchesStudent =
+        !selectedStudent || doc.studentId === selectedStudent;
+
+      return (
+        matchesSearch &&
+        matchesFolder &&
+        matchesStatus &&
+        matchesType &&
+        matchesStudent
+      );
     });
-  }, [documents, searchTerm, selectedFolder, statusFilter, documentTypeFilter, selectedStudent]);
+  }, [
+    documents,
+    searchTerm,
+    selectedFolder,
+    statusFilter,
+    documentTypeFilter,
+    selectedStudent
+  ]);
 
   const folderStats = useMemo(() => {
     const stats = {};
     documents.forEach(doc => {
+      if (!doc.folder || !doc.status) return;
+
       if (!stats[doc.folder]) {
         stats[doc.folder] = { total: 0, flagged: 0, approved: 0, pending: 0 };
       }
@@ -185,26 +146,36 @@ const StudentDocumentManager = () => {
   }, [documents]);
 
   const handleStatusChange = (docId, newStatus) => {
-    setDocuments(docs => 
-      docs.map(doc => doc.id === docId ? { ...doc, status: newStatus } : doc)
+    setDocuments(docs =>
+      docs.map(doc =>
+        doc.id === docId ? { ...doc, status: newStatus } : doc
+      )
     );
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'approved': return COLORS.success;
-      case 'flagged': return COLORS.danger;
-      case 'pending': return COLORS.warning;
-      default: return COLORS.textMedium;
+      case "approved":
+        return COLORS.success;
+      case "flagged":
+        return COLORS.danger;
+      case "pending":
+        return COLORS.warning;
+      default:
+        return COLORS.textMedium;
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'approved': return <CheckCircle size={16} />;
-      case 'flagged': return <Flag size={16} />;
-      case 'pending': return <AlertCircle size={16} />;
-      default: return null;
+      case "approved":
+        return <CheckCircle size={16} />;
+      case "flagged":
+        return <Flag size={16} />;
+      case "pending":
+        return <AlertCircle size={16} />;
+      default:
+        return null;
     }
   };
 
