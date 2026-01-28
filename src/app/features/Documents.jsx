@@ -41,19 +41,19 @@ const StudentDocumentManager = () => {
         ]);
 
         const studentsData = studentsRes.data.students || [];
-        const documentsData = documentsRes.data.result || [];
+        const documentsData = documentsRes.data || [];
 
         // Map students by ID
         const studentMap = {};
         studentsData.forEach(s => {
-          if (s.id !== undefined && s.id !== null) studentMap[s.id] = s;
+          if (s.id) studentMap[s.id] = s;
         });
 
-        // Folder mapper
+        // Map doc types to folders
         const mapFolder = (docType) => {
           if (!docType) return "Miscellaneous";
           const type = docType.toLowerCase();
-          if (["idDocument","proofofresidence","medicalcertificate"].includes(type)) return "Personal Documents";
+          if (["iddocument","proofofresidence","medicalcertificate"].includes(type)) return "Personal Documents";
           if (["academictranscript","matriccertificate","assessmentresults"].includes(type)) return "Academic Records";
           if (["employmentcontract","setaagreement"].includes(type)) return "Employment & SETA Documents";
           if (["timesheet","monthlyreport"].includes(type)) return "Progress Reports";
@@ -71,10 +71,9 @@ const StudentDocumentManager = () => {
             studentName: student.first_name && student.last_name ? `${student.first_name} ${student.last_name}` : "Unknown",
             documentType: doc.doc_type || "Unknown",
             folder: mapFolder(doc.doc_type),
-            uploadDate: doc.uploaded_at ? new Date(doc.uploaded_at).toLocaleDateString() : "N/A",
-            status: doc.status || "pending",
+            uploadDate: "N/A", // API doesn't return uploaded_at
+            status: "pending",  // Default pending
             fileName: doc.document || "Unnamed Document",
-            fileSize: doc.file_size ? `${(doc.file_size / 1024).toFixed(2)} KB` : "N/A"
           };
         });
 
@@ -453,7 +452,7 @@ const StudentDocumentManager = () => {
             ) : (
               filteredDocuments.map(doc => (
                 <div
-                  key={doc.document_id}
+                  key={doc.id}
                   style={{
                     backgroundColor: COLORS.bgWhite,
                     padding: '16px',
@@ -481,7 +480,7 @@ const StudentDocumentManager = () => {
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                         <span style={{ fontSize: '14px', fontWeight: '600', color: COLORS.text }}>
-                          {doc.document}
+                          {doc.fileName}
                         </span>
                         <span style={{
                           fontSize: '11px',
@@ -493,13 +492,13 @@ const StudentDocumentManager = () => {
                         </span>
                       </div>
                       <div style={{ fontSize: '12px', color: COLORS.textMedium, display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                        <span>{doc.user_id}</span>
+                        <span>{doc.studentNr}</span>
                         <span>•</span>
-                        <span>{doc.doc_type}</span>
+                        <span>{doc.documentType}</span>
                         <span>•</span>
-                        {/*<span>{doc.folder}</span>
-                        <span>•</span>*/}
-                        <span>{doc.document}</span>
+                        <span>{doc.folder}</span>
+                        <span>•</span>*
+                        <span>{doc.status}</span>
                         <span>•</span>
                         <span>Uploaded: {doc.uploadDate}</span>
                       </div>
