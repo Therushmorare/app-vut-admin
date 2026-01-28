@@ -297,7 +297,7 @@ const StudentDocumentManager = () => {
                 <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: COLORS.textMedium }} />
                 <input
                   type="text"
-                  placeholder="Search by student number, name, or filename..."
+                  placeholder="Search by student ID, name, or filename..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   style={{
