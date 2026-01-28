@@ -16,6 +16,42 @@ export default function LearnerSearch({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  const normalizedPlacements = useMemo(() =>
+    placements.map(p => ({
+      ...p,
+      studentId: p.student_id,
+      companyId: p.company_id,
+      startDate: p.start_date,
+      endDate: p.end_date
+    })),
+  [placements]);
+
+  const normalizedCompanies = useMemo(() =>
+    companies.map(c => ({
+      ...c,
+      id: c.company_id,
+      companyName: c.company_name,
+      industrySector: c.industry
+    })),
+  [companies]);
+
+  const normalizedAgreements = useMemo(() =>
+    agreements.map(a => ({
+      ...a,
+      id: a.agreement_id,
+      setaName: a.name
+    })),
+  [agreements]);
+
+  const normalizedAllocations = useMemo(() =>
+    allocatedLearners.map(a => ({
+      ...a,
+      studentId: a.student_id,
+      agreementId: a.agreement_id,
+      programmeId: a.programme_id
+    })),
+  [allocatedLearners]);
+
   const filteredLearners = useMemo(() => {
     let results = students;
 
@@ -55,19 +91,21 @@ export default function LearnerSearch({
     }
 
     if (filters.status) {
-      const placedLearnerIds = placements.map(p => p.learnerId);
+      const placedLearnerIds = normalizedPlacements.map(p => p.studentId);
       if (filters.status === 'Unplaced') {
         results = results.filter(l => !placedLearnerIds.includes(l.id));
       } else {
         results = results.filter(l => {
-          const placement = placements.find(p => p.learnerId === l.id);
+          const placement = normalizedPlacements.find(p => p.studentId === l.id);
           return placement && placement.status === filters.status;
         });
       }
     }
 
     if (filters.hostCompany) {
-      const companyPlacements = placements.filter(p => p.companyId === filters.hostCompany);
+      const companyPlacements = normalizedPlacements.filter(
+        p => p.companyId === filters.hostCompany
+      );
       const learnerIds = companyPlacements.map(p => p.learnerId);
       results = results.filter(l => learnerIds.includes(l.id));
     }
@@ -101,10 +139,22 @@ export default function LearnerSearch({
   );
 
   const enrichedLearners = paginatedLearners.map(learner => {
-    const placement = placements.find(p => p.learnerId === learner.id);
-    const company = placement ? companies.find(c => c.id === placement.companyId) : null;
-    const agreement = agreements.find(a => a.id === learner.agreementId);
-    
+    const allocation = normalizedAllocations.find(
+      a => a.studentId === learner.id
+    );
+
+    const placement = normalizedPlacements.find(
+      p => p.studentId === learner.id
+    );
+
+    const company = placement
+      ? normalizedCompanies.find(c => c.id === placement.companyId)
+      : null;
+
+    const agreement = allocation
+      ? normalizedAgreements.find(a => a.id === allocation.agreementId)
+      : null;
+
     return {
       ...learner,
       placement,
@@ -127,7 +177,7 @@ export default function LearnerSearch({
   const exportToCSV = () => {
     const headers = ['Name', 'Student ID', 'Faculty', 'Programme', 'SETA', 'Status', 'Host Company', 'Start Date', 'End Date'];
     const rows = enrichedLearners.map(l => [
-      `${l.firstName} ${l.lastName}`,
+      `${l.first_name} ${l.last_name}`,
       l.studentId || '',
       l.faculty || '',
       l.programme || '',
