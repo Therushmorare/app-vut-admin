@@ -117,14 +117,15 @@ const StudentDocumentManager = () => {
     return documents.filter((doc) => {
       const matchesSearch =
         searchTerm === "" ||
-        doc.document.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.doc_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.user_id.toString().toLowerCase().includes(searchTerm.toLowerCase());
+        doc.fileName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.documentType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.studentId.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.studentName.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesFolder = selectedFolder === "all" || doc.folder === selectedFolder;
       const matchesStatus = statusFilter === "all" || doc.status === statusFilter;
-      const matchesType = documentTypeFilter === "all" || doc.doc_type === documentTypeFilter;
-      const matchesStudent = !selectedStudent || String(doc.user_id) === String(selectedStudent);
+      const matchesType = documentTypeFilter === "all" || doc.documentType === documentTypeFilter;
+      const matchesStudent = !selectedStudent || doc.studentId === selectedStudent;
 
       return matchesSearch && matchesFolder && matchesStatus && matchesType && matchesStudent;
     });
