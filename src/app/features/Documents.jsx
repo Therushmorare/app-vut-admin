@@ -53,7 +53,7 @@ const StudentDocumentManager = () => {
         const mapFolder = (docType) => {
           if (!docType) return "Miscellaneous";
           const type = docType.toLowerCase();
-          if (["iddocument","proofofresidence","medicalcertificate"].includes(type)) return "Personal Documents";
+          if (["idDocument","proofofresidence","medicalcertificate"].includes(type)) return "Personal Documents";
           if (["academictranscript","matriccertificate","assessmentresults"].includes(type)) return "Academic Records";
           if (["employmentcontract","setaagreement"].includes(type)) return "Employment & SETA Documents";
           if (["timesheet","monthlyreport"].includes(type)) return "Progress Reports";
