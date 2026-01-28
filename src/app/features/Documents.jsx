@@ -43,34 +43,31 @@ const StudentDocumentManager = () => {
         const documentsData = documentsRes.data.result || [];
 
         const studentMap = {};
-        studentsData.forEach(s => {
-          studentMap[s.id] = s;
-        });
+        studentsData.forEach(s => studentMap[s.id] = s);
 
         const mapFolder = (docType) => {
           if (!docType) return "Miscellaneous";
           const type = docType.toLowerCase();
-          if (["id document", "proof of residence", "medical certificate"].includes(type)) return "Personal Documents";
-          if (["matric certificate", "assessment results"].includes(type)) return "Academic Records";
-          if (["employment contract", "seta agreement"].includes(type)) return "Employment & SETA Documents";
-          if (["timesheet", "monthly report"].includes(type)) return "Progress Reports";
+          if (["id document","proof of residence","medical certificate"].includes(type)) return "Personal Documents";
+          if (["matric certificate","assessment results"].includes(type)) return "Academic Records";
+          if (["employment contract","seta agreement"].includes(type)) return "Employment & SETA Documents";
+          if (["timesheet","monthly report"].includes(type)) return "Progress Reports";
           return "Miscellaneous";
         };
 
         const normalizedDocuments = documentsData.map(doc => {
           const student = studentMap[doc.user_id];
-
           return {
             id: doc.document_id,
-            studentId: doc.user_id,
+            studentId: Number(doc.user_id),
             studentNr: student?.student_number || "N/A",
             studentName: student ? `${student.first_name} ${student.last_name}` : "Unknown",
             documentType: doc.doc_type || "Unknown",
             folder: mapFolder(doc.doc_type),
-            uploadDate: "N/A",        // You can add real dates if available
-            status: "pending",        // default status
+            uploadDate: doc.uploaded_at || "N/A",
+            status: doc.status || "pending",
             fileName: doc.document || "Unnamed Document",
-            fileSize: "N/A",          // You can add real file size if available
+            fileSize: doc.file_size ? `${(doc.file_size / 1024).toFixed(2)} KB` : "N/A",
             programme: student?.programme || "N/A",
             faculty: student?.faculty || "N/A"
           };
@@ -102,12 +99,11 @@ const StudentDocumentManager = () => {
     return documents.filter(doc => {
       const matchesSearch =
         searchTerm === "" ||
-        (doc.fileName &&
-          doc.fileName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (doc.studentName &&
-          doc.studentName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (doc.studentNr &&
-          doc.studentNr.toLowerCase().includes(searchTerm.toLowerCase()));
+        (
+          (doc.fileName && doc.fileName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (doc.studentName && doc.studentName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (doc.studentNr && doc.studentNr.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+        );
 
       const matchesFolder =
         selectedFolder === "all" || doc.folder === selectedFolder;
@@ -148,7 +144,7 @@ const StudentDocumentManager = () => {
         stats[doc.folder] = { total: 0, flagged: 0, approved: 0, pending: 0 };
       }
       stats[doc.folder].total++;
-      stats[doc.folder][doc.status]++;
+      stats[doc.folder][doc.status] = (stats[doc.folder][doc.status] || 0) + 1;
     });
     return stats;
   }, [documents]);
