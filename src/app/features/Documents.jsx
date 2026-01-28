@@ -117,14 +117,14 @@ const StudentDocumentManager = () => {
     return documents.filter((doc) => {
       const matchesSearch =
         searchTerm === "" ||
-        doc.fileName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.studentNr.toString().toLowerCase().includes(searchTerm.toLowerCase());
+        doc.document.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.doc_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.user_id.toString().toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesFolder = selectedFolder === "all" || doc.folder === selectedFolder;
       const matchesStatus = statusFilter === "all" || doc.status === statusFilter;
-      const matchesType = documentTypeFilter === "all" || doc.documentType === documentTypeFilter;
-      const matchesStudent = !selectedStudent || String(doc.studentId) === String(selectedStudent);
+      const matchesType = documentTypeFilter === "all" || doc.doc_type === documentTypeFilter;
+      const matchesStudent = !selectedStudent || String(doc.user_id) === String(selectedStudent);
 
       return matchesSearch && matchesFolder && matchesStatus && matchesType && matchesStudent;
     });
@@ -132,7 +132,7 @@ const StudentDocumentManager = () => {
 
   const handleStatusChange = (docId, newStatus) => {
     setDocuments((docs) =>
-      docs.map((doc) => (doc.id === docId ? { ...doc, status: newStatus } : doc))
+      docs.map((doc) => (doc.document_id === docId ? { ...doc, status: newStatus } : doc))
     );
   };
 
@@ -393,7 +393,7 @@ const StudentDocumentManager = () => {
                   alignItems: 'center',
                   gap: '6px'
                 }}>
-                  Student: {students.find(s => s.id === selectedStudent)?.name}
+                  Student: {students.find(s => s.id === selectedStudent)?.first_name}
                   <X size={14} style={{ cursor: 'pointer' }} onClick={() => setSelectedStudent(null)} />
                 </span>
               )}
@@ -452,7 +452,7 @@ const StudentDocumentManager = () => {
             ) : (
               filteredDocuments.map(doc => (
                 <div
-                  key={doc.id}
+                  key={doc.document_id}
                   style={{
                     backgroundColor: COLORS.bgWhite,
                     padding: '16px',
@@ -480,7 +480,7 @@ const StudentDocumentManager = () => {
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                         <span style={{ fontSize: '14px', fontWeight: '600', color: COLORS.text }}>
-                          {doc.fileName}
+                          {doc.document}
                         </span>
                         <span style={{
                           fontSize: '11px',
@@ -492,13 +492,13 @@ const StudentDocumentManager = () => {
                         </span>
                       </div>
                       <div style={{ fontSize: '12px', color: COLORS.textMedium, display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                        <span>{doc.studentNr} - {doc.studentName}</span>
+                        <span>{doc.user_id}</span>
                         <span>•</span>
-                        <span>{doc.documentType}</span>
+                        <span>{doc.doc_type}</span>
                         <span>•</span>
-                        <span>{doc.folder}</span>
-                        <span>•</span>
-                        <span>{doc.fileSize}</span>
+                        {/*<span>{doc.folder}</span>
+                        <span>•</span>*/}
+                        <span>{doc.document}</span>
                         <span>•</span>
                         <span>Uploaded: {doc.uploadDate}</span>
                       </div>
