@@ -31,45 +31,49 @@ const StudentDocumentManager = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
+  // Fetch data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [studentsRes, documentsRes] = await Promise.all([
-          axios.get("https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/students"),
-          axios.get("https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/studentDocuments")
+          axios.get(
+            "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/students"
+          ),
+          axios.get(
+            "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/studentDocuments"
+          ),
         ]);
 
         const studentsData = studentsRes.data.students || [];
         const documentsData = documentsRes.data.result || [];
 
         const studentMap = {};
-        studentsData.forEach(s => studentMap[s.id] = s);
+        studentsData.forEach(s => studentMap[String(s.id)] = s); // <--- force string keys
 
         const mapFolder = (docType) => {
           if (!docType) return "Miscellaneous";
-
           const type = docType.toLowerCase();
 
-          if (["iddocument","proofofresidence","medicalcertificate"].includes(type)) 
+          if (["idDocument", "proofOfResidence", "medicalcertificate"].includes(type))
             return "Personal Documents";
 
-          if (["academictranscript","matriccertificate","assessmentresults"].includes(type)) 
+          if (["academicTranscript", "matriccertificate", "assessmentresults"].includes(type))
             return "Academic Records";
 
-          if (["employmentcontract","setaagreement"].includes(type)) 
+          if (["employmentcontract", "setaagreement"].includes(type))
             return "Employment & SETA Documents";
 
-          if (["timesheet","monthlyreport"].includes(type)) 
+          if (["timesheet", "monthlyreport"].includes(type))
             return "Progress Reports";
 
-          if (["cv","bankstatement"].includes(type))
+          if (["cv", "bankStatement"].includes(type))
             return "Financial Documents";
 
           return "Miscellaneous";
         };
 
         const normalizedDocuments = documentsData.map(doc => {
-          const student = studentMap[doc.user_id];
+          const student = studentMap[String(doc.user_id)]; // <--- ensure string key
           return {
             id: doc.document_id,
             studentId: doc.user_id,
@@ -83,9 +87,6 @@ const StudentDocumentManager = () => {
             fileSize: doc.file_size ? `${(doc.file_size / 1024).toFixed(2)} KB` : "N/A",
             programme: student?.programme || "N/A",
             faculty: student?.faculty || "N/A",
-            displayType: doc.doc_type
-              .replace(/([A-Z])/g, ' $1') // insert space before capital letters
-              .replace(/^./, str => str.toUpperCase()) // capitalize first letter
           };
         });
 
@@ -99,77 +100,51 @@ const StudentDocumentManager = () => {
     fetchData();
   }, []);
 
+  // Folders for sidebar
   const folders = useMemo(() => {
-    const folderSet = new Set(documents.map(doc => doc.folder).filter(Boolean));
+    const folderSet = new Set(documents.map((doc) => doc.folder).filter(Boolean));
     return ["all", ...Array.from(folderSet).sort()];
   }, [documents]);
 
+  // Document types for filter
   const documentTypes = useMemo(() => {
-    const typeSet = new Set(
-      documents.map(doc => doc.documentType).filter(Boolean)
-    );
+    const typeSet = new Set(documents.map((doc) => doc.documentType).filter(Boolean));
     return ["all", ...Array.from(typeSet).sort()];
   }, [documents]);
 
-  const filteredDocuments = useMemo(() => {
-    return documents.filter(doc => {
-      const matchesSearch =
-        searchTerm === "" ||
-        (
-          (doc.fileName && doc.fileName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (doc.studentName && doc.studentName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (doc.studentNr && doc.studentNr.toString().toLowerCase().includes(searchTerm.toLowerCase()))
-        );
-
-      const matchesFolder =
-        selectedFolder === "all" || doc.folder === selectedFolder;
-
-      const matchesStatus =
-        statusFilter === "all" || doc.status === statusFilter;
-
-      const matchesType =
-        documentTypeFilter === "all" ||
-        doc.documentType === documentTypeFilter;
-
-      const matchesStudent =
-        !selectedStudent || doc.studentId === selectedStudent;
-
-      return (
-        matchesSearch &&
-        matchesFolder &&
-        matchesStatus &&
-        matchesType &&
-        matchesStudent
-      );
-    });
-  }, [
-    documents,
-    searchTerm,
-    selectedFolder,
-    statusFilter,
-    documentTypeFilter,
-    selectedStudent
-  ]);
-
+  // Folder stats
   const folderStats = useMemo(() => {
     const stats = {};
-    documents.forEach(doc => {
+    documents.forEach((doc) => {
       if (!doc.folder || !doc.status) return;
-
-      if (!stats[doc.folder]) {
-        stats[doc.folder] = { total: 0, flagged: 0, approved: 0, pending: 0 };
-      }
+      if (!stats[doc.folder]) stats[doc.folder] = { total: 0, flagged: 0, approved: 0, pending: 0 };
       stats[doc.folder].total++;
       stats[doc.folder][doc.status] = (stats[doc.folder][doc.status] || 0) + 1;
     });
     return stats;
   }, [documents]);
 
+  // Filtered documents
+  const filteredDocuments = useMemo(() => {
+    return documents.filter((doc) => {
+      const matchesSearch =
+        searchTerm === "" ||
+        doc.fileName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.studentNr.toString().toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesFolder = selectedFolder === "all" || doc.folder === selectedFolder;
+      const matchesStatus = statusFilter === "all" || doc.status === statusFilter;
+      const matchesType = documentTypeFilter === "all" || doc.documentType === documentTypeFilter;
+      const matchesStudent = !selectedStudent || String(doc.studentId) === String(selectedStudent);
+      
+      return matchesSearch && matchesFolder && matchesStatus && matchesType && matchesStudent;
+    });
+  }, [documents, searchTerm, selectedFolder, statusFilter, documentTypeFilter, selectedStudent]);
+
   const handleStatusChange = (docId, newStatus) => {
-    setDocuments(docs =>
-      docs.map(doc =>
-        doc.id === docId ? { ...doc, status: newStatus } : doc
-      )
+    setDocuments((docs) =>
+      docs.map((doc) => (doc.id === docId ? { ...doc, status: newStatus } : doc))
     );
   };
 
