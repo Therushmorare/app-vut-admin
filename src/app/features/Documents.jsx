@@ -47,11 +47,24 @@ const StudentDocumentManager = () => {
 
         const mapFolder = (docType) => {
           if (!docType) return "Miscellaneous";
+
           const type = docType.toLowerCase();
-          if (["id document","proof of residence","medical certificate"].includes(type)) return "Personal Documents";
-          if (["matric certificate","assessment results"].includes(type)) return "Academic Records";
-          if (["employment contract","seta agreement"].includes(type)) return "Employment & SETA Documents";
-          if (["timesheet","monthly report"].includes(type)) return "Progress Reports";
+
+          if (["iddocument","proofofresidence","medicalcertificate"].includes(type)) 
+            return "Personal Documents";
+
+          if (["academictranscript","matriccertificate","assessmentresults"].includes(type)) 
+            return "Academic Records";
+
+          if (["employmentcontract","setaagreement"].includes(type)) 
+            return "Employment & SETA Documents";
+
+          if (["timesheet","monthlyreport"].includes(type)) 
+            return "Progress Reports";
+
+          if (["cv","bankstatement"].includes(type))
+            return "Financial Documents";
+
           return "Miscellaneous";
         };
 
@@ -59,7 +72,7 @@ const StudentDocumentManager = () => {
           const student = studentMap[doc.user_id];
           return {
             id: doc.document_id,
-            studentId: Number(doc.user_id),
+            studentId: doc.user_id,
             studentNr: student?.student_number || "N/A",
             studentName: student ? `${student.first_name} ${student.last_name}` : "Unknown",
             documentType: doc.doc_type || "Unknown",
@@ -69,7 +82,10 @@ const StudentDocumentManager = () => {
             fileName: doc.document || "Unnamed Document",
             fileSize: doc.file_size ? `${(doc.file_size / 1024).toFixed(2)} KB` : "N/A",
             programme: student?.programme || "N/A",
-            faculty: student?.faculty || "N/A"
+            faculty: student?.faculty || "N/A",
+            displayType: doc.doc_type
+              .replace(/([A-Z])/g, ' $1') // insert space before capital letters
+              .replace(/^./, str => str.toUpperCase()) // capitalize first letter
           };
         });
 
