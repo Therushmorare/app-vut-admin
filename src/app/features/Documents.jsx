@@ -36,57 +36,45 @@ const StudentDocumentManager = () => {
     const fetchData = async () => {
       try {
         const [studentsRes, documentsRes] = await Promise.all([
-          axios.get(
-            "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/students"
-          ),
-          axios.get(
-            "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/studentDocuments"
-          ),
+          axios.get("https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/students"),
+          axios.get("https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/studentDocuments")
         ]);
 
         const studentsData = studentsRes.data.students || [];
         const documentsData = documentsRes.data.result || [];
 
+        // Map students by ID
         const studentMap = {};
-        studentsData.forEach(s => studentMap[String(s.id)] = s); // <--- force string keys
+        studentsData.forEach(s => {
+          if (s.id !== undefined && s.id !== null) studentMap[s.id] = s;
+        });
 
+        // Folder mapper
         const mapFolder = (docType) => {
           if (!docType) return "Miscellaneous";
           const type = docType.toLowerCase();
-
-          if (["idDocument", "proofOfResidence", "medicalcertificate"].includes(type))
-            return "Personal Documents";
-
-          if (["academicTranscript", "matriccertificate", "assessmentresults"].includes(type))
-            return "Academic Records";
-
-          if (["employmentcontract", "setaagreement"].includes(type))
-            return "Employment & SETA Documents";
-
-          if (["timesheet", "monthlyreport"].includes(type))
-            return "Progress Reports";
-
-          if (["cv", "bankStatement"].includes(type))
-            return "Financial Documents";
-
+          if (["iddocument","proofofresidence","medicalcertificate"].includes(type)) return "Personal Documents";
+          if (["academictranscript","matriccertificate","assessmentresults"].includes(type)) return "Academic Records";
+          if (["employmentcontract","setaagreement"].includes(type)) return "Employment & SETA Documents";
+          if (["timesheet","monthlyreport"].includes(type)) return "Progress Reports";
+          if (["cv","bankstatement"].includes(type)) return "Financial Documents";
           return "Miscellaneous";
         };
 
+        // Normalize documents
         const normalizedDocuments = documentsData.map(doc => {
-          const student = studentMap[String(doc.user_id)]; // <--- ensure string key
+          const student = studentMap[doc.user_id] || {};
           return {
             id: doc.document_id,
             studentId: doc.user_id,
-            studentNr: student?.student_number || "N/A",
-            studentName: student ? `${student.first_name} ${student.last_name}` : "Unknown",
+            studentNr: student.student_number || "N/A",
+            studentName: student.first_name && student.last_name ? `${student.first_name} ${student.last_name}` : "Unknown",
             documentType: doc.doc_type || "Unknown",
             folder: mapFolder(doc.doc_type),
-            uploadDate: doc.uploaded_at || "N/A",
+            uploadDate: doc.uploaded_at ? new Date(doc.uploaded_at).toLocaleDateString() : "N/A",
             status: doc.status || "pending",
             fileName: doc.document || "Unnamed Document",
-            fileSize: doc.file_size ? `${(doc.file_size / 1024).toFixed(2)} KB` : "N/A",
-            programme: student?.programme || "N/A",
-            faculty: student?.faculty || "N/A",
+            fileSize: doc.file_size ? `${(doc.file_size / 1024).toFixed(2)} KB` : "N/A"
           };
         });
 
@@ -137,7 +125,7 @@ const StudentDocumentManager = () => {
       const matchesStatus = statusFilter === "all" || doc.status === statusFilter;
       const matchesType = documentTypeFilter === "all" || doc.documentType === documentTypeFilter;
       const matchesStudent = !selectedStudent || String(doc.studentId) === String(selectedStudent);
-      
+
       return matchesSearch && matchesFolder && matchesStatus && matchesType && matchesStudent;
     });
   }, [documents, searchTerm, selectedFolder, statusFilter, documentTypeFilter, selectedStudent]);
