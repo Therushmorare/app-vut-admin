@@ -521,7 +521,7 @@ const StudentDocumentManager = () => {
                       {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
                     </div>
 
-                    <button
+                    {/*<button
                       onClick={() => handleStatusChange(doc.id, 'flagged')}
                       disabled={doc.status === 'flagged'}
                       style={{
@@ -542,9 +542,9 @@ const StudentDocumentManager = () => {
                     >
                       <Flag size={14} />
                       Flag
-                    </button>
+                    </button>*/}
 
-                    <button
+                    {/*<button
                       onClick={() => handleStatusChange(doc.id, 'approved')}
                       disabled={doc.status === 'approved'}
                       style={{
@@ -565,9 +565,10 @@ const StudentDocumentManager = () => {
                     >
                       <CheckCircle size={14} />
                       Approve
-                    </button>
+                    </button>*/}
 
                     <button
+                      onClick={() => window.open(doc.fileName, '_blank', 'noopener,noreferrer')}
                       style={{
                         padding: '8px',
                         backgroundColor: COLORS.bgWhite,
@@ -584,6 +585,16 @@ const StudentDocumentManager = () => {
                     </button>
 
                     <button
+                      onClick={() => {
+                        const link = document.createElement('a');
+                        link.href = doc.fileName; // file URL
+                        // optional: get filename from URL
+                        const fileNameFromUrl = doc.fileName.split('/').pop();
+                        link.setAttribute('download', fileNameFromUrl || 'document.pdf');
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      }}
                       style={{
                         padding: '8px',
                         backgroundColor: COLORS.bgWhite,
@@ -598,6 +609,7 @@ const StudentDocumentManager = () => {
                     >
                       <Download size={16} />
                     </button>
+                    
                   </div>
                 </div>
               ))
