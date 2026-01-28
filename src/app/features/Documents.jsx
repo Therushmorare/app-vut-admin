@@ -42,29 +42,37 @@ const StudentDocumentManager = () => {
         const studentsData = studentsRes.data.students || [];
         const documentsData = documentsRes.data.result || [];
 
-        // map student id to student info
         const studentMap = {};
         studentsData.forEach(s => {
           studentMap[s.id] = s;
         });
 
-        // normalize documents using available fields only
+        const mapFolder = (docType) => {
+          if (!docType) return "Miscellaneous";
+          const type = docType.toLowerCase();
+          if (["id document", "proof of residence", "medical certificate"].includes(type)) return "Personal Documents";
+          if (["matric certificate", "assessment results"].includes(type)) return "Academic Records";
+          if (["employment contract", "seta agreement"].includes(type)) return "Employment & SETA Documents";
+          if (["timesheet", "monthly report"].includes(type)) return "Progress Reports";
+          return "Miscellaneous";
+        };
+
         const normalizedDocuments = documentsData.map(doc => {
           const student = studentMap[doc.user_id];
+
           return {
             id: doc.document_id,
             studentId: doc.user_id,
-            studentNr: student?.student_number || "",
-            studentName: student
-              ? `${student.first_name} ${student.last_name}`
-              : "",
-            documentType: doc.doc_type,
-            folder: null,       // API does not provide
-            uploadDate: null,   // API does not provide
-            status: null,       // API does not provide
-            fileName: doc.document,
-            programme: student?.programme,
-            faculty: student?.faculty
+            studentNr: student?.student_number || "N/A",
+            studentName: student ? `${student.first_name} ${student.last_name}` : "Unknown",
+            documentType: doc.doc_type || "Unknown",
+            folder: mapFolder(doc.doc_type),
+            uploadDate: "N/A",        // You can add real dates if available
+            status: "pending",        // default status
+            fileName: doc.document || "Unnamed Document",
+            fileSize: "N/A",          // You can add real file size if available
+            programme: student?.programme || "N/A",
+            faculty: student?.faculty || "N/A"
           };
         });
 
