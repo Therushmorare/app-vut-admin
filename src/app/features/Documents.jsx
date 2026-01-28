@@ -222,9 +222,14 @@ const StudentDocumentManager = () => {
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {folders.map(folder => {
-              const stats = folder === 'all' 
-                ? { total: documents.length, flagged: documents.filter(d => d.status === 'flagged').length }
-                : folderStats[folder] || { total: 0, flagged: 0 };
+              const stats = folder === 'all'
+                ? {
+                    total: documents.length,
+                    pending: documents.filter(d => d.status === 'pending').length,
+                    approved: documents.filter(d => d.status === 'approved').length,
+                    flagged: documents.filter(d => d.status === 'flagged').length,
+                  }
+                : folderStats[folder] || { total: 0, pending: 0, approved: 0, flagged: 0 };
               
               return (
                 <button
