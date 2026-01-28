@@ -228,14 +228,14 @@ const ReportsPage = () =>{
   if (action === 'view') {
 
     const mappedStudent = {
-      name: `${learner.firstName} ${learner.lastName}`,
-      studentNumber: learner.studentId,
-      idNumber: learner.idNumber,
+      name: `${learner.first_name} ${learner.last_name}`,
+      studentNumber: learner.id,
+      idNumber: learner.ID_number,
       email: learner.email,
-      phone: learner.cellPhone || learner.phoneNumber,
+      phone: learner.phone_number || learner.phoneNumber,
       programme: learner.programme,
       faculty: learner.faculty,
-      dateOfBirth: learner.dateOfBirth,
+      dateOfBirth: learner.date_of_birth,
       gender: learner.gender,
       race: learner.race,
       nationality: learner.nationality,
