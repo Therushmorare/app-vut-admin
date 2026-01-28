@@ -96,7 +96,7 @@ const StudentDocumentManager = () => {
 
   // Document types for filter
   const documentTypes = useMemo(() => {
-    const typeSet = new Set(documents.map((doc) => doc.documentType).filter(Boolean));
+    const typeSet = new Set(documents.map((doc) => doc.doc_type).filter(Boolean));
     return ["all", ...Array.from(typeSet).sort()];
   }, [documents]);
 
