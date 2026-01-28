@@ -297,7 +297,7 @@ const StudentDocumentManager = () => {
               <option value="">All Students</option>
               {students.map(student => (
                 <option key={student.id} value={student.id}>
-                  {student.studentNr} - {student.name}
+                  {student.student_number} - {student.first_name} {student.last_name}
                 </option>
               ))}
             </select>
