@@ -417,7 +417,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
             
             <div className="space-y-3">
               {renderDocumentField('SETA Learner Agreement', formData.learnerAgreement, 'Learner Agreement')}
-              {renderDocumentField('ID/Passport Copy', formData.idCopy, 'ID Copy')}
+              {renderDocumentField('ID/Passport Copy', formData.document, 'ID Copy')}
               {renderDocumentField('Proof of Residence', formData.proofOfResidence, 'Proof of Residence')}
               {renderDocumentField('Certified Prior Qualifications', formData.priorQualifications, 'Prior Qualifications')}
               {renderDocumentField('Curriculum Vitae (CV)', formData.cv, 'CV')}
