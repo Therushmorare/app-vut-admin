@@ -362,7 +362,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
     const totalCompanies = companies.length;
     const totalPlacements = placements.length;
     const totalCapacity = companies.reduce((sum, c) => sum + parseInt(c.learnerCapacity || 0), 0);
-    const aPlacements = companyPlacements.filter(p => p.status === 'Active').length;
+    const aPlacements = placements.filter(p => p.status === 'Active').length;
 
     return { totalCompanies, totalPlacements, totalCapacity, aPlacements };
   }, [companies, placements]);
