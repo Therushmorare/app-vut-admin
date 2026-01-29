@@ -47,9 +47,10 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
     academicWarnings: student?.academicWarnings || 'None',
     
     // SETA Programme Details
-    learnerships: student?.learnerships || 'Skills Programme in Business Management',
+    seta: student?.seta,
     setaName: student?.setaName || 'FP&M SETA',
-    setaCode: student?.setaCode || 'FPMSETA001',
+    agreementReference: student?.agreementReference || 'FPMSETA001',
+    agreementStatus: student?.agreementStatus,
     assessorName: student?.assessorName || 'Dr. Sarah Smith',
     assessorRegNo: student?.assessorRegNo || 'ASS-2024-001',
     moderatorName: student?.moderatorName || 'Prof. Mike Johnson',
@@ -294,13 +295,11 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
           <div>
             <h3 className="text-lg font-semibold text-[#0245A3] mb-4">SETA Programme Details</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {renderField('Learnership/Skills Programme', formData.learnerships, 'learnerships')}
               {renderField('SETA Name', formData.seta, 'seta')}
               {renderField('SETA Code', formData.setaName, 'setaName')}
               {renderField('Agreement Reference', formData.agreementReference, 'agreementReference')}
               {renderField('Agreement Status', formData.agreementStatus, 'agreementStatus')}
-              {renderField('Moderator Name', formData.moderatorName, 'moderatorName')}
-              {renderField('Moderator Registration No.', formData.moderatorRegNo, 'moderatorRegNo')}
+              {renderField('Moderator ID', formData.moderatorName, 'moderatorName')}
               {renderField('Programme Start Date', formData.programmeStartDate, 'programmeStartDate', 'date')}
               {renderField('Programme End Date', formData.programmeEndDate, 'programmeEndDate', 'date')}
               {renderField('Programme Status', formData.programmeStatus, 'programmeStatus', 'text', {
