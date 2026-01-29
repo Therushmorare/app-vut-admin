@@ -274,26 +274,17 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
           <div>
             <h3 className="text-lg font-semibold text-[#0245A3] mb-4">Academic</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {renderField('Highest Qualification', formData.highestQualification, 'highestQualification')}
-              {renderField('NQF Level', formData.nqfLevel, 'nqfLevel')}
+              {renderField('Student Number', formData.studentNumber, 'studentNumber')}
+              {renderField('Faculty', formData.faculty, 'faculty')}
               {renderField('Current Programme', formData.programme, 'programme')}
               {renderField('Enrollment Status', formData.enrollmentStatus, 'enrollmentStatus', 'text', {
                 select: true,
                 selectOptions: ['Active', 'Completed', 'Withdrawn', 'Deferred']
               })}
-              {renderField('Modules Progress', formData.modulesCompleted, 'modulesCompleted')}
-              {renderField('Unit Standards', formData.unitStandardsProgress, 'unitStandardsProgress')}
               {renderField('Credits Achieved', formData.creditsAchieved, 'creditsAchieved')}
               <div className="md:col-span-2">
               </div>
             </div>
-            {isEditing && (
-              <div className="mt-4 flex gap-2">
-                <button className="px-4 py-2 bg-[#0245A3] text-white rounded-md hover:bg-opacity-90 text-sm font-medium">
-                  Add Module Results
-                </button>
-              </div>
-            )}
           </div>
         );
       
@@ -303,10 +294,10 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
             <h3 className="text-lg font-semibold text-[#0245A3] mb-4">SETA Programme Details</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderField('Learnership/Skills Programme', formData.learnerships, 'learnerships')}
-              {renderField('SETA Name', formData.setaName, 'setaName')}
-              {renderField('SETA Code', formData.setaCode, 'setaCode')}
-              {renderField('Assessor Name', formData.assessorName, 'assessorName')}
-              {renderField('Assessor Registration No.', formData.assessorRegNo, 'assessorRegNo')}
+              {renderField('SETA Name', formData.seta, 'seta')}
+              {renderField('SETA Code', formData.setaName, 'setaName')}
+              {renderField('Agreement Reference', formData.agreementReference, 'agreementReference')}
+              {renderField('Agreement Status', formData.agreementStatus, 'agreementStatus')}
               {renderField('Moderator Name', formData.moderatorName, 'moderatorName')}
               {renderField('Moderator Registration No.', formData.moderatorRegNo, 'moderatorRegNo')}
               {renderField('Programme Start Date', formData.programmeStartDate, 'programmeStartDate', 'date')}
@@ -332,8 +323,8 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
             <h3 className="text-lg font-semibold text-[#0245A3] mb-4">Workplace Placement</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderField('Employer/Company Name', formData.employerName, 'employerName')}
-              {renderField('Supervisor Name', formData.supervisorName, 'supervisorName')}
-              {renderField('Supervisor Contact', formData.supervisorContact, 'supervisorContact', 'tel')}
+              {renderField('Supervisor Name', formData.supervisor, 'supervisorName')}
+              {renderField('Supervisor Contact', formData.supervisorEmail, 'supervisorContact', 'tel')}
               {renderField('Employer SDL Number', formData.employerSdl, 'employerSdl')}
               <div className="md:col-span-2">
                 {renderField('Workplace Address', formData.workplaceAddress, 'workplaceAddress')}
