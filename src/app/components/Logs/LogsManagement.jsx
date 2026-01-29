@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import { Search, ChevronLeft, ChevronRight, Download } from "lucide-react";
+import { COLORS, formatDate } from "../../utils/helpers";
 
 // API endpoint
 const API_URL =
@@ -94,144 +95,178 @@ export default function LogsManagement() {
 
     URL.revokeObjectURL(url);
   };
-return (
-  <div className="min-h-screen bg-gray-50 p-8">
-    <div className="max-w-7xl mx-auto">
+    return (
+    <div className="min-h-screen bg-gray-50 p-8">
+        <div className="max-w-7xl mx-auto space-y-6">
 
-    {/* Header */}
-    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-      <h1 className="text-2xl font-semibold">System Logs</h1>
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <div>
+            <h1 className="text-2xl font-semibold text-gray-900">
+                System Logs
+            </h1>
+            <p className="text-sm text-gray-500">
+                Track system activity and user actions
+            </p>
+            </div>
 
-      <button
-        onClick={exportCSV}
-        className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded w-full sm:w-auto justify-center"
-      >
-        <Download size={16} />
-        Export CSV
-      </button>
-    </div>
+            <button
+            onClick={exportCSV}
+            className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg w-full sm:w-auto justify-center hover:bg-gray-800 transition"
+            >
+            <Download size={16} />
+            Export CSV
+            </button>
+        </div>
 
-    {/* Filters */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <select
-        value={userType}
-        onChange={(e) => {
-          setPage(1);
-          setUserType(e.target.value);
-        }}
-        className="border p-2 rounded w-full"
-      >
-        <option value="">All User Types</option>
-        <option value="Super Administrator">Super Administrator</option>
-        <option value="Institution Administrator">
-          Institution Administrator
-        </option>
-        <option value="student">Student</option>
-      </select>
-
-      <div className="relative w-full">
-        <Search size={16} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search action or user ID"
-          value={search}
-          onChange={(e) => {
-            setPage(1);
-            setSearch(e.target.value);
-          }}
-          className="border pl-8 p-2 rounded w-full"
-        />
-      </div>
-
-      <input
-        type="date"
-        value={startDate}
-        onChange={(e) => {
-          setPage(1);
-          setStartDate(e.target.value);
-        }}
-        className="border p-2 rounded w-full"
-      />
-
-      <input
-        type="date"
-        value={endDate}
-        onChange={(e) => {
-          setPage(1);
-          setEndDate(e.target.value);
-        }}
-        className="border p-2 rounded w-full"
-      />
-    </div>
-
-    {/* Table */}
-    <div className="border rounded overflow-x-auto">
-      <table className="min-w-[700px] w-full text-sm">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-3 text-left">User ID</th>
-            <th className="p-3 text-left">User Type</th>
-            <th className="p-3 text-left">Action</th>
-            <th className="p-3 text-left">Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            <tr>
-              <td colSpan="4" className="p-4 text-center">
-                Loading...
-              </td>
-            </tr>
-          ) : paginatedLogs.length === 0 ? (
-            <tr>
-              <td colSpan="4" className="p-4 text-center">
-                No logs found
-              </td>
-            </tr>
-          ) : (
-            paginatedLogs.map((log, idx) => (
-              <tr key={idx} className="border-t">
-                <td className="p-3 font-mono text-xs break-all">
-                  {log.user_id}
-                </td>
-                <td className="p-3">{log.user_type}</td>
-                <td className="p-3">{log.action_type}</td>
-                <td className="p-3 whitespace-nowrap">
-                  {new Date(log.created_at).toLocaleString()}
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
-
-    {/* Pagination */}
-    {totalPages > 1 && (
-      <div className="flex justify-center items-center gap-4 pt-2">
-        <button
-          disabled={page === 1}
-          onClick={() => setPage((p) => p - 1)}
-          className="p-2 border rounded disabled:opacity-40"
+        {/* Filters */}
+        <div
+            className="rounded-xl p-5 border border-gray-200 shadow-sm bg-white"
         >
-          <ChevronLeft size={16} />
-        </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-        <span className="text-sm">
-          Page {page} of {totalPages}
-        </span>
+            <select
+                value={userType}
+                onChange={(e) => {
+                setPage(1);
+                setUserType(e.target.value);
+                }}
+                className="w-full pl-3 pr-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-black focus:outline-none"
+                style={{ borderColor: COLORS.border }}
+            >
+                <option value="">All User Types</option>
+                <option value="Super Administrator">Super Administrator</option>
+                <option value="Institution Administrator">
+                Institution Administrator
+                </option>
+                <option value="student">Student</option>
+            </select>
 
-        <button
-          disabled={page === totalPages}
-          onClick={() => setPage((p) => p + 1)}
-          className="p-2 border rounded disabled:opacity-40"
-        >
-          <ChevronRight size={16} />
-        </button>
-      </div>
-    )}
-  </div>
-</div>
-);
+            <div className="relative w-full">
+                <Search
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+                <input
+                type="text"
+                placeholder="Search action or user ID"
+                value={search}
+                onChange={(e) => {
+                    setPage(1);
+                    setSearch(e.target.value);
+                }}
+                className="border pl-9 pr-3 py-2.5 rounded-lg w-full text-sm focus:ring-2 focus:ring-black focus:outline-none"
+                style={{ borderColor: COLORS.border }}
+                />
+            </div>
+
+            <input
+                type="date"
+                value={startDate}
+                onChange={(e) => {
+                setPage(1);
+                setStartDate(e.target.value);
+                }}
+                className="border p-2.5 rounded-lg w-full text-sm focus:ring-2 focus:ring-black focus:outline-none"
+                style={{ borderColor: COLORS.border }}
+            />
+
+            <input
+                type="date"
+                value={endDate}
+                onChange={(e) => {
+                setPage(1);
+                setEndDate(e.target.value);
+                }}
+                className="border p-2.5 rounded-lg w-full text-sm focus:ring-2 focus:ring-black focus:outline-none"
+                style={{ borderColor: COLORS.border }}
+            />
+            </div>
+        </div>
+
+        {/* Table */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+                <thead className="bg-gray-100 border-b border-gray-200">
+                <tr>
+                    {["User ID", "User Type", "Action", "Date"].map((title) => (
+                    <th
+                        key={title}
+                        className="text-left px-6 py-4 font-semibold text-gray-700 uppercase tracking-wide"
+                    >
+                        {title}
+                    </th>
+                    ))}
+                </tr>
+                </thead>
+
+                <tbody className="divide-y divide-gray-100">
+                {loading ? (
+                    <tr>
+                    <td colSpan="4" className="p-6 text-center text-gray-500">
+                        Loading...
+                    </td>
+                    </tr>
+                ) : paginatedLogs.length === 0 ? (
+                    <tr>
+                    <td colSpan="4" className="p-6 text-center text-gray-500">
+                        No logs found
+                    </td>
+                    </tr>
+                ) : (
+                    paginatedLogs.map((log, idx) => (
+                    <tr
+                        key={idx}
+                        className="hover:bg-gray-50 transition-colors"
+                    >
+                        <td className="px-6 py-4 font-mono text-xs text-gray-800">
+                        {log.user_id}
+                        </td>
+                        <td className="px-6 py-4 text-gray-700">
+                        {log.user_type}
+                        </td>
+                        <td className="px-6 py-4 text-gray-700">
+                        {log.action_type}
+                        </td>
+                        <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
+                        {new Date(log.created_at).toLocaleString()}
+                        </td>
+                    </tr>
+                    ))
+                )}
+                </tbody>
+            </table>
+            </div>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+            <button
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+                className="p-2 border rounded-lg disabled:opacity-40 hover:bg-gray-50 transition"
+            >
+                <ChevronLeft size={16} />
+            </button>
+
+            <span className="text-sm text-gray-600">
+                Page <span className="font-medium">{page}</span> of{" "}
+                <span className="font-medium">{totalPages}</span>
+            </span>
+
+            <button
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => p + 1)}
+                className="p-2 border rounded-lg disabled:opacity-40 hover:bg-gray-50 transition"
+            >
+                <ChevronRight size={16} />
+            </button>
+            </div>
+        )}
+        </div>
+    </div>
+    );
 
 }
