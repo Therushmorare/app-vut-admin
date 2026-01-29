@@ -18,6 +18,7 @@ import {
 import SettingsPanel from "../features/Settings";
 import DocumentsModal from "../features/Documents";
 import NotificationsModal from "../features/Notifications/NotificationsModal";
+import Charts from "./Reports/Charts";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -59,7 +60,8 @@ const Navbar = () => {
     "/pages/setas": { title: "SETA Management", icon: BriefcaseBusiness },
     "/pages/reports": { title: "Reports", icon: FileText },
     "/pages/documents": { title: "Documents", icon: FileText },
-    "/pages/admins": {title: "Admins", icon: Users}
+    "/pages/admins": {title: "Admins", icon: Users},
+    "/pages/logs": {title: "Logs", icon: Charts}
   };
 
   const currentMenuItem = menuItems[pathname];
@@ -142,6 +144,10 @@ const Navbar = () => {
         return 'Search SETAs by name, skills, position...';
       case '/pages/reports':
         return 'Search reports by title, type, date...';
+      case '/pages/admins':
+        return 'Search admins by ID, Name(s).....';
+      case '/pages/logs':
+        return 'Search Logs by user types, IDs, actions, dates...';
       default:
         return 'Search...';
     }
@@ -249,8 +255,19 @@ const Navbar = () => {
                 {/* Logout */}
                 <div className="border-t border-gray-100 pt-2">
                   <a
-                    href="https://recruitvut.netlify.app/"
-                    onClick={() => setShowProfileDropdown(false)}
+                    href="/"
+                    onClick={(e) => {
+                      e.preventDefault();
+
+                      // Clear all session data
+                      sessionStorage.clear();
+
+                      // Close dropdown
+                      setShowProfileDropdown(false);
+
+                      // Redirect to login root
+                      window.location.href = "/";
+                    }}
                     className="w-full px-4 py-3 flex items-center space-x-3 hover:bg-red-50 transition-colors duration-150 group"
                   >
                     <LogOut
