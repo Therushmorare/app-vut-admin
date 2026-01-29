@@ -23,8 +23,8 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
     status: student?.status || 'Active',
     
 
-    physicalAddress: student?.address || '123 Main Street, Johannesburg, 2000',
-    postalAddress: student?.address || 'P.O. Box 456, Johannesburg, 2001',
+    physicalAddress: student?.physicalAddress || '123 Main Street, Johannesburg, 2000',
+    postalAddress: student?.physicalAddress || 'P.O. Box 456, Johannesburg, 2001',
     universityEmail: student?.email || 'bokamoso@university.ac.za',
     personalEmail: student?.email || 'bokamoso.personal@gmail.com',
     cellPhone: student?.phone || '+27 82 123 4567',
