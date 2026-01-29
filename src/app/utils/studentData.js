@@ -78,7 +78,7 @@ export const generateStudents = async () => {
   );
 
   const bankMap = Object.fromEntries(
-    banking.map((b) => [b.user_id, b])
+    banking.map((b) => [b.student_id || b.user_id, b])
   );
 
   // Documents grouped per user
@@ -176,7 +176,8 @@ export const generateStudents = async () => {
       agreementReference: agreement?.reference_number ?? null,
       agreementStatus: agreement?.status ?? null,
       programmeID: allocation?.programme_id ?? null,
-
+      programmeStatus: allocation?.status ?? null,
+      
       /* ------------------ EMPLOYER ------------------ */
       employer: company?.company_name ?? "Not Placed",
       employerName: company?.company_name ?? "Not Placed",
