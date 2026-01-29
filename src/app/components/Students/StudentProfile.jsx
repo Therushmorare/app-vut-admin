@@ -38,6 +38,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
     highestQualification: student?.highestQualification || 'Grade 12 (Matric)',
     nqfLevel: student?.nqfLevel || 'NQF Level 5',
     programme: student?.programme || 'Business Administration',
+    faculty: student?.faculty || 'Faculty Of Science',
     enrollmentStatus: student?.status || 'Active',
     modulesCompleted: student?.modulesCompleted || '8/12',
     unitStandardsProgress: student?.unitStandardsProgress || '15/20 Competent',
