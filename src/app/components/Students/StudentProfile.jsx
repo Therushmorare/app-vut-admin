@@ -51,6 +51,8 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
     setaName: student?.setaName || 'FP&M SETA',
     agreementReference: student?.agreementReference || 'FPMSETA001',
     agreementStatus: student?.agreementStatus,
+    programmeID: student?.programmeID,
+    programmeStatus: student?.programmeStatus,
     assessorName: student?.assessorName || 'Dr. Sarah Smith',
     assessorRegNo: student?.assessorRegNo || 'ASS-2024-001',
     moderatorName: student?.moderatorName || 'Prof. Mike Johnson',
@@ -62,7 +64,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
     // Workplace Placement
     employerName: student?.employer || 'Tech Solutions Ltd',
     supervisorName: student?.supervisor || 'Jabulane Maphisa',
-    supervisorContact: student?.supervisorContact || '+27 11 555 0123',
+    supervisorContact: student?.supervisorPhone || '+27 11 555 0123',
     employerSdl: student?.employerSdl || 'SDL123456789',
     workplaceAddress: student?.workplaceAddress || '456 Business Park, Sandton, 2196',
     placementStartDate: student?.placementStart || '2025-11-01',
@@ -299,9 +301,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
               {renderField('SETA Code', formData.setaName, 'setaName')}
               {renderField('Agreement Reference', formData.agreementReference, 'agreementReference')}
               {renderField('Agreement Status', formData.agreementStatus, 'agreementStatus')}
-              {renderField('Moderator ID', formData.moderatorName, 'moderatorName')}
-              {renderField('Programme Start Date', formData.programmeStartDate, 'programmeStartDate', 'date')}
-              {renderField('Programme End Date', formData.programmeEndDate, 'programmeEndDate', 'date')}
+              {renderField('Programme ID', formData.programmeID, 'programeID')}
               {renderField('Programme Status', formData.programmeStatus, 'programmeStatus', 'text', {
                 select: true,
                 selectOptions: ['Active', 'Completed', 'Withdrawn']
@@ -323,9 +323,8 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
             <h3 className="text-lg font-semibold text-[#0245A3] mb-4">Workplace Placement</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderField('Employer/Company Name', formData.employerName, 'employerName')}
-              {renderField('Supervisor Name', formData.supervisor, 'supervisorName')}
-              {renderField('Supervisor Contact', formData.supervisorEmail, 'supervisorContact', 'tel')}
-              {renderField('Employer SDL Number', formData.employerSdl, 'employerSdl')}
+              {renderField('Supervisor Name', formData.supervisorName, 'supervisorName')}
+              {renderField('Supervisor Contact', formData.supervisorContact, 'supervisorContact', 'tel')}
               <div className="md:col-span-2">
                 {renderField('Workplace Address', formData.workplaceAddress, 'workplaceAddress')}
               </div>

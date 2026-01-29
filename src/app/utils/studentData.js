@@ -175,6 +175,7 @@ export const generateStudents = async () => {
       setaName: agreement?.name ?? "N/A",
       agreementReference: agreement?.reference_number ?? null,
       agreementStatus: agreement?.status ?? null,
+      programmeID: allocation?.programme_id ?? null,
 
       /* ------------------ EMPLOYER ------------------ */
       employer: company?.company_name ?? "Not Placed",
