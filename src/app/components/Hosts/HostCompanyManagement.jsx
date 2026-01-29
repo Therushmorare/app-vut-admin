@@ -362,8 +362,9 @@ export default function HostCompanyManagement({ allStudents = [] }) {
     const totalCompanies = companies.length;
     const totalPlacements = placements.length;
     const totalCapacity = companies.reduce((sum, c) => sum + parseInt(c.learnerCapacity || 0), 0);
-    
-    return { totalCompanies, totalPlacements, totalCapacity };
+    const aPlacements = companyPlacements.filter(p => p.status === 'Active').length;
+
+    return { totalCompanies, totalPlacements, totalCapacity, aPlacements };
   }, [companies, placements]);
 
   const filteredCompanies = useMemo(() => {
@@ -459,7 +460,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
               <h3 className="text-sm font-medium text-gray-600">Active Placements</h3>
               <Users className="w-5 h-5" style={{ color: COLORS.success }} />
             </div>
-            <p className="text-3xl font-bold" style={{ color: COLORS.primary }}>{stats.activePlacements}</p>
+            <p className="text-3xl font-bold" style={{ color: COLORS.primary }}>{stats.aPlacements}</p>
           </div>
           
           <div className="rounded-lg p-6 shadow-sm border" style={{ backgroundColor: COLORS.bgWhite, borderColor: COLORS.border }}>
@@ -467,7 +468,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
               <h3 className="text-sm font-medium text-gray-600">Total Placements</h3>
               <Briefcase className="w-5 h-5" style={{ color: COLORS.info }} />
             </div>
-            <p className="text-3xl font-bold" style={{ color: COLORS.primary }}>{activePlacementsByCompany}</p>
+            <p className="text-3xl font-bold" style={{ color: COLORS.primary }}>{stats.totalPlacements}</p>
           </div>
           
           <div className="rounded-lg p-6 shadow-sm border" style={{ backgroundColor: COLORS.bgWhite, borderColor: COLORS.border }}>
