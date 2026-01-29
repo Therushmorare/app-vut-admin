@@ -1,20 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
-import {
-  Search,
-  ChevronDown,
-  ChevronUp,
-  User,
-  Mail,
-  Phone,
-  Calendar,
-  Shield,
-  Plus,
-  X,
-  Download,
-  Search
-} from "lucide-react";
+import { Search, ChevronDown, ChevronUp, User, Mail, Phone, Calendar, Shield, Plus, X, Download } from "lucide-react";
 import { COLORS, formatDate } from "../../utils/helpers";
 
 // API endpoints
