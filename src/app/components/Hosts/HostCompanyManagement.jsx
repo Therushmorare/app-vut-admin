@@ -467,7 +467,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
               <h3 className="text-sm font-medium text-gray-600">Total Placements</h3>
               <Briefcase className="w-5 h-5" style={{ color: COLORS.info }} />
             </div>
-            <p className="text-3xl font-bold" style={{ color: COLORS.primary }}>{stats.totalPlacements}</p>
+            <p className="text-3xl font-bold" style={{ color: COLORS.primary }}>{activePlacementsByCompany}</p>
           </div>
           
           <div className="rounded-lg p-6 shadow-sm border" style={{ backgroundColor: COLORS.bgWhite, borderColor: COLORS.border }}>
