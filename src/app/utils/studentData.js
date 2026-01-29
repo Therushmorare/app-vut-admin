@@ -174,12 +174,14 @@ export const generateStudents = async () => {
       /* ------------------ EMPLOYER ------------------ */
       employer: company?.company_name ?? "Not Placed",
       employerName: company?.company_name ?? "Not Placed",
-
+      workplaceAddress: company?.address ?? "Not Available",
       supervisor: placement?.supervisor ?? "Not Assigned",
       supervisorEmail: placement?.email ?? null,
       supervisorPhone: placement?.phone ?? null,
 
       placementStatus: placement?.status ?? "Not Placed",
+      placementStartDate: placement?.start_data,
+      placementEndDate: placement?.end_data,
       placementPeriod: placement
         ? `${placement.start_date} → ${placement.end_date}`
         : null,
