@@ -58,7 +58,7 @@ export const generateStudents = async () => {
   const biographics = biographicsData.biographics ?? [];
   const setas = setasData.setas ?? [];
   const companies = companiesData.companies ?? [];
-  const banking = Array.isArray(bankingData) ? banking : [];
+  const banking = bankingData.banking ?? [];
   const docs = Array.isArray(documentsData) ? documentsData : [];
   const allocations = allocationsData.allocations ?? [];
   const agreements = Array.isArray(agreementsData) ? agreementsData : [];
@@ -181,7 +181,7 @@ export const generateStudents = async () => {
 
       placementStatus: placement?.status ?? "Not Placed",
       placementStartDate: placement?.start_data,
-      placementEndDate: placement?.end_data,
+      placementEndDate: placement.end_data,
       placementPeriod: placement
         ? `${placement.start_date} → ${placement.end_date}`
         : null,
