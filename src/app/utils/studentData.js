@@ -131,6 +131,11 @@ export const generateStudents = async () => {
       : null;
 
     const attendance = Math.floor(Math.random() * 40) + 60;
+    console.log('--- AGREEMENT DEBUG ---');
+    console.log('agreement:', agreement);
+    console.log('agreement.name:', agreement?.name);
+    console.log('agreement.reference_number:', agreement?.reference_number);
+    console.log('agreement.status:', agreement?.status);
 
     return {
       /* ------------------ IDENTIFIERS ------------------ */

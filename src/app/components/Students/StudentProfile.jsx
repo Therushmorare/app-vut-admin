@@ -47,10 +47,10 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
     academicWarnings: student?.academicWarnings || 'None',
     
     // SETA Programme Details
-    seta: agreement?.name,
-    setaName: agreement?.name || 'FP&M SETA',
-    agreementReference: agreement?.reference_number || 'FPMSETA001',
-    agreementStatus: agreement?.status,
+    seta: student?.seta,
+    setaName: student?.setaName || 'FP&M SETA',
+    agreementReference: student?.agreementReference || 'FPMSETA001',
+    agreementStatus: student?.agreementStatus,
     assessorName: student?.assessorName || 'Dr. Sarah Smith',
     assessorRegNo: student?.assessorRegNo || 'ASS-2024-001',
     moderatorName: student?.moderatorName || 'Prof. Mike Johnson',
