@@ -180,8 +180,8 @@ export const generateStudents = async () => {
       supervisorPhone: placement?.phone ?? null,
 
       placementStatus: placement?.status ?? "Not Placed",
-      placementStartDate: placement?.start_data,
-      placementEndDate: placement.end_data,
+      placementStartDate: placement?.start_date,
+      placementEndDate: placement.end_date,
       placementPeriod: placement
         ? `${placement.start_date} → ${placement.end_date}`
         : null,
