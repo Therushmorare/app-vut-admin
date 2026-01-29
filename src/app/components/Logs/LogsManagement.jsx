@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
+import { COLORS } from '../../utils/helpers';
 import { Search, ChevronLeft, ChevronRight, Download } from "lucide-react";
 
 // API endpoint
@@ -20,16 +21,18 @@ export default function LogsManagement() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // Client-side role check (SSR SAFE)
-  useEffect(() => {
-    const role = sessionStorage.getItem("admin_id");
+    // Client-side role check (SSR SAFE)
+    useEffect(() => {
+    const adminId = sessionStorage.getItem("admin_id");
 
-    if (role !== "Super Administrator") {
-      window.location.replace("/");
-    } else {
-      setAuthorized(true);
+    if (!adminId) {
+        sessionStorage.clear();
+        window.location.replace("/");
+        return;
     }
-  }, []);
+
+    setAuthorized(true);
+    }, []);
 
   // Stop rendering until auth check completes
   if (authorized === null) {
@@ -114,137 +117,141 @@ export default function LogsManagement() {
 
     URL.revokeObjectURL(url);
   };
+return (
+  <div className="space-y-6 w-full">
+    {/* Header */}
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+      <h1 className="text-2xl font-semibold">System Logs</h1>
 
-  return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">System Logs</h1>
+      <button
+        onClick={exportCSV}
+        className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded w-full sm:w-auto justify-center"
+      >
+        <Download size={16} />
+        Export CSV
+      </button>
+    </div>
+
+    {/* Filters */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <select
+        value={userType}
+        onChange={(e) => {
+          setPage(1);
+          setUserType(e.target.value);
+        }}
+        className="border p-2 rounded w-full"
+      >
+        <option value="">All User Types</option>
+        <option value="Super Administrator">Super Administrator</option>
+        <option value="Institution Administrator">
+          Institution Administrator
+        </option>
+        <option value="student">Student</option>
+      </select>
+
+      <div className="relative w-full">
+        <Search size={16} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search action or user ID"
+          value={search}
+          onChange={(e) => {
+            setPage(1);
+            setSearch(e.target.value);
+          }}
+          className="border pl-8 p-2 rounded w-full"
+        />
+      </div>
+
+      <input
+        type="date"
+        value={startDate}
+        onChange={(e) => {
+          setPage(1);
+          setStartDate(e.target.value);
+        }}
+        className="border p-2 rounded w-full"
+      />
+
+      <input
+        type="date"
+        value={endDate}
+        onChange={(e) => {
+          setPage(1);
+          setEndDate(e.target.value);
+        }}
+        className="border p-2 rounded w-full"
+      />
+    </div>
+
+    {/* Table */}
+    <div className="border rounded overflow-x-auto">
+      <table className="min-w-[700px] w-full text-sm">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="p-3 text-left">User ID</th>
+            <th className="p-3 text-left">User Type</th>
+            <th className="p-3 text-left">Action</th>
+            <th className="p-3 text-left">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {loading ? (
+            <tr>
+              <td colSpan="4" className="p-4 text-center">
+                Loading...
+              </td>
+            </tr>
+          ) : paginatedLogs.length === 0 ? (
+            <tr>
+              <td colSpan="4" className="p-4 text-center">
+                No logs found
+              </td>
+            </tr>
+          ) : (
+            paginatedLogs.map((log, idx) => (
+              <tr key={idx} className="border-t">
+                <td className="p-3 font-mono text-xs break-all">
+                  {log.user_id}
+                </td>
+                <td className="p-3">{log.user_type}</td>
+                <td className="p-3">{log.action_type}</td>
+                <td className="p-3 whitespace-nowrap">
+                  {new Date(log.created_at).toLocaleString()}
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+
+    {/* Pagination */}
+    {totalPages > 1 && (
+      <div className="flex justify-center items-center gap-4 pt-2">
         <button
-          onClick={exportCSV}
-          className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded"
+          disabled={page === 1}
+          onClick={() => setPage((p) => p - 1)}
+          className="p-2 border rounded disabled:opacity-40"
         >
-          <Download size={16} />
-          Export CSV
+          <ChevronLeft size={16} />
+        </button>
+
+        <span className="text-sm">
+          Page {page} of {totalPages}
+        </span>
+
+        <button
+          disabled={page === totalPages}
+          onClick={() => setPage((p) => p + 1)}
+          className="p-2 border rounded disabled:opacity-40"
+        >
+          <ChevronRight size={16} />
         </button>
       </div>
+    )}
+  </div>
+);
 
-      {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <select
-          value={userType}
-          onChange={(e) => {
-            setPage(1);
-            setUserType(e.target.value);
-          }}
-          className="border p-2 rounded"
-        >
-          <option value="">All User Types</option>
-          <option value="Super Administrator">Super Administrator</option>
-          <option value="Institution Administrator">
-            Institution Administrator
-          </option>
-          <option value="student">Student</option>
-        </select>
-
-        <div className="relative">
-          <Search size={16} className="absolute left-2 top-3 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search action or user ID"
-            value={search}
-            onChange={(e) => {
-              setPage(1);
-              setSearch(e.target.value);
-            }}
-            className="border pl-8 p-2 rounded w-full"
-          />
-        </div>
-
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => {
-            setPage(1);
-            setStartDate(e.target.value);
-          }}
-          className="border p-2 rounded"
-        />
-
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => {
-            setPage(1);
-            setEndDate(e.target.value);
-          }}
-          className="border p-2 rounded"
-        />
-      </div>
-
-      {/* Table */}
-      <div className="border rounded overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-3 text-left">User ID</th>
-              <th className="p-3 text-left">User Type</th>
-              <th className="p-3 text-left">Action</th>
-              <th className="p-3 text-left">Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="4" className="p-4 text-center">
-                  Loading...
-                </td>
-              </tr>
-            ) : paginatedLogs.length === 0 ? (
-              <tr>
-                <td colSpan="4" className="p-4 text-center">
-                  No logs found
-                </td>
-              </tr>
-            ) : (
-              paginatedLogs.map((log, idx) => (
-                <tr key={idx} className="border-t">
-                  <td className="p-3 font-mono text-xs">{log.user_id}</td>
-                  <td className="p-3">{log.user_type}</td>
-                  <td className="p-3">{log.action_type}</td>
-                  <td className="p-3">
-                    {new Date(log.created_at).toLocaleString()}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-4 mt-4">
-          <button
-            disabled={page === 1}
-            onClick={() => setPage((p) => p - 1)}
-            className="p-2 border rounded disabled:opacity-40"
-          >
-            <ChevronLeft size={16} />
-          </button>
-
-          <span className="text-sm">
-            Page {page} of {totalPages}
-          </span>
-
-          <button
-            disabled={page === totalPages}
-            onClick={() => setPage((p) => p + 1)}
-            className="p-2 border rounded disabled:opacity-40"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
-      )}
-    </div>
-  );
 }
