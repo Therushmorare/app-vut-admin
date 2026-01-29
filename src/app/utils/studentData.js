@@ -117,7 +117,7 @@ export const generateStudents = async () => {
       accountNumber: bank.account_number,
 
       learnerAgreement: "Uploaded - Verified",
-      idCopy: studentDocs.idDocument || "Not Uploaded",
+      idCopy: studentDocs.document || "Not Uploaded",
       proofOfResidence: studentDocs.proofOfResidence || "Not Uploaded",
       priorQualifications:
         studentDocs.academicTranscript || "Not Uploaded",
