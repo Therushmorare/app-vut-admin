@@ -181,7 +181,7 @@ export const generateStudents = async () => {
 
       placementStatus: placement?.status ?? "Not Placed",
       placementStartDate: placement?.start_date,
-      placementEndDate: placement.end_date,
+      placementEndDate: placement?.end_date,
       placementPeriod: placement
         ? `${placement.start_date} → ${placement.end_date}`
         : null,
