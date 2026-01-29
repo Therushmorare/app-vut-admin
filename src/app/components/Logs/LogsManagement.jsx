@@ -95,7 +95,9 @@ export default function LogsManagement() {
     URL.revokeObjectURL(url);
   };
 return (
-  <div className="space-y-6 w-full">
+  <div className="min-h-screen bg-gray-50 p-8">
+    <div className="max-w-7xl mx-auto">
+
     {/* Header */}
     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
       <h1 className="text-2xl font-semibold">System Logs</h1>
@@ -229,6 +231,7 @@ return (
       </div>
     )}
   </div>
+</div>
 );
 
 }
