@@ -28,12 +28,11 @@ const safeGet = async (url) => {
 
 // Document type → frontend key mapping
 const DOC_TYPE_MAP = {
-  ID_DOCUMENT: "idDocument",
-  PASSPORT: "idDocument",
-  PROOF_OF_RESIDENCE: "proofOfResidence",
-  ACADEMIC_TRANSCRIPT: "academicTranscript",
-  CV: "cv",
-  BANK_STATEMENT: "bankStatement",
+  idDocument: "idDocument",
+  proofOfResidence: "proofOfResidence",
+  academicTranscript: "academicTranscript",
+  cv: "cv",
+  bankStatement: "bankStatement",
 };
 
 /**
@@ -57,7 +56,7 @@ export const generateStudents = async () => {
   const setas = setasData.setas ?? [];
   const companies = companiesData.companies ?? [];
   const banking = bankingData.banking ?? [];
-  const docs = documentsData.docs ?? [];
+  const docs = Array.isArray(documentsData) ? documentsData : [];
 
   // Index maps
   const bioMap = Object.fromEntries(
@@ -78,6 +77,7 @@ export const generateStudents = async () => {
 
   // Documents grouped per user
   const docMap = {};
+
   docs.forEach((d) => {
     const key = DOC_TYPE_MAP[d.doc_type];
     if (!key) return;
@@ -86,7 +86,11 @@ export const generateStudents = async () => {
       docMap[d.user_id] = {};
     }
 
-    docMap[d.user_id][key] = "Uploaded - Verified";
+    docMap[d.user_id][key] = {
+      status: "Uploaded",
+      url: d.document,
+      documentId: d.document_id,
+    };
   });
 
   // Normalize students
@@ -95,8 +99,7 @@ export const generateStudents = async () => {
     const seta = setaMap[student.seta_id] || {};
     const company = companyMap[student.company_id] || {};
     const bank = bankMap[student.id] || {};
-    const studentDocs = docMap[student.id] || {};
-
+    const studentDocs = docMap[student.id] || {}
     const attendance = Math.floor(Math.random() * 40) + 60;
 
     return {
@@ -117,11 +120,11 @@ export const generateStudents = async () => {
       accountNumber: bank.account_number,
 
       learnerAgreement: "Uploaded - Verified",
-      idCopy: studentDocs.idDocument || "Not Uploaded",
-      proofOfResidence: studentDocs.proofOfResidence || "Not Uploaded",
-      priorQualifications:
-        studentDocs.academicTranscript || "Not Uploaded",
-      cv: studentDocs.cv || "Not Uploaded",
+      idCopy: studentDocs.idDocument ?? null,
+      proofOfResidence: studentDocs.proofOfResidence ?? null,
+      priorQualifications: studentDocs.academicTranscript ?? null,
+      cv: studentDocs.cv ?? null,
+      bankStatement: studentDocs.bankStatement ?? null,
 
       seta: seta.name || "N/A",
       setaName: seta.name || "N/A",

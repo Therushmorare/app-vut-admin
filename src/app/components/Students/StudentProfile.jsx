@@ -163,22 +163,29 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
     </div>
   );
 
-  const renderDocumentField = (label, status, docType) => (
+  const renderDocumentField = (label, doc, docType) => (
     <div className="mb-4 p-3 bg-gray-50 rounded-md border border-gray-200">
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-          <p className="text-sm text-gray-600">{status}</p>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {label}
+          </label>
+          <p className="text-sm text-gray-600">
+            {doc ? "Uploaded" : "Not Uploaded"}
+          </p>
         </div>
-        <div className="flex gap-2">
+
+        {doc && (
           <button
-            onClick={() => alert(`Viewing ${docType}...`)}
+            onClick={() =>
+              window.open(doc.url, "_blank", "noopener,noreferrer")
+            }
             className="p-2 text-[#201c52] hover:bg-[#201c52] hover:bg-opacity-10 rounded-md transition-colors"
             title="View Document"
           >
             <Eye size={16} />
           </button>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -417,7 +424,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
             
             <div className="space-y-3">
               {renderDocumentField('SETA Learner Agreement', formData.learnerAgreement, 'Learner Agreement')}
-              {renderDocumentField('ID/Passport Copy', formData.document, 'ID Copy')}
+              {renderDocumentField('ID/Passport Copy', formData.idCopy, 'ID Copy')}
               {renderDocumentField('Proof of Residence', formData.proofOfResidence, 'Proof of Residence')}
               {renderDocumentField('Certified Prior Qualifications', formData.priorQualifications, 'Prior Qualifications')}
               {renderDocumentField('Curriculum Vitae (CV)', formData.cv, 'CV')}
