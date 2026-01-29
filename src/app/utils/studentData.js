@@ -50,6 +50,9 @@ export const generateStudents = async () => {
   const companiesData = await safeGet("/api/administrators/host-companies");
   const bankingData = await safeGet("/api/administrators/bankingDetails");
   const documentsData = await safeGet("/api/administrators/studentDocuments");
+  const allocationsData = await safeGet("/api/administrators/learner-allocations");
+  const agreementsData = await safeGet("/api/administrators/setaAgreements");
+  const placementsData = await safeGet("/api/administrators/learner-placements");
 
   const students = studentsData.students ?? [];
   const biographics = biographicsData.biographics ?? [];
@@ -57,6 +60,9 @@ export const generateStudents = async () => {
   const companies = companiesData.companies ?? [];
   const banking = bankingData.banking ?? [];
   const docs = Array.isArray(documentsData) ? documentsData : [];
+  const allocations = allocationsData.allocations ?? [];
+  const agreements = Array.isArray(agreementsData) ? agreementsData : [];
+  const placements = placementsData.placements ?? [];
 
   // Index maps
   const bioMap = Object.fromEntries(
@@ -68,7 +74,7 @@ export const generateStudents = async () => {
   );
 
   const companyMap = Object.fromEntries(
-    companies.map((c) => [c.id, c])
+    companies.map(c => [c.company_id, c])
   );
 
   const bankMap = Object.fromEntries(
@@ -93,46 +99,104 @@ export const generateStudents = async () => {
     };
   });
 
+  const allocationMap = {};
+    allocations.forEach(a => {
+      allocationMap[a.student_id] = a;
+  });
+
+  const agreementMap = {};
+  agreements.forEach(a => {
+    agreementMap[a.agreement_id] = a;
+  });
+
+  const placementMap = {};
+  placements.forEach(p => {
+    placementMap[p.student_id] = p;
+  });
+
   // Normalize students
   return students.map((student) => {
     const bioData = bioMap[student.id] || {};
-    const seta = setaMap[student.seta_id] || {};
-    const company = companyMap[student.company_id] || {};
     const bank = bankMap[student.id] || {};
-    const studentDocs = docMap[student.id] || {}
+    const studentDocs = docMap[student.id] || {};
+
+    const allocation = allocationMap[student.id] || null;
+    const agreement = allocation
+      ? agreementMap[allocation.agreement_id]
+      : null;
+
+    const placement = placementMap[student.id] || null;
+    const company = placement
+      ? companyMap[placement.company_id]
+      : null;
+
     const attendance = Math.floor(Math.random() * 40) + 60;
 
     return {
+      /* ------------------ IDENTIFIERS ------------------ */
       id: student.id,
       studentNr: student.id,
       studentNumber: student.student_number,
 
+      /* ------------------ BASIC INFO ------------------ */
       name: `${student.first_name} ${student.last_name}`,
       email: student.email,
       personalEmail: student.email,
       phone: student.phone_number,
 
       programme: student.programme,
-      faculty: student.faculty,
+      faculty: agreement?.faculty ?? "N/A",
       status: student.status,
 
-      bankName: bank.bank_name,
-      accountNumber: bank.account_number,
+      /* ------------------ BANKING ------------------ */
+      bankName: bank.bank_name ?? null,
+      accountNumber: bank.account_number ?? null,
 
-      learnerAgreement: "Uploaded - Verified",
+      /* ------------------ DOCUMENTS ------------------ */
+      learnerAgreement: agreement
+        ? "Uploaded - Active"
+        : "Not Allocated",
+
+      learnerAgreementFile: agreement?.file_url ?? null,
+
       idCopy: studentDocs.idDocument ?? null,
       proofOfResidence: studentDocs.proofOfResidence ?? null,
       priorQualifications: studentDocs.academicTranscript ?? null,
       cv: studentDocs.cv ?? null,
       bankStatement: studentDocs.bankStatement ?? null,
 
-      seta: seta.name || "N/A",
-      setaName: seta.name || "N/A",
+      /* ------------------ SETA ------------------ */
+      seta: agreement?.name ?? "N/A",
+      setaName: agreement?.name ?? "N/A",
+      agreementReference: agreement?.reference_number ?? null,
+      agreementStatus: agreement?.status ?? null,
 
-      employer: company.company_name || "N/A",
-      employerName: company.company_name || "N/A",
-      supervisor: company.contact_person || "Not Assigned",
+      /* ------------------ EMPLOYER ------------------ */
+      employer: company?.company_name ?? "Not Placed",
+      employerName: company?.company_name ?? "Not Placed",
 
+      supervisor: placement?.supervisor ?? "Not Assigned",
+      supervisorEmail: placement?.email ?? null,
+      supervisorPhone: placement?.phone ?? null,
+
+      placementStatus: placement?.status ?? "Not Placed",
+      placementPeriod: placement
+        ? `${placement.start_date} → ${placement.end_date}`
+        : null,
+
+      /* ------------------ BIOGRAPHICS ------------------ */
+      idNumber:
+        student.ID_number ??
+        student.id_number ??
+        null,
+
+      dateOfBirth: bioData.date_of_birth ?? null,
+      gender: bioData.gender ?? null,
+      physicalAddress: bioData.address ?? null,
+      postalAddress: bioData.address ?? null,
+      nationality: "South African",
+
+      /* ------------------ SYSTEM ------------------ */
       attendance,
       compliance:
         attendance >= 80
@@ -141,30 +205,12 @@ export const generateStudents = async () => {
           ? "At Risk"
           : "Non-Compliant",
 
-      stipendStatus: "Pending",
-
-      idNumber:
-        student.ID_number ??
-        student.id_number ??
-        null,
+      stipendStatus: allocation?.status ?? "Pending",
 
       avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
-        student.first_name + " " + student.last_name
+        `${student.first_name} ${student.last_name}`
       )}&background=0245A3&color=ffffff&size=128`,
-
-      dateOfBirth: bioData.date_of_birth ?? null,
-      gender: bioData.gender ?? null,
-      physicalAddress: bioData.address ?? null,
-      postalAddress: bioData.address ?? null,
-
-      nationality: "South African",
-      learnerships: student.programme
-        ? `${student.programme} Learnership`
-        : null,
-
-      stipendAmount: null,
-      lastPayment: null,
-      nextPayment: null,
     };
   });
+
 };

@@ -21,7 +21,7 @@ export default function StudentManagementSystem() {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true); // new loading state
 
-  // ✅ Fetch students client-side
+  //Fetch students client-side
   useEffect(() => {
     const fetchStudents = async () => {
       try {
