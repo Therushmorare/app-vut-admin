@@ -22,7 +22,7 @@ export default function LogsManagement() {
 
   // Client-side role check (SSR SAFE)
   useEffect(() => {
-    const role = sessionStorage.getItem("user_type");
+    const role = sessionStorage.getItem("admin_id");
 
     if (role !== "Super Administrator") {
       window.location.replace("/");
