@@ -58,7 +58,7 @@ export const generateStudents = async () => {
   const biographics = biographicsData.biographics ?? [];
   const setas = setasData.setas ?? [];
   const companies = companiesData.companies ?? [];
-  const banking = Array.isArray(bankingData) ? banking : [];
+  const banking = Array.isArray(bankingData) ? bankingData : [];
   const docs = Array.isArray(documentsData) ? documentsData : [];
   const allocations = allocationsData.allocations ?? [];
   const agreements = Array.isArray(agreementsData) ? agreementsData : [];
