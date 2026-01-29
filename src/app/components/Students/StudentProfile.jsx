@@ -359,7 +359,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
                 selectOptions: ['Learnership', 'Bursary', 'Internship', 'WIL', 'Discretionary Grant']
               })}
               {renderField('Monthly Stipend Amount', formData.monthlyStipend, 'monthlyStipend')}
-              {renderField('Total Paid to Date', formData.totalPaid, 'totalPaid', 'text', { readOnly: true })}
+              {renderField('Total Paid to Date', formData.yearlyStipend, 'totalPaid', 'text', { readOnly: true })}
               {renderField('Bank Name', formData.bankName, 'bankName')}
               {renderField('Account Number (Masked)', formData.accountNumber, 'accountNumber', 'text', { readOnly: true })}
               {renderField('Payment Status', formData.stipendStatus, 'stipendStatus', 'text', {
