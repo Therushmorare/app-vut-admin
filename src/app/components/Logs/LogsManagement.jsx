@@ -21,28 +21,6 @@ export default function LogsManagement() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-    // Client-side role check (SSR SAFE)
-    useEffect(() => {
-    const adminId = sessionStorage.getItem("admin_id");
-
-    if (!adminId) {
-        sessionStorage.clear();
-        window.location.replace("/");
-        return;
-    }
-
-    setAuthorized(true);
-    }, []);
-
-  // Stop rendering until auth check completes
-  if (authorized === null) {
-    return (
-      <div className="p-10 text-center text-gray-500">
-        Checking permissions...
-      </div>
-    );
-  }
-
   // Fetch logs
   useEffect(() => {
     fetch(API_URL)
