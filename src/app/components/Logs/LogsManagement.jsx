@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
-import { COLORS } from '../../utils/helpers';
 import { Search, ChevronLeft, ChevronRight, Download } from "lucide-react";
 
 // API endpoint
