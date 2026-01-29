@@ -8,6 +8,7 @@ import {
   LogOut,
   GraduationCap,
   Users,
+  BarChart,
   Calendar,
   FileText,
   Briefcase,
@@ -61,7 +62,7 @@ const Navbar = () => {
     "/pages/reports": { title: "Reports", icon: FileText },
     "/pages/documents": { title: "Documents", icon: FileText },
     "/pages/admins": {title: "Admins", icon: Users},
-    "/pages/logs": {title: "Logs", icon: Charts}
+    "/pages/logs": {title: "Logs", icon: BarChart}
   };
 
   const currentMenuItem = menuItems[pathname];
