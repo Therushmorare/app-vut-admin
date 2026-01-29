@@ -1,29 +1,16 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
-import { Search, ChevronDown, ChevronUp, User, Mail, Phone, Calendar, Shield, Plus, X, Download } from "lucide-react";
-import { COLORS, formatDate } from "../../utils/helpers";
+import { Search, ChevronLeft, ChevronRight, Download } from "lucide-react";
 
-// API endpoints
+// API endpoint
 const API_URL =
   "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/user-logs";
 
 const PAGE_SIZE = 10;
 
 export default function LogsManagement() {
-  const userRole = sessionStorage.getItem("user_type");
-
-  if (userRole !== "Super Administrator") {
-    return (
-      <div className="p-10 text-center">
-        <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
-        <p className="text-gray-500">
-          Only Super Administrators can view system logs.
-        </p>
-      </div>
-    );
-  }
-
+  const [authorized, setAuthorized] = useState(null); // null = checking
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -33,6 +20,27 @@ export default function LogsManagement() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
+  // Client-side role check (SSR SAFE)
+  useEffect(() => {
+    const role = sessionStorage.getItem("user_type");
+
+    if (role !== "Super Administrator") {
+      window.location.replace("/");
+    } else {
+      setAuthorized(true);
+    }
+  }, []);
+
+  // Stop rendering until auth check completes
+  if (authorized === null) {
+    return (
+      <div className="p-10 text-center text-gray-500">
+        Checking permissions...
+      </div>
+    );
+  }
+
+  // Fetch logs
   useEffect(() => {
     fetch(API_URL)
       .then((res) => res.json())
@@ -44,7 +52,6 @@ export default function LogsManagement() {
   }, []);
 
   const filteredLogs = useMemo(() => {
-    setPage(1);
     return logs
       .filter((log) => {
         const matchesUserType =
@@ -125,7 +132,10 @@ export default function LogsManagement() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <select
           value={userType}
-          onChange={(e) => setUserType(e.target.value)}
+          onChange={(e) => {
+            setPage(1);
+            setUserType(e.target.value);
+          }}
           className="border p-2 rounded"
         >
           <option value="">All User Types</option>
@@ -142,7 +152,10 @@ export default function LogsManagement() {
             type="text"
             placeholder="Search action or user ID"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setPage(1);
+              setSearch(e.target.value);
+            }}
             className="border pl-8 p-2 rounded w-full"
           />
         </div>
@@ -150,14 +163,20 @@ export default function LogsManagement() {
         <input
           type="date"
           value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
+          onChange={(e) => {
+            setPage(1);
+            setStartDate(e.target.value);
+          }}
           className="border p-2 rounded"
         />
 
         <input
           type="date"
           value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
+          onChange={(e) => {
+            setPage(1);
+            setEndDate(e.target.value);
+          }}
           className="border p-2 rounded"
         />
       </div>
