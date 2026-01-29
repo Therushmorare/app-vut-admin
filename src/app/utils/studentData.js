@@ -145,7 +145,7 @@ export const generateStudents = async () => {
       phone: student.phone_number,
 
       programme: student.programme,
-      faculty: agreement?.faculty ?? "N/A",
+      faculty: student?.faculty ?? "N/A",
       status: student.status,
 
       /* ------------------ BANKING ------------------ */
