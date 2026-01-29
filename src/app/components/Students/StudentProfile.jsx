@@ -74,8 +74,8 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
     
     // Financial Info
     fundingType: student?.fundingType || 'Learnership Stipend',
-    monthlyStipend: student?.stipendAmount || 'R 3,500',
-    totalPaid: student?.totalPaid || 'R 35,000',
+    monthlyStipend: student?.monthlyStipend || 'R 3,500',
+    yearlyStipend: student?.yearlyStipend || 'R 35,000',
     bankName: student?.bankName || 'Standard Bank',
     accountNumber: student?.accountNumber || '****5678',
     stipendStatus: student?.stipendStatus || 'Paid',

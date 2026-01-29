@@ -35,8 +35,20 @@ const DOC_TYPE_MAP = {
   bankStatement: "bankStatement",
 };
 
+// Fetch stipend budget for a programme
+const getStipendBudget = async (programme_id) => {
+  if (!programme_id) return null;
+  try {
+    const res = await api.get(`/api/administrators/stipend-budget/${programme_id}`);
+    return res.data ?? null;
+  } catch (err) {
+    console.error(`Stipend API failed for programme_id: ${programme_id}`, err.message);
+    return null;
+  }
+};
+
 /**
- * Fetch students data safely
+ * Fetch students data safely with stipend integration
  */
 export const generateStudents = async () => {
   if (!API_BASE) {
@@ -44,15 +56,28 @@ export const generateStudents = async () => {
     return [];
   }
 
-  const studentsData = await safeGet("/api/administrators/students");
-  const biographicsData = await safeGet("/api/administrators/biographics");
-  const setasData = await safeGet("/api/administrators/setas");
-  const companiesData = await safeGet("/api/administrators/host-companies");
-  const bankingData = await safeGet("/api/administrators/bankingDetails");
-  const documentsData = await safeGet("/api/administrators/studentDocuments");
-  const allocationsData = await safeGet("/api/administrators/learner-allocations");
-  const agreementsData = await safeGet("/api/administrators/setaAgreements");
-  const placementsData = await safeGet("/api/administrators/learner-placements");
+  // Fetch all required data
+  const [
+    studentsData,
+    biographicsData,
+    setasData,
+    companiesData,
+    bankingData,
+    documentsData,
+    allocationsData,
+    agreementsData,
+    placementsData,
+  ] = await Promise.all([
+    safeGet("/api/administrators/students"),
+    safeGet("/api/administrators/biographics"),
+    safeGet("/api/administrators/setas"),
+    safeGet("/api/administrators/host-companies"),
+    safeGet("/api/administrators/bankingDetails"),
+    safeGet("/api/administrators/studentDocuments"),
+    safeGet("/api/administrators/learner-allocations"),
+    safeGet("/api/administrators/setaAgreements"),
+    safeGet("/api/administrators/learner-placements"),
+  ]);
 
   const students = studentsData.students ?? [];
   const biographics = biographicsData.biographics ?? [];
@@ -65,33 +90,20 @@ export const generateStudents = async () => {
   const placements = placementsData.placements ?? [];
 
   // Index maps
-  const bioMap = Object.fromEntries(
-    biographics.map((b) => [b.user_id, b])
-  );
-
-  const setaMap = Object.fromEntries(
-    setas.map((s) => [s.id, s])
-  );
-
-  const companyMap = Object.fromEntries(
-    companies.map(c => [c.company_id, c])
-  );
-
-  const bankMap = Object.fromEntries(
-    banking.map((b) => [b.student_id || b.user_id, b])
-  );
+  const bioMap = Object.fromEntries(biographics.map((b) => [b.user_id, b]));
+  const setaMap = Object.fromEntries(setas.map((s) => [s.id, s]));
+  const companyMap = Object.fromEntries(companies.map((c) => [c.company_id, c]));
+  const bankMap = Object.fromEntries(banking.map((b) => [b.student_id || b.user_id, b]));
+  const allocationMap = Object.fromEntries(allocations.map((a) => [a.student_id, a]));
+  const agreementMap = Object.fromEntries(agreements.map((a) => [a.agreement_id, a]));
+  const placementMap = Object.fromEntries(placements.map((p) => [p.student_id, p]));
 
   // Documents grouped per user
   const docMap = {};
-
   docs.forEach((d) => {
     const key = DOC_TYPE_MAP[d.doc_type];
     if (!key) return;
-
-    if (!docMap[d.user_id]) {
-      docMap[d.user_id] = {};
-    }
-
+    if (!docMap[d.user_id]) docMap[d.user_id] = {};
     docMap[d.user_id][key] = {
       status: "Uploaded",
       url: d.document,
@@ -99,56 +111,36 @@ export const generateStudents = async () => {
     };
   });
 
-  const allocationMap = {};
-    allocations.forEach(a => {
-      allocationMap[a.student_id] = a;
-  });
-
-  const agreementMap = {};
-  agreements.forEach(a => {
-    agreementMap[a.agreement_id] = a;
-  });
-
-  const placementMap = {};
-  placements.forEach(p => {
-    placementMap[p.student_id] = p;
-  });
+  // Fetch stipend budgets per unique programme (optimization)
+  const uniqueProgrammeIds = [...new Set(allocations.map(a => a.programme_id).filter(Boolean))];
+  const stipendMap = {};
+  await Promise.all(
+    uniqueProgrammeIds.map(async (pid) => {
+      stipendMap[pid] = await getStipendBudget(pid);
+    })
+  );
 
   // Normalize students
   return students.map((student) => {
     const bioData = bioMap[student.id] || {};
     const bank = bankMap[student.id] || {};
     const studentDocs = docMap[student.id] || {};
-
     const allocation = allocationMap[student.id] || null;
-    const agreement = allocation
-      ? agreementMap[allocation.agreement_id]
-      : null;
-
+    const agreement = allocation ? agreementMap[allocation.agreement_id] : null;
     const placement = placementMap[student.id] || null;
-    const company = placement
-      ? companyMap[placement.company_id]
-      : null;
+    const company = placement ? companyMap[placement.company_id] : null;
+    const stipend = allocation ? stipendMap[allocation.programme_id] : null;
 
     const attendance = Math.floor(Math.random() * 40) + 60;
-    console.log('--- AGREEMENT DEBUG ---');
-    console.log('agreement:', agreement);
-    console.log('agreement.name:', agreement?.name);
-    console.log('agreement.reference_number:', agreement?.reference_number);
-    console.log('agreement.status:', agreement?.status);
 
     return {
-      /* ------------------ IDENTIFIERS ------------------ */
       id: student.id,
       studentNr: student.id,
       studentNumber: student.student_number,
-
-      /* ------------------ BASIC INFO ------------------ */
       name: `${student.first_name} ${student.last_name}`,
       email: student.email,
       personalEmail: student.email,
       phone: student.phone_number,
-
       programme: student.programme,
       faculty: student?.faculty ?? "N/A",
       status: student.status,
@@ -158,12 +150,8 @@ export const generateStudents = async () => {
       accountNumber: bank.account_number ?? null,
 
       /* ------------------ DOCUMENTS ------------------ */
-      learnerAgreement: agreement
-        ? "Uploaded - Active"
-        : "Not Allocated",
-
+      learnerAgreement: agreement ? "Uploaded - Active" : "Not Allocated",
       learnerAgreementFile: agreement?.file_url ?? null,
-
       idCopy: studentDocs.idDocument ?? null,
       proofOfResidence: studentDocs.proofOfResidence ?? null,
       priorQualifications: studentDocs.academicTranscript ?? null,
@@ -177,7 +165,7 @@ export const generateStudents = async () => {
       agreementStatus: agreement?.status ?? null,
       programmeID: allocation?.programme_id ?? null,
       programmeStatus: allocation?.status ?? null,
-      
+
       /* ------------------ EMPLOYER ------------------ */
       employer: company?.company_name ?? "Not Placed",
       employerName: company?.company_name ?? "Not Placed",
@@ -185,7 +173,6 @@ export const generateStudents = async () => {
       supervisor: placement?.supervisor ?? "Not Assigned",
       supervisorEmail: placement?.email ?? null,
       supervisorPhone: placement?.phone ?? null,
-
       placementStatus: placement?.status ?? "Not Placed",
       placementStartDate: placement?.start_date,
       placementEndDate: placement?.end_date,
@@ -194,11 +181,7 @@ export const generateStudents = async () => {
         : null,
 
       /* ------------------ BIOGRAPHICS ------------------ */
-      idNumber:
-        student.ID_number ??
-        student.id_number ??
-        null,
-
+      idNumber: student.ID_number ?? student.id_number ?? null,
       dateOfBirth: bioData.date_of_birth ?? null,
       gender: bioData.gender ?? null,
       physicalAddress: bioData.address ?? null,
@@ -213,13 +196,13 @@ export const generateStudents = async () => {
           : attendance >= 70
           ? "At Risk"
           : "Non-Compliant",
-
       stipendStatus: allocation?.status ?? "Pending",
+      yearlyStipend: stipend?.yearly_stipend_per_student ?? null,
+      monthlyStipend: stipend?.monthly_stipend_per_student ?? null,
 
       avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
         `${student.first_name} ${student.last_name}`
       )}&background=0245A3&color=ffffff&size=128`,
     };
   });
-
 };
