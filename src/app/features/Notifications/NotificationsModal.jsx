@@ -6,54 +6,42 @@ const NotificationsModal = ({ onClose }) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [lastChecked, setLastChecked] = useState(new Date().toISOString());
 
-  // Fetch students and logs on mount
   useEffect(() => {
     fetchNotifications();
   }, []);
 
   const fetchNotifications = async () => {
     try {
-      // Fetch students
-      const studentRes = await fetch('https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/students');
-      const studentData = await studentRes.json();
-
-      const newStudentNotifs = studentData.students
-        .filter(s => new Date(s.created_at || Date.now()) > new Date(lastChecked))
-        .map(s => ({
-          id: `student-${s.id}`,
-          type: 'student',
-          icon: Bell,
-          title: 'New Student Registered',
-          message: `${s.first_name} ${s.last_name} has registered.`,
-          time: new Date().toLocaleTimeString(),
-          isRead: false,
-          priority: 'medium',
-          expanded: false
-        }));
-
-      // Fetch user logs
       const logsRes = await fetch('https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/user-logs');
       const logsData = await logsRes.json();
 
-      const uploadLogs = logsData.logs
-        .filter(l => l.action_type === 'upload' && new Date(l.created_at) > new Date(lastChecked))
-        .map((l, idx) => ({
-          id: `upload-${idx}-${l.user_id}`,
-          type: 'upload',
+      const newLogs = logsData.logs.filter(l => new Date(l.created_at) > new Date(lastChecked));
+
+      const newNotifs = newLogs.map((l, idx) => {
+        let title = '';
+        if (l.action_type === 'New student created an account') {
+          title = 'New Student Registered';
+        } else if (l.action_type.toLowerCase().includes('upload')) {
+          title = 'New Upload';
+        } else {
+          title = 'System Activity';
+        }
+
+        return {
+          id: `log-${idx}-${l.user_id}`,
+          type: l.user_type.toLowerCase(),
           icon: Bell,
-          title: 'New Upload',
-          message: `User ${l.user_id} uploaded a new file.`,
+          title,
+          message: l.action_type,
           time: new Date(l.created_at).toLocaleTimeString(),
           isRead: false,
           priority: 'medium',
           expanded: false
-        }));
+        };
+      });
 
-      const allNotifs = [...newStudentNotifs, ...uploadLogs, ...notifications];
-      setNotifications(allNotifs);
-      setUnreadCount(allNotifs.filter(n => !n.isRead).length);
-
-      // Update lastChecked
+      setNotifications(prev => [...newNotifs, ...prev]);
+      setUnreadCount(prev => prev + newNotifs.length);
       setLastChecked(new Date().toISOString());
 
     } catch (err) {
@@ -62,11 +50,14 @@ const NotificationsModal = ({ onClose }) => {
   };
 
   const markAsRead = (id) => {
-    setNotifications(notifications.map(n => n.id === id ? { ...n, isRead: true } : n));
-    setUnreadCount(notifications.filter(n => !n.isRead && n.id !== id).length);
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+    setUnreadCount(prev => prev - 1);
   };
 
-  const clearAll = () => setNotifications([]);
+  const clearAll = () => {
+    setNotifications([]);
+    setUnreadCount(0);
+  };
 
   return (
     <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 p-4">
