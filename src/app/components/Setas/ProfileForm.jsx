@@ -53,6 +53,7 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
     try {
       const payload = {
         administrator_id: adminId,
+        agreement_id: formData.agreementId, // still required for CREATE
         description: formData.description,
         financial_year: formData.financialYear,
         seta_phone_number: formData.contactPhone,
@@ -61,17 +62,17 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
         comments: formData.notes
       };
 
-      if (formData.agreementId) {
-        // 🔹 UPDATE EXISTING SETA PROFILE
+      if (formData.setaProfileId) {
+        //UPDATE EXISTING PROFILE
         const res = await axios.post(
-          `${API_BASE}/api/administrators/seta-profiles/${formData.agreementId}`,
+          `${API_BASE}/api/administrators/seta-profiles/${formData.setaProfileId}`,
           payload,
           { withCredentials: true }
         );
         console.log("SETA profile updated:", res.data);
         onSubmit?.(res.data);
       } else {
-        // 🔹 CREATE NEW SETA PROFILE
+        //CREATE NEW PROFILE
         const res = await axios.post(
           `${API_BASE}/api/administrators/seta-profiles`,
           payload,
@@ -82,10 +83,7 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
       }
 
     } catch (err) {
-      console.error(
-        "Failed to save SETA profile:",
-        err.response?.data || err
-      );
+      console.error("Failed to save SETA profile:", err.response?.data || err);
       alert(err.response?.data?.message || "Failed to save SETA profile");
     }
   };
