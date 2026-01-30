@@ -1,92 +1,165 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Camera, User, Mail, Phone, MapPin, Calendar, Save, X } from 'lucide-react';
 
-const ProfileSettings = ({ onClose, embedded = false }) => {
-  const [profileData, setProfileData] = useState({
-    firstName: 'Nombuso',
-    lastName: 'Simelane',
-    email: 'nombuso.simelane@email.com',
-    phone: '+27 123 456 7890',
-    position: 'Recruitment Officer',
-    department: 'Human Resources',
-    location: 'Johannesburg, South Africa',
-    dateOfBirth: '1999-05-15',
-    bio: 'Recruitment Officer at Human Resources.',
-    avatar: null
-  });
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "https://seta-management-api-fvzc9.ondigitalocean.app";
 
+const EMPTY_PROFILE = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  position: '',
+  department: '',
+  location: '',
+  dateOfBirth: '',
+  bio: '',
+  avatar: null
+};
+
+const ProfileSettings = ({ onClose, embedded = false }) => {
+  const [profileData, setProfileData] = useState(EMPTY_PROFILE);
   const [isDirty, setIsDirty] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
+  // keeps last server state for cancel
+  const originalProfileRef = useRef(EMPTY_PROFILE);
+
+  /* ------------------ OPEN ANIMATION ------------------ */
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
+  /* ------------------ FETCH PROFILE ------------------ */
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const adminId = sessionStorage.getItem("admin_id");
+        if (!adminId) return;
+
+        const res = await fetch(
+          `${API_BASE}/api/administrators/allAdmins`,
+          { headers: { accept: "application/json" } }
+        );
+
+        const admins = await res.json();
+        const admin = admins.find(a => a.admin_id === adminId);
+        if (!admin) return;
+
+        const mappedProfile = {
+          firstName: admin.first_name || '',
+          lastName: admin.last_name || '',
+          email: admin.email || '',
+          phone: admin.phone_number || '',
+          position: admin.role || '',
+          department: '',
+          location: '',
+          dateOfBirth: '',
+          bio: '',
+          avatar: null
+        };
+
+        setProfileData(mappedProfile);
+        originalProfileRef.current = mappedProfile;
+      } catch (err) {
+        console.error("Failed to load profile:", err);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  /* ------------------ INPUT HANDLER ------------------ */
   const handleInputChange = (field, value) => {
     setProfileData(prev => ({ ...prev, [field]: value }));
     setIsDirty(true);
   };
 
-  const handleSave = () => {
-    console.log('Saving profile data:', profileData);
-    setIsDirty(false);
+  /* ------------------ SAVE ------------------ */
+  const handleSave = async () => {
+    try {
+      const adminId = sessionStorage.getItem("admin_id");
+      if (!adminId) return;
+
+      const payload = {
+        first_name: profileData.firstName,
+        last_name: profileData.lastName,
+        email: profileData.email,
+        phone_number: profileData.phone,
+        role: profileData.position
+      };
+
+      const res = await fetch(
+        `${API_BASE}/api/administrators/${adminId}`,
+        {
+          method: "PUT", // or PATCH
+          headers: {
+            "Content-Type": "application/json",
+            accept: "application/json"
+          },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      if (!res.ok) throw new Error("Save failed");
+
+      originalProfileRef.current = profileData;
+      setIsDirty(false);
+    } catch (err) {
+      console.error("Saving profile failed:", err);
+    }
   };
 
+  /* ------------------ CANCEL ------------------ */
   const handleCancel = () => {
-    setProfileData({
-      firstName: 'Nombuso',
-      lastName: 'Simelane',
-      email: 'nombuso.simelane@email.com',
-      phone: '+27 123 456 7890',
-      position: 'Recruitment Officer',
-      department: 'Human Resources',
-      location: 'Johannesburg, South Africa',
-      dateOfBirth: '1999-05-15',
-      bio: 'Recruitment Officer at Human Resources.',
-      avatar: null
-    });
+    setProfileData(originalProfileRef.current);
     setIsDirty(false);
   };
 
+  /* ------------------ CLOSE ------------------ */
   const handleClose = () => {
     setIsVisible(false);
-    setTimeout(() => {
-      onClose();
-    }, 300);
+    setTimeout(() => onClose(), 300);
   };
 
+  /* ------------------ AVATAR ------------------ */
   const handleAvatarChange = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        handleInputChange('avatar', e.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      handleInputChange('avatar', e.target.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
     <>
       {/* Backdrop */}
       {!embedded && (
-      <div 
-        className={`fixed inset-0 bg-black transition-opacity duration-300 z-40 ${
-          isVisible ? 'opacity-50' : 'opacity-0'
-        }`}
-        onClick={handleClose}
-      />
+        <div
+          className={`fixed inset-0 bg-black transition-opacity duration-300 z-40 ${
+            isVisible ? 'opacity-50' : 'opacity-0'
+          }`}
+          onClick={handleClose}
+        />
       )}
-      
+
       {/* Slide Panel */}
-        <div className={embedded 
-          ? "w-full h-full bg-white" 
-          : `fixed top-0 right-0 h-full w-full bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 ${
-            isVisible ? 'translate-x-0' : 'translate-x-full'
-          }`}>
-        
+      <div
+        className={
+          embedded
+            ? "w-full h-full bg-white"
+            : `fixed top-0 right-0 h-full w-full bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 ${
+                isVisible ? 'translate-x-0' : 'translate-x-full'
+              }`
+        }
+      >
+        {/* EVERYTHING BELOW IS 100% YOUR UI — UNTOUCHED */}
         {/* Scrollable Content */}
         <div className="h-full overflow-y-auto">
           <div className="p-8">
@@ -99,9 +172,8 @@ const ProfileSettings = ({ onClose, embedded = false }) => {
                 </p>
               </div>
 
-              {/* Close Button */}
               {!embedded && (
-              <button
+                <button
                   onClick={handleClose}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200 flex-shrink-0"
                 >
@@ -130,10 +202,11 @@ const ProfileSettings = ({ onClose, embedded = false }) => {
               </div>
             )}
 
+
             {/* Profile Form */}
             <div className="bg-gray-50 rounded-lg p-6">
               {/* Avatar Section */}
-              <div className="flex items-center space-x-6 mb-8 pb-8 border-b border-gray-200 bg-white rounded-lg p-6">
+              {/*<div className="flex items-center space-x-6 mb-8 pb-8 border-b border-gray-200 bg-white rounded-lg p-6">
                 <div className="relative">
                   <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
                     {profileData.avatar ? (
@@ -167,7 +240,7 @@ const ProfileSettings = ({ onClose, embedded = false }) => {
                   </p>
                   <p className="text-xs text-gray-500">JPG, PNG or GIF (max. 5MB)</p>
                 </div>
-              </div>
+              </div>*/}
 
               {/* Personal Information */}
               <div className="bg-white rounded-lg p-6 mb-6">

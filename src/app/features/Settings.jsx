@@ -35,14 +35,14 @@ const SettingsPanel = ({ onClose }) => {
   switch (activeTab) {
     case 'profile':
       return <ProfileSettings onClose={handleClose} embedded={true} />;
-    case 'account':
-      return <AccountSettings onClose={handleClose} embedded={true} />;
-    case 'permissions':
-      return <Permissions onClose={handleClose} embedded={true} />;
+    {/*case 'account':
+      return <AccountSettings onClose={handleClose} embedded={true} />;*/}
+    {/*case 'permissions':
+      return <Permissions onClose={handleClose} embedded={true} />;*/}
     case 'help':
       return <HelpSupport onClose={handleClose} embedded={true} />;
-    case 'activity':
-      return <ActivityLog onClose={handleClose} embedded={true} />;
+    {/*case 'activity':
+      return <ActivityLog onClose={handleClose} embedded={true} />;*/}
     default:
       return null;
   }
