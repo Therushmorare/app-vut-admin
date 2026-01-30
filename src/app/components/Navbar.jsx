@@ -29,7 +29,7 @@ const Navbar = () => {
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   const [showDocumentsModal, setShowDocumentsModal] = useState(false);
   const dropdownRef = useRef(null);
-
+  const [unreadCount, setUnreadCount] = useState(0);
   const userAvatar = "";
 
   const [userName, setUserName] = useState("");
@@ -185,16 +185,17 @@ const Navbar = () => {
         <div className="flex items-center space-x-4">
           {/* Notifications */}
           <div className="relative">
-            <button
-              onClick={() =>
-                setShowNotificationsModal(!showNotificationsModal)
-              }
-              className="relative p-2.5 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-[#0245A3] transition-all duration-200"
+              <button
+              onClick={() => setShowNotificationsModal(true)}
+              className="relative p-2.5 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-[#0245A3]"
             >
               <Bell size={20} />
-              <span className="absolute -top-1 -right-1 bg-[#E94E68] text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
-                3
-              </span>
+
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[#E94E68] text-white text-xs font-semibold rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
             </button>
           </div>
 
