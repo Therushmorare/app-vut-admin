@@ -57,7 +57,7 @@ const ProfileSettings = ({ onClose, embedded = false }) => {
           position: admin.role || '',
           department: '',
           location: '',
-          dateOfBirth: admin.joined_at,
+          dateOfBirth: admin.joined_at || '',
           bio: '',
           avatar: null
         };

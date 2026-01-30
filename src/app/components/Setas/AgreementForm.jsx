@@ -65,36 +65,41 @@ const AgreementForm = ({ agreement, onSubmit, onCancel }) => {
       return;
     }
 
-    if (!uploadedFile) {
+    if (!uploadedFile && !formData.agreementId) {
+      // Require file only if creating new agreement
       setErrors({ document: "Agreement document is required" });
       return;
     }
 
     try {
       const payload = new FormData();
-
       payload.append("administrator_id", adminId);
-      payload.append("agreement_file", uploadedFile);
+      if (uploadedFile) payload.append("agreement_file", uploadedFile);
       payload.append("seta_name", formData.setaName);
-
-      // 🔥 FIX #1 — BACKEND EXPECTS "faculty", NOT "faculties"
       payload.append("faculty", formData.faculties.join(","));
-
       payload.append("start_period", formData.startDate);
       payload.append("end_period", formData.endDate);
       payload.append("reference_number", formData.agreementRef);
       payload.append("status", formData.status);
 
-      await axios.post(
-        "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/agreements",
-        payload
-        // 🔥 FIX #2 — removed withCredentials
-      );
+      if (formData.agreementId) {
+        // 🔹 UPDATE EXISTING AGREEMENT
+        await axios.post(
+          `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/agreements/${formData.agreementId}`,
+          payload
+        );
+      } else {
+        // 🔹 CREATE NEW AGREEMENT
+        await axios.post(
+          "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/agreements",
+          payload
+        );
+      }
 
       onSubmit?.();
     } catch (err) {
-      console.error("Agreement upload failed:", err);
-      alert(err.response?.data?.message || "Failed to create agreement");
+      console.error("Agreement save failed:", err);
+      alert(err.response?.data?.message || "Failed to save agreement");
     }
   };
 
