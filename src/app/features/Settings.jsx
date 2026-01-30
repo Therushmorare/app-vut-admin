@@ -18,10 +18,10 @@ const SettingsPanel = ({ onClose }) => {
 
   const tabs = [
     { key: 'profile', label: 'Profile', icon: User },
-    { key: 'account', label: 'Account', icon: Shield },
-    { key: 'permissions', label: 'Permissions', icon: Settings },
+    /*{ key: 'account', label: 'Account', icon: Shield },*/
+    /*{ key: 'permissions', label: 'Permissions', icon: Settings },*/
     { key: 'help', label: 'Help & Support', icon: HelpCircle },
-    { key: 'activity', label: 'Activity Log', icon: Activity }
+    /*{ key: 'activity', label: 'Activity Log', icon: Activity }*/
   ];
 
   const handleClose = () => {
@@ -35,8 +35,8 @@ const SettingsPanel = ({ onClose }) => {
   switch (activeTab) {
     case 'profile':
       return <ProfileSettings onClose={handleClose} embedded={true} />;
-    {/*case 'account':
-      return <AccountSettings onClose={handleClose} embedded={true} />;*/}
+    case 'account':
+      return <AccountSettings onClose={handleClose} embedded={true} />;
     {/*case 'permissions':
       return <Permissions onClose={handleClose} embedded={true} />;*/}
     case 'help':

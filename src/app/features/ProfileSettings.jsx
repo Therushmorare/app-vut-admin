@@ -57,7 +57,7 @@ const ProfileSettings = ({ onClose, embedded = false }) => {
           position: admin.role || '',
           department: '',
           location: '',
-          dateOfBirth: '',
+          dateOfBirth: admin.joined_at,
           bio: '',
           avatar: null
         };
@@ -313,7 +313,7 @@ const ProfileSettings = ({ onClose, embedded = false }) => {
                     />
                   </div>
 
-                  <div>
+                  {/*<div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Department
                     </label>
@@ -332,9 +332,9 @@ const ProfileSettings = ({ onClose, embedded = false }) => {
                       <option value="Finance">Finance</option>
                       <option value="Operations">Operations</option>
                     </select>
-                  </div>
+                  </div>*/}
 
-                  <div>
+                  {/*<div>
                     <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
                       <MapPin size={16} className="mr-2" />
                       Location
@@ -346,12 +346,12 @@ const ProfileSettings = ({ onClose, embedded = false }) => {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-green-700 focus:ring-2 focus:ring-green-100 outline-none transition-all duration-200"
                       placeholder="Your location"
                     />
-                  </div>
+                  </div>*/}
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
                       <Calendar size={16} className="mr-2" />
-                      Date of Birth
+                      Date Joined
                     </label>
                     <input
                       type="date"
@@ -364,7 +364,7 @@ const ProfileSettings = ({ onClose, embedded = false }) => {
               </div>
 
               {/* Bio Section */}
-              <div className="bg-white rounded-lg p-6 mb-6">
+              {/*<div className="bg-white rounded-lg p-6 mb-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">About</h3>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -382,10 +382,10 @@ const ProfileSettings = ({ onClose, embedded = false }) => {
                     {profileData.bio.length}/500 characters
                   </p>
                 </div>
-              </div>
+              </div>*/}
 
               {/* Save Button */}
-              <div className="flex justify-end bg-white rounded-lg p-6">
+              {/*<div className="flex justify-end bg-white rounded-lg p-6">
                 <button
                   onClick={handleSave}
                   disabled={!isDirty}
@@ -398,7 +398,7 @@ const ProfileSettings = ({ onClose, embedded = false }) => {
                   <Save size={16} />
                   <span>Save Profile</span>
                 </button>
-              </div>
+              </div>*/}
             </div>
           </div>
         </div>
