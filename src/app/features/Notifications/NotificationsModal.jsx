@@ -12,10 +12,15 @@ const NotificationsModal = ({ onClose }) => {
 
   const fetchNotifications = async () => {
     try {
-      const logsRes = await fetch('https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/user-logs');
+      const logsRes = await fetch(
+        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/user-logs'
+      );
       const logsData = await logsRes.json();
 
-      const newLogs = logsData.logs.filter(l => new Date(l.created_at) > new Date(lastChecked));
+      // Show all logs if notifications are empty, otherwise only new logs
+      const newLogs = notifications.length === 0
+        ? logsData.logs
+        : logsData.logs.filter(l => new Date(l.created_at) > new Date(lastChecked));
 
       const newNotifs = newLogs.map((l, idx) => {
         let title = '';
@@ -41,7 +46,7 @@ const NotificationsModal = ({ onClose }) => {
       });
 
       setNotifications(prev => [...newNotifs, ...prev]);
-      setUnreadCount(prev => prev + newNotifs.length);
+      setUnreadCount(newNotifs.length);
       setLastChecked(new Date().toISOString());
 
     } catch (err) {
