@@ -35,51 +35,60 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
     return newErrors;
   };
 
-    const handleSubmit = async (e) => {
-      e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-      const adminId = sessionStorage.getItem("admin_id");
-      if (!adminId) {
-        alert("Admin session expired. Please log in again.");
-        return;
-      }
+    const adminId = sessionStorage.getItem("admin_id");
+    if (!adminId) {
+      alert("Admin session expired. Please log in again.");
+      return;
+    }
 
-      const newErrors = validate();
-      if (Object.keys(newErrors).length > 0) {
-        setErrors(newErrors);
-        return;
-      }
+    const newErrors = validate();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
-      try {
-        const payload = {
-          administrator_id: adminId,
-          agreement_id: formData.agreementId,
-          description: formData.description,
-          financial_year: formData.financialYear,
-          seta_phone: formData.contactPhone,
-          seta_email: formData.contactEmail,
-          program_type: formData.programTypes.join(", "),
-          comments: formData.notes
-        };
+    try {
+      const payload = {
+        administrator_id: adminId,
+        description: formData.description,
+        financial_year: formData.financialYear,
+        seta_phone_number: formData.contactPhone,
+        seta_email: formData.contactEmail,
+        program_type: formData.programTypes.join(", "),
+        comments: formData.notes
+      };
 
+      if (formData.agreementId) {
+        // 🔹 UPDATE EXISTING SETA PROFILE
+        const res = await axios.post(
+          `${API_BASE}/api/administrators/seta-profiles/${formData.agreementId}`,
+          payload,
+          { withCredentials: true }
+        );
+        console.log("SETA profile updated:", res.data);
+        onSubmit?.(res.data);
+      } else {
+        // 🔹 CREATE NEW SETA PROFILE
         const res = await axios.post(
           `${API_BASE}/api/administrators/seta-profiles`,
           payload,
           { withCredentials: true }
         );
-
         console.log("SETA profile created:", res.data);
-
-        // optional: close modal / refresh list
         onSubmit?.(res.data);
-
-      } catch (err) {
-        console.error(
-          "Failed to create SETA profile:",
-          err.response?.data || err
-        );
       }
-    };
+
+    } catch (err) {
+      console.error(
+        "Failed to save SETA profile:",
+        err.response?.data || err
+      );
+      alert(err.response?.data?.message || "Failed to save SETA profile");
+    }
+  };
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));

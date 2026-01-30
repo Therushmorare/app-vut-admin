@@ -119,7 +119,7 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
     }
 
     try {
-      //CREATE FUNDING WINDOW
+      // Payload for funding window
       const fwPayload = {
         administrator_id: adminId,
         agreement_id: String(formData.agreementId),
@@ -132,22 +132,45 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
         budget_allocation: Number(formData.budgetAllocation)
       };
 
-      const fwRes = await fetch(
-        `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/funding-windows`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(fwPayload)
-        }
-      );
+      let fundingWindowId;
 
-      const fwData = await fwRes.json();
-      if (!fwRes.ok) throw new Error(fwData.message || "Failed to create funding window");
+      if (formData.fundingWindowId) {
+        // 🔹 UPDATE EXISTING FUNDING WINDOW
+        const fwRes = await fetch(
+          `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/funding-windows/${formData.fundingWindowId}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(fwPayload)
+          }
+        );
 
-      const fundingWindowId = fwData.funding_window_id;
+        const fwData = await fwRes.json();
+        if (!fwRes.ok) throw new Error(fwData.message || "Failed to update funding window");
 
-      //CREATE PROGRAMMES
+        fundingWindowId = formData.fundingWindowId;
+        console.log("Funding window updated:", fwData);
+      } else {
+        // 🔹 CREATE NEW FUNDING WINDOW
+        const fwRes = await fetch(
+          "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/funding-windows",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(fwPayload)
+          }
+        );
+
+        const fwData = await fwRes.json();
+        if (!fwRes.ok) throw new Error(fwData.message || "Failed to create funding window");
+
+        fundingWindowId = fwData.funding_window_id;
+        console.log("Funding window created:", fwData);
+      }
+
+      // CREATE / UPDATE PROGRAMMES
       for (const prog of formData.programmes) {
         const documentsArr =
           typeof prog.requiredDocs === "string"
@@ -159,7 +182,10 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
         progPayload.append("agreement_id", String(formData.agreementId));
         progPayload.append("funding_window_id", fundingWindowId);
         progPayload.append("programme_name", prog.programmeName.trim());
-        progPayload.append("duration", prog.programmeDuration ? `${prog.programmeDuration} months` : "0 months");
+        progPayload.append(
+          "duration",
+          prog.programmeDuration ? `${prog.programmeDuration} months` : "0 months"
+        );
         progPayload.append("required_num_students", Number(prog.requiredNumStudents || 0));
         progPayload.append("programme_budget", Number(prog.budgetAllocation || 0));
         progPayload.append("notes", prog.notes?.trim() || "");
@@ -172,11 +198,12 @@ export default function useFundingWindowForm(initialWindow, agreementId) {
         );
 
         const progData = await progRes.json();
-        if (!progRes.ok) throw new Error(progData.message || `Failed to create programme: ${prog.programmeName}`);
+        if (!progRes.ok) throw new Error(progData.message || `Failed to create/update programme: ${prog.programmeName}`);
       }
 
       setSubmitSuccess(true);
       if (callback) callback({ success: true, formData });
+
     } catch (err) {
       console.error("Funding window submission failed:", err);
       setSubmitError(err.message);
