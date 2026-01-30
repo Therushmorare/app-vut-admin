@@ -29,7 +29,6 @@ const Navbar = () => {
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   const [showDocumentsModal, setShowDocumentsModal] = useState(false);
   const dropdownRef = useRef(null);
-  const [unreadCount, setUnreadCount] = useState(0);
   const userAvatar = "";
 
   const [userName, setUserName] = useState("");
