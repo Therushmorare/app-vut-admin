@@ -70,52 +70,68 @@ const CommentLog = ({ agreementId, agreementRef, onClose }) => {
     if (!newComment.trim()) return;
 
     const adminId = sessionStorage.getItem("admin_id");
-    if (!adminId){
-      alert("Admin session expired. Please log in again.")
+    if (!adminId) {
+      alert("Admin session expired. Please log in again.");
       return;
     }
-    // Build payload for backend
+
+    if (!agreementId) {
+      console.error("Missing agreementId");
+      return;
+    }
+
     const payload = {
-      administrator_id: adminId, // replace with actual logged-in admin ID
+      administrator_id: adminId,
       agreement_id: agreementId,
-      log_type: commentType.toUpperCase().replace(' ', '_'), // convert "Status Change" → "STATUS_CHANGE"
+      log_type: commentType, // ✅ DO NOT transform
       comment: newComment
     };
 
-    // Optimistic UI update
-    const newEntry = {
-      id: Date.now().toString(),
+    // Optimistic UI entry
+    const optimisticEntry = {
+      id: `tmp-${Date.now()}`,
       text: newComment,
       type: commentType,
-      userName, // current user
+      userName,
       timestamp: new Date().toISOString(),
       agreementRef
     };
-    setComments(prev => [newEntry, ...prev]);
-    setNewComment('');
+
+    setComments(prev => [optimisticEntry, ...prev]);
+    setNewComment("");
 
     try {
-      // POST to backend
       const res = await fetch(
-        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/agreements/activity-log',
+        "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/agreements/activity-log",
         {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          credentials: "include", // ✅ REQUIRED
+          headers: {
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify(payload)
         }
       );
 
+      const data = await res.json();
+
       if (!res.ok) {
-        throw new Error('Failed to log activity');
+        console.error("Backend error:", data);
+        throw new Error(data?.message || "Failed to log activity");
       }
 
-      // Optionally, refresh comments from backend after POST
-      await fetchComments(); 
+      // ✅ Best practice: re-sync from backend
+      await fetchComments();
 
     } catch (err) {
-      console.error('Error logging activity:', err);
-      // Rollback optimistic update if POST fails
-      setComments(prev => prev.filter(c => c.id !== newEntry.id));
+      console.error("Error logging activity:", err);
+
+      // rollback optimistic update
+      setComments(prev =>
+        prev.filter(c => c.id !== optimisticEntry.id)
+      );
+
+      alert("Failed to save comment. Please try again.");
     }
   };
 
