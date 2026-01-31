@@ -303,6 +303,12 @@ export default function AdminManagement() {
                   Joined <SortIcon field="joined" />
                 </div>
               </th>
+              <th className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+                <div className="flex items-center space-x-1">
+                  Actions <SortIcon field="actions" />
+                </div>
+              </th>
+
             </tr>
           </thead>
           <tbody className="divide-y">
