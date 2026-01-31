@@ -150,6 +150,8 @@ const Navbar = () => {
         return 'Search admins by ID, Name(s).....';
       case '/pages/logs':
         return 'Search Logs by user types, IDs, actions, dates...';
+      case '/pages/spending':
+         return 'Search Programme Name...'
       default:
         return 'Search...';
     }
