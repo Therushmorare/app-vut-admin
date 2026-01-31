@@ -23,32 +23,53 @@ const CommentLog = ({ agreementId, agreementRef, onClose }) => {
 
   const fetchComments = async () => {
     try {
+      if (!agreementId) {
+        console.warn("fetchComments skipped: agreementId missing");
+        return;
+      }
+
       const res = await fetch(
-        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/all-activity-logs'
+        "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/all-activity-logs",
+        {
+          method: "GET",
+          credentials: "include", //REQUIRED
+          headers: {
+            Accept: "application/json"
+          }
+        }
       );
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch activity logs");
+      }
 
       const data = await res.json();
 
-      // Filter logs for this agreement
+      console.log("All logs:", data);
+      console.log("Current agreementId:", agreementId);
+
+      // Ensure string comparison
       const filtered = data.filter(
-        log => log.agreement_id === agreementId
+        log => String(log.agreement_id) === String(agreementId)
       );
 
-      // Map API → UI model
       const mapped = filtered
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
         .map((log, idx) => ({
           id: `${log.agreement_id}-${idx}`,
           text: log.comment,
           type: mapLogType(log.log_type),
-          userName: log.logger,
+          userName: log.logger, // UUID for now
           timestamp: log.created_at,
           agreementRef
         }));
 
+      console.log("Mapped comments:", mapped);
+
       setComments(mapped);
+
     } catch (error) {
-      console.error('Failed to fetch activity logs:', error);
+      console.error("Failed to fetch activity logs:", error);
     }
   };
 
