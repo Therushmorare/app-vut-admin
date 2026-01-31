@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { COLORS } from "../../utils/helpers";
 import { Loader2 } from "lucide-react";
+import { COLORS } from "../../../utils/helpers";
 
 export default function FormActions({ isEditMode, onCancel, onSubmit }) {
   const [loading, setLoading] = useState(false);
