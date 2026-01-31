@@ -14,7 +14,7 @@ import {
   YAxis,
 } from "recharts";
 import { COLORS } from "../../utils/helpers";
-import { Wallet, TrendingDown, Coins } from "lucide-react";
+import { Wallet, TrendingDown, Coins, Download } from "lucide-react";
 
 const API_BASE =
   "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators";
@@ -127,6 +127,48 @@ export default function ExpenditureManagement() {
     };
   });
 
+    const exportBudgetStatement = () => {
+    if (!scopedProgrammes.length) return;
+
+    // Prepare CSV headers
+    const headers = ["Programme", "Learners", "Budget", "Used", "Remaining", "Runway"];
+
+    // Map programmes to CSV rows
+    const rows = scopedProgrammes.map(p => {
+      const learners = scopedAllocations.filter(
+        a => a.programme_id === p.programme_id
+      ).length;
+
+      const stipend = stipends[p.programme_id];
+      const used = stipend ? learners * stipend.yearly_stipend_per_student : 0;
+      const remaining = p.budget - used;
+      const monthlyBurn = stipend ? stipend.monthly_stipend_per_student * learners : 0;
+      const runway = monthlyBurn > 0 ? Math.floor(remaining / monthlyBurn) : "—";
+
+      return [
+        p.programme_name,
+        learners,
+        `R ${p.budget.toLocaleString()}`,
+        `R ${used.toLocaleString()}`,
+        `R ${remaining.toLocaleString()}`,
+        runway !== "—" ? `${runway} months` : "—",
+      ].join(",");
+    });
+
+    // Combine headers + rows
+    const csvContent = [headers.join(","), ...rows].join("\n");
+
+    // Trigger download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "budget_statement.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="min-h-screen p-4 md:p-6" style={{ backgroundColor: COLORS.bgLight }}>
         <div className="max-w-7xl mx-auto">
@@ -135,19 +177,35 @@ export default function ExpenditureManagement() {
 
             <h2 className="text-xl font-bold mb-4" style={{ color: COLORS.primary }}>Budget Management</h2>
 
-            {/* Agreement Selector */}
-            <select
+            {/* Agreement Selector + Export Button */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+
+              {/* Left: Agreement Selector */}
+              <select
                 value={agreementId}
                 onChange={e => setAgreementId(e.target.value)}
-                className="border p-2 rounded"
-            >
+                className="border p-2 rounded w-full sm:w-auto"
+                style={{ borderColor: COLORS.border }}
+              >
                 <option value="">All Agreements</option>
                 {fundingWindows.map(fw => (
-                <option key={fw.agreement_id} value={fw.agreement_id}>
+                  <option key={fw.agreement_id} value={fw.agreement_id}>
                     {fw.name}
-                </option>
+                  </option>
                 ))}
-            </select>
+              </select>
+
+              {/* Right: Export Button */}
+              <button
+                onClick={exportBudgetStatement}
+                className="flex items-center gap-3 px-8 py-4 rounded-lg text-white text-lg font-bold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
+                style={{ backgroundColor: COLORS.success }}
+              >
+                <Download size={16} />
+                Export Budget Statement
+              </button>
+
+            </div>
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
