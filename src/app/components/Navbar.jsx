@@ -13,7 +13,8 @@ import {
   FileText,
   Briefcase,
   Search,
-  BriefcaseBusiness
+  BriefcaseBusiness,
+  Wallet
 } from "lucide-react";
 
 import SettingsPanel from "../features/Settings";
@@ -59,6 +60,7 @@ const Navbar = () => {
     "/pages/hosts": { title: "Host Company Management", icon: Users },
     "/pages/setas": { title: "SETA Management", icon: BriefcaseBusiness },
     "/pages/reports": { title: "Reports", icon: FileText },
+    "/pages/spending": {title: "Budgets", icon: Wallet},
     "/pages/documents": { title: "Documents", icon: FileText },
     "/pages/admins": {title: "Admins", icon: Users},
     "/pages/logs": {title: "Logs", icon: BarChart}
