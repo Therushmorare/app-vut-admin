@@ -133,8 +133,8 @@ export default function AgreementsTable({ agreements, onView, onEdit, onDelete, 
 
       {showCommentLog && selectedAgreementForLog && (
         <CommentLog
-          agreementId={selectedAgreementForLog.id}
-          agreementRef={selectedAgreementForLog.agreementRef}
+          agreementId={selectedAgreementForLog.agreement_id}
+          agreementRef={selectedAgreementForLog.reference_number}
           onClose={() => {
             setShowCommentLog(false);
             setSelectedAgreementForLog(null);
