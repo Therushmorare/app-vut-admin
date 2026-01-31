@@ -2,6 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { MessageSquare, Download, Send, Clock, User, FileText, X, TrendingUp, AlertCircle } from 'lucide-react';
 import { COLORS } from '../../utils/helpers';
 
+const mapLogType = (logType) => {
+  switch (logType.toUpperCase()) {
+    case 'STATUS_UPDATE': return 'Status Change';
+    case 'ISSUE': return 'Issue';
+    case 'UPDATE': return 'Update';
+    default: return 'Comment';
+  }
+};
+
 const CommentLog = ({ agreementId, agreementRef, onClose }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
@@ -9,25 +18,37 @@ const CommentLog = ({ agreementId, agreementRef, onClose }) => {
   const [userName] = useState('Current User');
 
   useEffect(() => {
-    loadComments();
+    fetchComments();
   }, [agreementId]);
 
-  const loadComments = () => {
+  const fetchComments = async () => {
     try {
-      const stored = localStorage.getItem(`comments-${agreementId}`);
-      if (stored) {
-        setComments(JSON.parse(stored));
-      }
-    } catch (error) {
-      console.error('Error loading comments:', error);
-    }
-  };
+      const res = await fetch(
+        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/all-activity-logs'
+      );
 
-  const saveComments = (data) => {
-    try {
-      localStorage.setItem(`comments-${agreementId}`, JSON.stringify(data));
+      const data = await res.json();
+
+      // Filter logs for this agreement
+      const filtered = data.filter(
+        log => log.agreement_id === agreementId
+      );
+
+      // Map API → UI model
+      const mapped = filtered
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .map((log, idx) => ({
+          id: `${log.agreement_id}-${idx}`,
+          text: log.comment,
+          type: mapLogType(log.log_type),
+          userName: log.logger,
+          timestamp: log.created_at,
+          agreementRef
+        }));
+
+      setComments(mapped);
     } catch (error) {
-      console.error('Error saving comments:', error);
+      console.error('Failed to fetch activity logs:', error);
     }
   };
 
@@ -45,22 +66,57 @@ const CommentLog = ({ agreementId, agreementRef, onClose }) => {
     return 'Just now';
   };
 
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (!newComment.trim()) return;
 
-    const comment = {
+    const adminId = sessionStorage.getItem("admin_id");
+    if (!adminId){
+      alert("Admin session expired. Please log in again.")
+      return;
+    }
+    // Build payload for backend
+    const payload = {
+      administrator_id: adminId, // replace with actual logged-in admin ID
+      agreement_id: agreementId,
+      log_type: commentType.toUpperCase().replace(' ', '_'), // convert "Status Change" → "STATUS_CHANGE"
+      comment: newComment
+    };
+
+    // Optimistic UI update
+    const newEntry = {
       id: Date.now().toString(),
       text: newComment,
       type: commentType,
-      userName,
+      userName, // current user
       timestamp: new Date().toISOString(),
       agreementRef
     };
-
-    const updated = [comment, ...comments];
-    setComments(updated);
-    saveComments(updated);
+    setComments(prev => [newEntry, ...prev]);
     setNewComment('');
+
+    try {
+      // POST to backend
+      const res = await fetch(
+        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/agreements/activity-log',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error('Failed to log activity');
+      }
+
+      // Optionally, refresh comments from backend after POST
+      await fetchComments(); 
+
+    } catch (err) {
+      console.error('Error logging activity:', err);
+      // Rollback optimistic update if POST fails
+      setComments(prev => prev.filter(c => c.id !== newEntry.id));
+    }
   };
 
   const handleExport = () => {

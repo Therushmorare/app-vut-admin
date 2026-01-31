@@ -42,12 +42,16 @@ const FundingWindowForm = ({ window, agreementId, onSubmit, onCancel }) => {
       <FormActions
         isEditMode={!!window}
         onCancel={onCancel}
-        onSubmit={() =>
-          handleSubmit((result) => {
-            if (result.success) alert("Funding window created successfully!");
-            else alert(`Error: ${result.error}`);
-          })
-        }
+        onSubmit={async () => {
+          try {
+            const result = await handleSubmit();
+            if (result?.success) alert("Funding window created successfully!");
+            else alert(`Error: ${result?.error || 'Unknown error'}`);
+          } catch (err) {
+            console.error(err);
+            alert("Error creating funding window");
+          }
+        }}
       />
       
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react"; // Loader2 for spinner
 import { COLORS, formatDate } from "../../utils/helpers";
 import axios from "axios";
 
@@ -23,6 +23,8 @@ const AgreementForm = ({ agreement, onSubmit, onCancel }) => {
   const [uploadPreview, setUploadPreview] = useState(
     agreement?.documentName || null
   );
+
+  const [loading, setLoading] = useState(false); // 🔹 Loading state
 
   const availableFaculties = [
     "Faculty of Applied & Computer Science",
@@ -52,6 +54,7 @@ const AgreementForm = ({ agreement, onSubmit, onCancel }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return; // prevent multiple clicks
 
     const adminId = sessionStorage.getItem("admin_id");
     if (!adminId) {
@@ -66,11 +69,11 @@ const AgreementForm = ({ agreement, onSubmit, onCancel }) => {
     }
 
     if (!uploadedFile && !formData.agreementId) {
-      // Require file only if creating new agreement
       setErrors({ document: "Agreement document is required" });
       return;
     }
 
+    setLoading(true); // 🔹 Start loading
     try {
       const payload = new FormData();
       payload.append("administrator_id", adminId);
@@ -83,13 +86,11 @@ const AgreementForm = ({ agreement, onSubmit, onCancel }) => {
       payload.append("status", formData.status);
 
       if (formData.agreementId) {
-        // 🔹 UPDATE EXISTING AGREEMENT
         await axios.post(
           `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/agreements/${formData.agreementId}`,
           payload
         );
       } else {
-        // 🔹 CREATE NEW AGREEMENT
         await axios.post(
           "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/agreements",
           payload
@@ -100,6 +101,8 @@ const AgreementForm = ({ agreement, onSubmit, onCancel }) => {
     } catch (err) {
       console.error("Agreement save failed:", err);
       alert(err.response?.data?.message || "Failed to save agreement");
+    } finally {
+      setLoading(false); // 🔹 Stop loading
     }
   };
 
@@ -134,7 +137,6 @@ const AgreementForm = ({ agreement, onSubmit, onCancel }) => {
     setUploadPreview(null);
     handleChange("documentName", "");
     handleChange("documentUrl", "");
-
     const fileInput = document.getElementById("pdf-upload");
     if (fileInput) fileInput.value = "";
   };
@@ -342,12 +344,16 @@ const AgreementForm = ({ agreement, onSubmit, onCancel }) => {
         </button>
         <button
           type="submit"
-          className="flex-1 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90"
+          disabled={loading} // 🔹 disable during loading
+          className={`flex-1 px-6 py-3 rounded-lg text-white font-medium flex items-center justify-center gap-2 transition-all ${
+            loading ? 'opacity-70 cursor-not-allowed' : 'hover:opacity-90'
+          }`}
           style={{ backgroundColor: COLORS.text }}
         >
-          {agreement ? 'Update Agreement' : 'Create Agreement'}
+          {loading && <Loader2 className="w-5 h-5 animate-spin" />}
+          {loading ? 'Processing...' : (agreement ? 'Update Agreement' : 'Create Agreement')}
         </button>
-      </div>
+        </div>
     </form>
   );
 };

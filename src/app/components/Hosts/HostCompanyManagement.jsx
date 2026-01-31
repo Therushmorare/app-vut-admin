@@ -259,18 +259,43 @@ export default function HostCompanyManagement({ allStudents = [] }) {
     setConfirmDialog({
       title: 'Delete Host Company',
       message: `Are you sure you want to delete ${company.company_name}? This will also remove all learner placements at this company.`,
-      onConfirm: () => {
-        const updatedCompanies = companies.filter(c => c.company_id !== company.company_id);
-        const updatedPlacements = placements.filter(p => p.company_id !== company.company_id);
-        
-        setCompanies(updatedCompanies);
-        setPlacements(updatedPlacements);
-        
-        saveCompanies(updatedCompanies);
-        savePlacements(updatedPlacements);
-        
-        setConfirmDialog(null);
-        showToast('Company deleted successfully!');
+      onConfirm: async () => {
+        const adminId = sessionStorage.getItem('admin_id');
+        if (!adminId) {
+          alert('Admin session expired. Please log in again.');
+          setConfirmDialog(null);
+          return;
+        }
+
+        try {
+          // Call backend DELETE endpoint
+          const res = await fetch(
+            `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/delete-host-company/${adminId}/${company.company_id}`,
+            { method: 'DELETE' }
+          );
+
+          if (!res.ok) {
+            throw new Error('Failed to delete host company');
+          }
+
+          // Update frontend state
+          const updatedCompanies = companies.filter(c => c.company_id !== company.company_id);
+          const updatedPlacements = placements.filter(p => p.company_id !== company.company_id);
+
+          setCompanies(updatedCompanies);
+          setPlacements(updatedPlacements);
+
+          // Save to localStorage if needed
+          saveCompanies(updatedCompanies);
+          savePlacements(updatedPlacements);
+
+          showToast('Company deleted successfully!');
+        } catch (err) {
+          console.error('Error deleting company:', err);
+          showToast('Failed to delete company. Please try again.', 'error');
+        } finally {
+          setConfirmDialog(null);
+        }
       },
       onCancel: () => setConfirmDialog(null)
     });

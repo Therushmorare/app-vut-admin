@@ -1,8 +1,9 @@
-"use client"
+"use client";
 
 import React, { useState } from 'react';
 import { COLORS } from '../../utils/helpers';
 import axios from "axios";
+import { Loader2 } from "lucide-react";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
@@ -18,10 +19,12 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
     contactEmail: profile?.contactEmail || '',
     contactPhone: profile?.contactPhone || '',
     programTypes: profile?.programTypes || [],
-    notes: profile?.notes || ''
+    notes: profile?.notes || '',
+    setaProfileExists: !!profile
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const validate = () => {
     const newErrors = {};
@@ -37,23 +40,25 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const adminId = sessionStorage.getItem("admin_id");
-    if (!adminId) {
-      alert("Admin session expired. Please log in again.");
-      return;
-    }
-
-    const newErrors = validate();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+    if (loading) return; // prevent multiple clicks
+    setLoading(true);
 
     try {
+      const adminId = sessionStorage.getItem("admin_id");
+      if (!adminId) {
+        alert("Admin session expired. Please log in again.");
+        return;
+      }
+
+      const newErrors = validate();
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
+      }
+
       const payload = {
         administrator_id: adminId,
-        agreement_id: formData.agreementId, // ✅ still required for CREATE
+        agreement_id: formData.agreementId,
         description: formData.description,
         financial_year: formData.financialYear,
         seta_phone: formData.contactPhone,
@@ -63,32 +68,29 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
       };
 
       let res;
-
-      if (formData.setaProfileExists === true) {
-        // 🔹 UPDATE (explicit, safe)
+      if (formData.setaProfileExists) {
+        // 🔹 UPDATE
         res = await axios.post(
           `${API_BASE}/api/administrators/seta-profiles/${formData.agreementId}`,
           payload,
           { withCredentials: true }
         );
-        console.log("SETA profile updated:", res.data);
       } else {
-        // 🔹 CREATE (default, always works)
+        // 🔹 CREATE
         res = await axios.post(
           `${API_BASE}/api/administrators/seta-profiles`,
           payload,
           { withCredentials: true }
         );
-        console.log("SETA profile created:", res.data);
       }
 
       onSubmit?.(res.data);
 
     } catch (err) {
-      console.error(
-        "Failed to save SETA profile:",
-        err.response?.data || err
-      );
+      console.error("Failed to save SETA profile:", err.response?.data || err);
+      alert(err.response?.data?.message || "Failed to save profile");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -108,6 +110,7 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Profile Name */}
       <div>
         <label className="block text-sm font-medium mb-2" style={{ color: COLORS.primary }}>Profile Name *</label>
         <input 
@@ -121,6 +124,7 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
         {errors.profileName && <p className="text-xs mt-1" style={{ color: COLORS.danger }}>{errors.profileName}</p>}
       </div>
 
+      {/* Description */}
       <div>
         <label className="block text-sm font-medium mb-2" style={{ color: COLORS.primary }}>Description</label>
         <textarea 
@@ -133,6 +137,7 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
         />
       </div>
 
+      {/* Grid Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium mb-2" style={{ color: COLORS.primary }}>Financial Year *</label>
@@ -182,6 +187,7 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
         </div>
       </div>
 
+      {/* Programme Types */}
       <div>
         <label className="block text-sm font-medium mb-2" style={{ color: COLORS.primary }}>Programme Types *</label>
         <div className="space-y-2">
@@ -200,6 +206,7 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
         {errors.programTypes && <p className="text-xs mt-1" style={{ color: COLORS.danger }}>{errors.programTypes}</p>}
       </div>
 
+      {/* Internal Notes */}
       <div>
         <label className="block text-sm font-medium mb-2" style={{ color: COLORS.primary }}>Internal Notes</label>
         <textarea 
@@ -212,6 +219,7 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
         />
       </div>
 
+      {/* Form Actions */}
       <div className="flex gap-3 pt-4">
         <button
           type="button"
@@ -223,10 +231,14 @@ const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
         </button>
         <button
           type="submit"
-          className="flex-1 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90"
+          disabled={loading}
+          className={`flex-1 px-6 py-3 rounded-lg text-white font-medium flex items-center justify-center gap-2 transition-all ${
+            loading ? "opacity-70 cursor-not-allowed" : "hover:opacity-90"
+          }`}
           style={{ backgroundColor: COLORS.success }}
         >
-          {profile ? 'Update Profile' : 'Create Profile'}
+          {loading && <Loader2 className="w-5 h-5 animate-spin" />}
+          {loading ? 'Processing...' : (profile ? 'Update Profile' : 'Create Profile')}
         </button>
       </div>
     </form>

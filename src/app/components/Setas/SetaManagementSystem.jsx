@@ -291,18 +291,43 @@ export default function SETAManagementSystem() {
     showToast('Agreement updated successfully!');
   };
 
-  const handleDeleteAgreement = (agreement) => {
+  const handleDeleteAgreement = async (agreement) => {
     setConfirmDialog({
       title: 'Delete Agreement',
       message: `Are you sure you want to delete ${agreement.reference_id}? This will also delete all associated profiles and funding windows.`,
-      onConfirm: () => {
-        setAgreements(agreements.filter(a => a.agreement_id !== agreement.agreement_id));
-        setProfiles(profiles.filter(p => p.agreementId !== agreement.agreement_id));
-        setFundingWindows(fundingWindows.filter(w => w.agreementId !== agreement.agreement_id));
-        setConfirmDialog(null);
-        showToast('Agreement deleted successfully!');
+      onConfirm: async () => {
+        const adminId = sessionStorage.getItem('admin_id');
+        if (!adminId) {
+          alert('Admin session expired. Please log in again.');
+          setConfirmDialog(null);
+          return;
+        }
+
+        try {
+          // Call backend DELETE endpoint
+          const res = await fetch(
+            `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/delete-agreement/${adminId}/${agreement.agreement_id}`,
+            { method: 'DELETE' }
+          );
+
+          if (!res.ok) {
+            throw new Error('Failed to delete agreement');
+          }
+
+          // Update frontend state
+          setAgreements(prev => prev.filter(a => a.agreement_id !== agreement.agreement_id));
+          setProfiles(prev => prev.filter(p => p.agreementId !== agreement.agreement_id));
+          setFundingWindows(prev => prev.filter(w => w.agreementId !== agreement.agreement_id));
+
+          showToast('Agreement deleted successfully!');
+        } catch (err) {
+          console.error('Error deleting agreement:', err);
+          showToast('Failed to delete agreement. Please try again.', 'error');
+        } finally {
+          setConfirmDialog(null);
+        }
       },
-      onCancel: () => setConfirmDialog(null)
+      onCancel: () => setConfirmDialog(null),
     });
   };
 
@@ -328,18 +353,45 @@ export default function SETAManagementSystem() {
     showToast('Profile updated successfully!');
   };
 
-  const handleDeleteProfile = (profile) => {
+  const handleDeleteProfile = async (profile) => {
     setConfirmDialog({
       title: 'Delete Profile',
       message: 'Are you sure you want to delete this profile? This will also delete all associated funding windows.',
-      onConfirm: () => {
-        setProfiles(profiles.filter(p => p.id !== profile.id));
-        setFundingWindows(fundingWindows.filter(w => w.agreement_id !== profile.agreementId));
-        setAgreements(agreements.map(a =>
-          a.agreement_id === profile.agreement_id ? { ...a, hasProfile: false } : a
-        ));
-        setConfirmDialog(null);
-        showToast('Profile deleted successfully!');
+      onConfirm: async () => {
+        const adminId = sessionStorage.getItem('admin_id');
+        if (!adminId) {
+          alert('Admin session expired. Please log in again.');
+          setConfirmDialog(null);
+          return;
+        }
+
+        try {
+          // Call backend DELETE endpoint
+          const res = await fetch(
+            `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/delete-profile/${adminId}/${profile.agreementId}`,
+            { method: 'DELETE' }
+          );
+
+          if (!res.ok) {
+            throw new Error('Failed to delete profile');
+          }
+
+          // Update frontend state
+          setProfiles(prev => prev.filter(p => p.id !== profile.id));
+          setFundingWindows(prev => prev.filter(w => w.agreementId !== profile.agreementId));
+          setAgreements(prev =>
+            prev.map(a =>
+              a.agreement_id === profile.agreement_id ? { ...a, hasProfile: false } : a
+            )
+          );
+
+          showToast('Profile deleted successfully!');
+        } catch (err) {
+          console.error('Error deleting profile:', err);
+          showToast('Failed to delete profile. Please try again.', 'error');
+        } finally {
+          setConfirmDialog(null);
+        }
       },
       onCancel: () => setConfirmDialog(null)
     });
@@ -367,10 +419,35 @@ export default function SETAManagementSystem() {
     setConfirmDialog({
       title: 'Delete Funding Window',
       message: `Are you sure you want to delete ${window.funding_window_name}?`,
-      onConfirm: () => {
-        setFundingWindows(fundingWindows.filter(w => w.id !== window.funding_window_id));
-        setConfirmDialog(null);
-        showToast('Funding window deleted successfully!');
+      onConfirm: async () => {
+        const adminId = sessionStorage.getItem('admin_id');
+        if (!adminId) {
+          alert('Admin session expired. Please log in again.');
+          setConfirmDialog(null);
+          return;
+        }
+
+        try {
+          // Call backend DELETE endpoint
+          const res = await fetch(
+            `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/delete-funding-window/${adminId}/${window.funding_window_id}`,
+            { method: 'DELETE' }
+          );
+
+          if (!res.ok) {
+            throw new Error('Failed to delete funding window');
+          }
+
+          // Update frontend state
+          setFundingWindows(prev => prev.filter(w => w.id !== window.funding_window_id));
+
+          showToast('Funding window deleted successfully!');
+        } catch (err) {
+          console.error('Error deleting funding window:', err);
+          showToast('Failed to delete funding window. Please try again.', 'error');
+        } finally {
+          setConfirmDialog(null);
+        }
       },
       onCancel: () => setConfirmDialog(null)
     });

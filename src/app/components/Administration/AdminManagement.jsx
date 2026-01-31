@@ -39,6 +39,9 @@ export default function AdminManagement() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [apiError, setApiError] = useState("");
+  const [viewModalData, setViewModalData] = useState(null);
+  const [deleteModalData, setDeleteModalData] = useState(null);
+  const [loadingDelete, setLoadingDelete] = useState(false);
 
   const itemsPerPage = 10;
 
@@ -302,7 +305,7 @@ export default function AdminManagement() {
               </th>
             </tr>
           </thead>
-            <tbody className="divide-y">
+          <tbody className="divide-y">
             {paginatedAdmins.map((admin) => (
               <tr key={admin.admin_id} className="hover:bg-gray-50">
                 <td className="px-6 py-4">
@@ -340,6 +343,23 @@ export default function AdminManagement() {
                   <Calendar className="inline w-4 h-4 mr-1 text-gray-400" />
                   {formatDate(admin.joined_at)}
                 </td>
+
+                {/* Actions Column */}
+                <td className="px-6 py-4 flex gap-2">
+                  <button
+                    onClick={() => setViewModalData(admin)}
+                    className="px-3 py-1 rounded-lg text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 transition-colors"
+                  >
+                    View
+                  </button>
+                  <button
+                    onClick={() => setDeleteModalData(admin)}
+                    className="px-3 py-1 rounded-lg text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors"
+                  >
+                    Delete
+                  </button>
+                </td>
+
               </tr>
             ))}
           </tbody>
@@ -358,7 +378,7 @@ export default function AdminManagement() {
 
       {/* ---------------- MODAL ---------------- */}
     {showModal && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div className="relative w-full max-w-lg rounded-2xl bg-white shadow-xl">
           
           {/* Header */}
@@ -441,6 +461,69 @@ export default function AdminManagement() {
         </div>
       </div>
     )}
+
+    {viewModalData && (
+      <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg w-11/12 md:w-1/2 p-6 relative">
+          <h2 className="text-lg font-semibold mb-4">Admin Details</h2>
+          <p><strong>Name:</strong> {viewModalData.first_name} {viewModalData.last_name}</p>
+          <p><strong>Employee Number:</strong> {viewModalData.employee_number}</p>
+          <p><strong>Email:</strong> {viewModalData.email}</p>
+          <p><strong>Phone:</strong> {viewModalData.phone_number}</p>
+          <p><strong>Role:</strong> {viewModalData.role}</p>
+          <p><strong>Status:</strong> {viewModalData.status}</p>
+          <p><strong>Joined:</strong> {formatDate(viewModalData.joined_at)}</p>
+
+          <button
+            onClick={() => setViewModalData(null)}
+            className="mt-4 px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    )}
+
+    {deleteModalData && (
+      <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg w-11/12 md:w-1/3 p-6 relative">
+          <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
+          <p>Are you sure you want to delete <strong>{deleteModalData.first_name} {deleteModalData.last_name}</strong>?</p>
+          <p className="text-sm text-gray-500 mt-2">This action cannot be undone.</p>
+
+          <div className="flex gap-3 mt-6">
+            <button
+              onClick={() => setDeleteModalData(null)}
+              className="flex-1 px-4 py-2 rounded-lg border font-medium hover:bg-gray-50"
+              style={{ borderColor: COLORS.border, color: COLORS.primary }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={async () => {
+                if (loadingDelete) return;
+                setLoadingDelete(true);
+                try {
+                  await onDelete(deleteModalData); // implement API delete
+                  setDeleteModalData(null);
+                } catch (err) {
+                  console.error("Delete failed", err);
+                } finally {
+                  setLoadingDelete(false);
+                }
+              }}
+              className={`flex-1 px-4 py-2 rounded-lg text-white font-medium transition-all ${
+                loadingDelete ? 'opacity-70 cursor-not-allowed' : 'hover:opacity-90'
+              }`}
+              style={{ backgroundColor: COLORS.danger }}
+            >
+              {loadingDelete ? "Deleting..." : "Delete"}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
     </div>
   </div>
   );

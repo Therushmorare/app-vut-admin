@@ -1,11 +1,26 @@
-import React from 'react';
-import { COLORS } from '../../../utils/helpers';
+"use client";
 
-export default function FormActions({ 
-  isEditMode, 
-  onCancel, 
-  onSubmit 
-}) {
+import React, { useState } from "react";
+import { COLORS } from "../../utils/helpers";
+import { Loader2 } from "lucide-react";
+
+export default function FormActions({ isEditMode, onCancel, onSubmit }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = async () => {
+    if (loading) return; // prevent multiple clicks
+    setLoading(true);
+    try {
+      // Await parent callback if provided
+      const result = await onSubmit?.();
+      return result;
+    } catch (err) {
+      console.error("Form submission failed:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex gap-3 pt-4">
       <button
@@ -16,13 +31,22 @@ export default function FormActions({
       >
         Cancel
       </button>
+
       <button
         type="button"
-        onClick={onSubmit}
-        className="flex-1 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90"
+        onClick={handleClick}
+        disabled={loading}
+        className={`flex-1 px-6 py-3 rounded-lg text-white font-medium flex items-center justify-center gap-2 transition-all ${
+          loading ? "opacity-70 cursor-not-allowed" : "hover:opacity-90"
+        }`}
         style={{ backgroundColor: COLORS.success }}
       >
-        {isEditMode ? 'Update Window' : 'Create Funding Window'}
+        {loading && <Loader2 className="w-5 h-5 animate-spin" />}
+        {loading
+          ? "Processing..."
+          : isEditMode
+          ? "Update Window"
+          : "Create Funding Window"}
       </button>
     </div>
   );
