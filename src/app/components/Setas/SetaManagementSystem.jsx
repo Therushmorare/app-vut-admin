@@ -320,12 +320,12 @@ export default function SETAManagementSystem() {
     });
   };
 
-  const handleCreateProfile = async () => {
+  const handleCreateProfile = async (agreementId) => {
     await fetchProfiles();
 
     setAgreements(prev =>
       prev.map(a =>
-        a.agreement_id === selectedAgreementId
+        a.agreement_id === agreementId
           ? { ...a, hasProfile: true }
           : a
       )
