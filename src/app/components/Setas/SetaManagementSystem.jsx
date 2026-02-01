@@ -76,116 +76,111 @@ export default function SETAManagementSystem() {
       setSearchTerm(window.globalSearchTerm);
     }
 
-    const fetchAgreements = async () => {
-      try {
-        const res = await axios.get(
-          `${API_BASE}/api/administrators/setaAgreements`,
-          { withCredentials: true }
-        );
-
-        setAgreements(res.data);
-      } catch (err) {
-        console.error("Failed to load SETA agreements:", err);
-      }
-    };
-
     fetchAgreements();
-
-    const fetchProfiles = async () => {
-      try {
-        const res = await axios.get(
-          `${API_BASE}/api/administrators/setas`,
-          { withCredentials: true}
-        );
-
-        setProfiles(res.data?.setas ?? []);
-      } catch (err) {
-        console.error("Failed to load SETA Profiles:", err);
-      }
-    }
-
     fetchProfiles();
-
-    const fetchFundingWindows = async () => {
-      try {
-        const res = await axios.get(
-          `${API_BASE}/api/administrators/getFundingWindows/`,
-          { withCredentials: true }
-        );
-
-        // res.data is already the array of funding windows
-        setFundingWindows(res.data ?? []);
-      } catch (err) {
-        console.error("Failed to load Funding Windows:", err);
-      }
-    };
-
     fetchFundingWindows();
-
-    const fetchStudents = async () => {
-      try {
-        const res = await axios.get(
-          `${API_BASE}/api/administrators/students`,
-          { withCredentials: true }
-        );
-
-        const students = Array.isArray(res.data)
-          ? res.data
-          : res.data?.students ?? [];
-
-        setAllStudents(students);
-      } catch (err) {
-        console.error("Failed to load Students:", err);
-        setAllStudents([]);
-      }
-    };
-
     fetchStudents();
-
-    const fetchAllocatedLearners = async () => {
-      try {
-        const res = await axios.get(
-          `${API_BASE}/api/administrators/learner-allocations`,
-          { withCredentials: true }
-        );
-
-        const allocations = Array.isArray(res.data)
-          ? res.data
-          : res.data?.allocations ?? [];
-
-        setAllocatedLearners(allocations);
-      } catch (err) {
-        console.error("Failed to load Allocated Learners:", err);
-        setAllocatedLearners([]);
-      }
-    };
-
     fetchAllocatedLearners();
-
-    const fetchSetaProgrammes = async () => {
-      try {
-        const res = await axios.get(
-          `${API_BASE}/api/administrators/getProgrammes/`,
-          { withCredentials: true }
-        );
-
-        const programmes = Array.isArray(res.data)
-          ? res.data
-          : res.data?.programmes ?? [];
-
-        setAllProgrammes(programmes);
-      } catch (err) {
-        console.error("Failed to load Programmes:", err);
-        setAllProgrammes([]);
-      }
-    };
-
     fetchSetaProgrammes();
 
     return () => {
       window.removeEventListener('globalSearchChange', handleGlobalSearch);
     };
   }, []);
+
+    const fetchAgreements = async () => {
+    try {
+      const res = await axios.get(
+        `${API_BASE}/api/administrators/setaAgreements`,
+        { withCredentials: true }
+      );
+
+      setAgreements(res.data);
+    } catch (err) {
+      console.error("Failed to load SETA agreements:", err);
+    }
+  };
+
+  const fetchProfiles = async () => {
+  try {
+    const res = await axios.get(
+      `${API_BASE}/api/administrators/setas`,
+      { withCredentials: true}
+    );
+
+    setProfiles(res.data?.setas ?? []);
+  } catch (err) {
+    console.error("Failed to load SETA Profiles:", err);
+    }
+  }
+
+  const fetchFundingWindows = async () => {
+    try {
+      const res = await axios.get(
+        `${API_BASE}/api/administrators/getFundingWindows/`,
+        { withCredentials: true }
+      );
+
+      // res.data is already the array of funding windows
+      setFundingWindows(res.data ?? []);
+    } catch (err) {
+      console.error("Failed to load Funding Windows:", err);
+    }
+  };
+
+  const fetchStudents = async () => {
+    try {
+      const res = await axios.get(
+        `${API_BASE}/api/administrators/students`,
+        { withCredentials: true }
+      );
+
+      const students = Array.isArray(res.data)
+        ? res.data
+        : res.data?.students ?? [];
+
+      setAllStudents(students);
+    } catch (err) {
+      console.error("Failed to load Students:", err);
+      setAllStudents([]);
+    }
+  };
+
+  const fetchAllocatedLearners = async () => {
+    try {
+      const res = await axios.get(
+        `${API_BASE}/api/administrators/learner-allocations`,
+        { withCredentials: true }
+      );
+
+      const allocations = Array.isArray(res.data)
+        ? res.data
+        : res.data?.allocations ?? [];
+
+      setAllocatedLearners(allocations);
+    } catch (err) {
+      console.error("Failed to load Allocated Learners:", err);
+      setAllocatedLearners([]);
+    }
+  };
+
+  const fetchSetaProgrammes = async () => {
+    try {
+      const res = await axios.get(
+        `${API_BASE}/api/administrators/getProgrammes/`,
+        { withCredentials: true }
+      );
+
+      const programmes = Array.isArray(res.data)
+        ? res.data
+        : res.data?.programmes ?? [];
+
+      setAllProgrammes(programmes);
+    } catch (err) {
+      console.error("Failed to load Programmes:", err);
+      setAllProgrammes([]);
+    }
+  };
 
   const stats = useMemo(() => ({
     active: agreements.filter(a => a.status === 'Active').length,
@@ -271,16 +266,10 @@ export default function SETAManagementSystem() {
     setModalType('');
   };
 
-  const handleCreateAgreement = (data) => {
-    const newAgreement = {
-      id: generateId(),
-      ...data,
-      hasProfile: false,
-      createdAt: new Date().toISOString()
-    };
-    setAgreements([...agreements, newAgreement]);
+  const handleCreateAgreement = async () => {
+    await fetchAgreements();
     closeModal();
-    showToast('Agreement created successfully!');
+    showToast("Agreement created successfully!");
   };
 
   const handleUpdateAgreement = (data) => {
@@ -331,18 +320,19 @@ export default function SETAManagementSystem() {
     });
   };
 
-  const handleCreateProfile = (data) => {
-    const newProfile = {
-      id: generateId(),
-      ...data,
-      createdAt: new Date().toISOString()
-    };
-    setProfiles([...profiles, newProfile]);
-    setAgreements(agreements.map(a =>
-      a.agreement_id === data.agreement_id ? { ...a, hasProfile: true } : a
-    ));
+  const handleCreateProfile = async () => {
+    await fetchProfiles();
+
+    setAgreements(prev =>
+      prev.map(a =>
+        a.agreement_id === selectedAgreementId
+          ? { ...a, hasProfile: true }
+          : a
+      )
+    );
+
     closeModal();
-    showToast('Profile created successfully!');
+    showToast("Profile created successfully!");
   };
 
   const handleUpdateProfile = (data) => {
@@ -397,12 +387,8 @@ export default function SETAManagementSystem() {
     });
   };
 
-  const handleCreateWindow = (data) => {
-    setFundingWindows([...fundingWindows, {
-      id: generateId(),
-      ...data,
-      createdAt: new Date().toISOString()
-    }]);
+  const handleCreateWindow = async () => {
+    await fetchFundingWindows();
     closeModal();
     showToast('Funding window created successfully!');
   };
