@@ -63,6 +63,7 @@ const Navbar = () => {
     "/pages/spending": {title: "Budgets", icon: Wallet},
     "/pages/documents": { title: "Documents", icon: FileText },
     "/pages/admins": {title: "Admins", icon: Users},
+    "/pages/forms": {title: "Web Forms", icon: FileText},
     "/pages/logs": {title: "Logs", icon: BarChart}
   };
 
