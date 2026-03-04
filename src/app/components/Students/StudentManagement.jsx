@@ -306,6 +306,7 @@ export default function StudentManagementSystem() {
         {/* Modal Render */}
         {showModal && (
           <Modal
+            isOpen={showModal}
             title={getModalTitle()}
             onClose={closeModal}
           >
