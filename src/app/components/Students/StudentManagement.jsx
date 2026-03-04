@@ -7,6 +7,7 @@ import StatsCards from './StatsCards';
 import StudentProfileModal from './StudentProfile';
 import { generateStudents } from '../../utils/studentData';
 import { COLORS, generateId, checkExpiringSoon } from '../../utils/helpers';
+import { Upload, Plus } from 'lucide-react';
 
 const STUDENTS_PER_PAGE = 30;
 
