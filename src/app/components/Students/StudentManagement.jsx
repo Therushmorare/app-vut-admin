@@ -8,11 +8,15 @@ import StudentProfileModal from './StudentProfile';
 import { generateStudents } from '../../utils/studentData';
 import { COLORS, generateId, checkExpiringSoon } from '../../utils/helpers';
 import { Upload, Plus } from 'lucide-react';
+import EmptyState from './EmptyState';
+import Modal from './Modal';
+import Toast from './Toast';
+import ConfirmDialog from './ConfirmDialog';
 
 const STUDENTS_PER_PAGE = 30;
 
 export default function StudentManagementSystem() {
-  const [allStudents, setAllStudents] = useState([]); // initialize empty
+  const [allStudents, setAllStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [filters, setFilters] = useState({
@@ -21,17 +25,33 @@ export default function StudentManagementSystem() {
   });
   const [sortConfig, setSortConfig] = useState({ key: 'studentNr', direction: 'asc' });
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(true); // new loading state
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
 
-  //Fetch students client-side
+  /* -------------------- NEW: Modal Controls -------------------- */
+  const openModal = (type) => {
+    setModalType(type);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setModalType('');
+    setSelectedFile(null);
+  };
+  /* ------------------------------------------------------------- */
+
+  // Fetch students
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const students = await generateStudents(); // async call
+        const students = await generateStudents();
         setAllStudents(students);
       } catch (error) {
         console.error('Student API integration failed:', error);
-        setAllStudents([]); // fallback
+        setAllStudents([]);
       } finally {
         setLoading(false);
       }
@@ -58,7 +78,7 @@ export default function StudentManagementSystem() {
     };
   }, []);
 
-  // Save students to localStorage
+  // Save students
   useEffect(() => {
     if (typeof window !== 'undefined' && allStudents.length > 0) {
       localStorage.setItem('all-students', JSON.stringify(allStudents));
@@ -90,8 +110,8 @@ export default function StudentManagementSystem() {
       let aVal = a[sortConfig.key];
       let bVal = b[sortConfig.key];
       if (typeof aVal === 'string') {
-        aVal = aVal.toLowerCase();
-        bVal = bVal.toLowerCase();
+        aVal = aVal?.toLowerCase();
+        bVal = bVal?.toLowerCase();
       }
       if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -131,18 +151,119 @@ export default function StudentManagementSystem() {
     }
   };
 
-  if (loading) return <p>Loading students...</p>; // loading indicator
+  if (loading) return <p>Loading students...</p>;
+
+  /* -------------------- CSV Upload Handler -------------------- */
+  const handleUploadStudents = async () => {
+    if (!selectedFile) return;
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+      const res = await fetch("/api/students/bulk-upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const newStudents = await res.json(); // backend should return uploaded students
+      setAllStudents(prev => [...prev, ...newStudents]);
+
+      alert("Students uploaded successfully!");
+      closeModal();
+    } catch (err) {
+      console.error(err);
+      alert("Upload failed. Please check your CSV format.");
+    }
+  };
+  /* ------------------------------------------------------------ */
+
+  const getModalTitle = () => {
+    const titles = {
+      uploadStudents: 'Upload Students (CSV)'
+    };
+    return titles[modalType] || '';
+  };
+
+  const renderModalContent = () => {
+    switch(modalType) {
+
+      case 'uploadStudents':
+        return (
+          <div className="space-y-6">
+
+            <div
+              className="rounded-lg p-4 text-sm"
+              style={{ backgroundColor: COLORS.bgLight }}
+            >
+              <p className="font-medium mb-2" style={{ color: COLORS.primary }}>
+                CSV Format Requirements:
+              </p>
+              <ul className="list-disc pl-5 space-y-1 text-gray-600">
+                <li>First Name</li>
+                <li>Last Name</li>
+                <li>ID Number</li>
+                <li>Email</li>
+                <li>Phone Number</li>
+                <li>Programme</li>
+              </ul>
+            </div>
+
+            <div>
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: COLORS.primary }}
+              >
+                Upload CSV File *
+              </label>
+
+              <input
+                type="file"
+                accept=".csv"
+                onChange={(e) => setSelectedFile(e.target.files[0])}
+                className="w-full px-4 py-2 border rounded-lg bg-white"
+                style={{ borderColor: COLORS.border }}
+              />
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <button
+                onClick={closeModal}
+                className="flex-1 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90"
+                style={{ backgroundColor: COLORS.text }}
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleUploadStudents}
+                disabled={!selectedFile}
+                className="flex-1 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 disabled:opacity-50"
+                style={{ backgroundColor: COLORS.primary }}
+              >
+                Upload
+              </button>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
-    
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
+
         <button
-          onClick=""
+          onClick={() => openModal('uploadStudents')}
           className="flex items-center gap-2 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 transition-opacity shadow-md mb-4"
           style={{ backgroundColor: COLORS.text }}
         >
-        <Upload className="w-5 h-5" />
+          <Upload className="w-5 h-5" />
           Upload Students
         </button>
 
@@ -165,23 +286,33 @@ export default function StudentManagementSystem() {
           onClearFilters={handleClearFilters}
           onQuickAction={handleQuickAction}
         />
-        
+
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
         />
-        
+
         {selectedStudent && (
           <StudentProfileModal
             student={selectedStudent}
             onClose={() => setSelectedStudent(null)}
             onSave={(updatedStudent) => {
-              console.log('Updated student:', updatedStudent);
               setSelectedStudent(null);
             }}
           />
         )}
+
+        {/* Modal Render */}
+        {showModal && (
+          <Modal
+            title={getModalTitle()}
+            onClose={closeModal}
+          >
+            {renderModalContent()}
+          </Modal>
+        )}
+
       </div>
     </div>
   );
