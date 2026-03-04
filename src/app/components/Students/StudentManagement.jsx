@@ -165,41 +165,47 @@ export default function StudentManagementSystem() {
       return;
     }
 
+    console.log("Uploading file:", selectedFile);
+
     const formData = new FormData();
     formData.append("file", selectedFile);
 
     try {
       const res = await fetch(
-        `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/importStudents/${adminId}`, // <-- your aid
+        `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/importStudents/${adminId}`,
         {
           method: "POST",
           body: formData,
           credentials: "include", // if using cookies
-          // OR use Authorization header if using JWT:
-          // headers: { Authorization: `Bearer ${token}` }
         }
       );
 
+      console.log("Server responded with status:", res.status);
+
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Upload failed");
+        let errorMessage = "Upload failed";
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (_) {
+          // ignore JSON parse errors
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await res.json();
+      console.log("Upload response:", data);
 
-      alert(
-        `Upload completed.\nImported: ${data.imported_rows}\nFailed: ${data.failed_rows}`
-      );
+      alert(`Upload completed.\nImported: ${data.imported_rows}\nFailed: ${data.failed_rows}`);
 
       closeModal();
       setSelectedFile(null);
-
     } catch (err) {
-      console.error(err);
+      console.error("Upload error:", err);
       alert(err.message || "Upload failed. Please check your CSV format.");
     }
   };
-
+  
   const getModalTitle = () => {
     const titles = {
       uploadStudents: 'Upload Students (CSV)'
