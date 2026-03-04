@@ -141,7 +141,7 @@ export default function StudentManagementSystem() {
 
         <button
           onClick=""
-          className="flex items-center gap-2 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 transition-opacity shadow-md"
+          className="flex items-center gap-2 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 transition-opacity shadow-md mb-4"
           style={{ backgroundColor: COLORS.text }}
         >
           <Upload className="w-5 h-5" />
