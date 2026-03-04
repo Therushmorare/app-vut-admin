@@ -154,27 +154,49 @@ export default function StudentManagementSystem() {
   if (loading) return <p>Loading students...</p>;
 
   const handleUploadStudents = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile) {
+      alert("Please select a CSV file first.");
+      return;
+    }
+
+    const adminId = sessionStorage.getItem("admin_id");
+    if (!adminId) {
+      alert("Admin session expired. Please log in again.");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("file", selectedFile);
 
     try {
-      const res = await fetch("/api/students/bulk-upload", {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch(
+        `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/importStudents/${adminId}`, // <-- your aid
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include", // if using cookies
+          // OR use Authorization header if using JWT:
+          // headers: { Authorization: `Bearer ${token}` }
+        }
+      );
 
-      if (!res.ok) throw new Error("Upload failed");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Upload failed");
+      }
 
-      const newStudents = await res.json(); // backend should return uploaded students
-      setAllStudents(prev => [...prev, ...newStudents]);
+      const data = await res.json();
 
-      alert("Students uploaded successfully!");
+      alert(
+        `Upload completed.\nImported: ${data.imported_rows}\nFailed: ${data.failed_rows}`
+      );
+
       closeModal();
+      setSelectedFile(null);
+
     } catch (err) {
       console.error(err);
-      alert("Upload failed. Please check your CSV format.");
+      alert(err.message || "Upload failed. Please check your CSV format.");
     }
   };
 
