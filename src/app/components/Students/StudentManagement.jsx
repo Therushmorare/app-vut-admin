@@ -8,7 +8,7 @@ import StudentProfileModal from './StudentProfile';
 import { generateStudents } from '../../utils/studentData';
 import { COLORS, generateId, checkExpiringSoon } from '../../utils/helpers';
 import { Upload, Plus } from 'lucide-react';
-import Modal from './Modal';
+import Modal from '../Setas/Modal';
 import EmptyState from '../Setas/EmptyState';
 import Toast from '../Setas/Toast';
 import ConfirmDialog from '../Setas/ConfirmDialog';
