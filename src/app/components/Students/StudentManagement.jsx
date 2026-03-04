@@ -138,7 +138,7 @@ export default function StudentManagementSystem() {
         <StatsCards students={filteredAndSortedStudents} />
 
         <button
-          onClick={() => openModal('createAgreement')}
+          onClick=""
           className="flex items-center gap-2 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 transition-opacity shadow-md"
           style={{ backgroundColor: COLORS.text }}
         >
