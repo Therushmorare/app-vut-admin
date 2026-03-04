@@ -16,6 +16,7 @@ const Sidebar = () => {
     { id: 'documents', label: 'Documents', href: '/pages/documents' },
     { id: 'budgets', label: 'Budgets', href: '/pages/spending'},
     { id: 'admins', label: 'Admins', href: '/pages/admins'},
+    { id: 'forms', label: 'Web Forms', href: '/pages/forms'},
     { id: 'logs', label: 'Logs', href: '/pages/logs'}
   ];
 
