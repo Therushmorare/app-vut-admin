@@ -6,6 +6,7 @@ import Pagination from './Pagination';
 import StatsCards from './StatsCards';
 import StudentProfileModal from './StudentProfile';
 import { generateStudents } from '../../utils/studentData';
+import { COLORS, generateId, checkExpiringSoon } from '../../utils/helpers';
 
 const STUDENTS_PER_PAGE = 30;
 
