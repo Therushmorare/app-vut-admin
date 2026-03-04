@@ -153,7 +153,6 @@ export default function StudentManagementSystem() {
 
   if (loading) return <p>Loading students...</p>;
 
-  /* -------------------- CSV Upload Handler -------------------- */
   const handleUploadStudents = async () => {
     if (!selectedFile) return;
 
@@ -178,7 +177,6 @@ export default function StudentManagementSystem() {
       alert("Upload failed. Please check your CSV format.");
     }
   };
-  /* ------------------------------------------------------------ */
 
   const getModalTitle = () => {
     const titles = {
@@ -211,23 +209,52 @@ export default function StudentManagementSystem() {
               </ul>
             </div>
 
-            <div>
+            <div className="space-y-3">
               <label
-                className="block text-sm font-medium mb-2"
+                className="block text-sm font-medium"
                 style={{ color: COLORS.primary }}
               >
                 Upload CSV File *
               </label>
 
-              <input
-                type="file"
-                accept=".csv"
-                onChange={(e) => setSelectedFile(e.target.files[0])}
-                className="w-full px-4 py-2 border rounded-lg bg-white"
-                style={{ borderColor: COLORS.border }}
-              />
-            </div>
+              <div
+                className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer
+                  ${selectedFile ? "bg-green-50" : "bg-gray-50 hover:bg-gray-100"}
+                `}
+                style={{ borderColor: selectedFile ? "#16a34a" : COLORS.border }}
+                onClick={() => document.getElementById("csvUploadInput").click()}
+              >
+                <input
+                  id="csvUploadInput"
+                  type="file"
+                  accept=".csv"
+                  onChange={(e) => setSelectedFile(e.target.files[0])}
+                  className="hidden"
+                />
 
+                {!selectedFile ? (
+                  <>
+                    <Upload className="w-10 h-10 mx-auto mb-3 text-gray-400" />
+                    <p className="font-medium text-gray-700">
+                      Click to upload your CSV file
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Only .csv files allowed
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-green-600 font-semibold text-lg">
+                      {selectedFile.name}
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Click to replace file
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+            
             <div className="flex gap-3 pt-4">
               <button
                 onClick={closeModal}
