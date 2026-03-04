@@ -137,16 +137,16 @@ export default function StudentManagementSystem() {
     
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
-        <StatsCards students={filteredAndSortedStudents} />
-
         <button
           onClick=""
           className="flex items-center gap-2 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 transition-opacity shadow-md mb-4"
           style={{ backgroundColor: COLORS.text }}
         >
-          <Upload className="w-5 h-5" />
+        <Upload className="w-5 h-5" />
           Upload Students
         </button>
+
+        <StatsCards students={filteredAndSortedStudents} />
 
         <StudentsFilter
           filters={filters}
