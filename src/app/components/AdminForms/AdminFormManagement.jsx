@@ -32,13 +32,12 @@ export default function AdminFormManagement(){
     <div className="min-h-screen bg-gray-50 p-8">
     <div className="max-w-7xl mx-auto">
       <div className="flex justify-end">
-        <h1 className="text-2xl font-bold">Web Forms</h1>
         <Link href="/pages/designer">
           <button 
-          className="text-sm px-3 py-1 rounded-lg border hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ color: COLORS.text, borderColor: COLORS.text }}
+          className="flex items-center gap-2 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 transition-opacity shadow-md"
+          style={{ backgroundColor: COLORS.success }}
           >
-        <Plus className="w-4 h-4" /> Create Form
+        <Plus className="w-5 h-5" /> Create Form
           </button>
         </Link>
       </div>
