@@ -98,22 +98,42 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
   const userAvatar = "";
   const userName = formData.fullName;
   const size = 'lg';   
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      sender: "Student",
-      subject: "Training Feedback",
-      message: "Please submit your weekly feedback form."
-    },
-    {
-      id: 2,
-      sender: "Student",
-      subject: "Programme Challenges",
-      message: "I'm struggling with transportation to the training center."
-    }
-  ]);
+  const [messages, setMessages] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(true);
+  const [selectedMessage, setSelectedMessage] = useState(null);
 
-const [selectedMessage, setSelectedMessage] = useState(null);
+  useEffect(() => {
+  fetchMessages();
+  }, []);
+
+  const fetchMessages = async () => {
+  try {
+    const response = await fetch("/api/administrators/allMessages");
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Failed to fetch messages");
+      return;
+    }
+
+    const formattedMessages = data.map(msg => ({
+      id: msg.message_id,
+      sender: msg.sender_email,
+      receiver: msg.receiver_email,
+      message: msg.message,
+      created_at: msg.created_at
+    }));
+
+    setMessages(formattedMessages);
+
+  } catch (error) {
+    console.error("Fetch messages error:", error);
+  } finally {
+    setLoadingMessages(false);
+  }
+  };
+
   const getInitials = (name) => {
     return name
       .split(' ')
@@ -142,6 +162,57 @@ const [selectedMessage, setSelectedMessage] = useState(null);
 
   const handleSendEmail = () => {
     alert(`Sending email to ${formData.universityEmail}...`);
+  };
+
+    const sendMessage = async () => {
+    try {
+
+      if (!selectedUser) {
+        alert("Please select a user to message");
+        return;
+      }
+
+      const adminId = sessionStorage.getItem("admin_id");
+
+      const payload = {
+        sender_id: adminId,
+        receiver_id: selectedUser.id,
+        message: formData.message
+      };
+
+      const response = await fetch("https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Failed to send message");
+        return;
+      }
+
+      // Add message locally to UI
+      const newMessage = {
+        id: data.message_id,
+        sender: "You",
+        message: formData.message
+      };
+
+      setMessages(prev => [...prev, newMessage]);
+
+      // clear message input
+      setFormData(prev => ({
+        ...prev,
+        message: ""
+      }));
+
+    } catch (error) {
+      console.error("Send message error:", error);
+    }
   };
 
   const tabs = [
@@ -443,98 +514,155 @@ const [selectedMessage, setSelectedMessage] = useState(null);
           </div>
         );
 
-    case 'communique':
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[500px]">
+        case 'communique':
+          return (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[500px]">
 
-          <div className="border rounded-lg overflow-y-auto bg-white">
-
-            <div className="p-3 border-b font-semibold text-[#0245A3]">
-              Messages
-            </div>
-
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                onClick={() => setSelectedMessage(msg)}
-                className="p-3 border-b hover:bg-gray-100 cursor-pointer"
-              >
-                <div className="font-medium text-sm">{msg.sender}</div>
-                <div className="text-xs text-gray-500 truncate">
-                  {msg.subject}
+              {/* Left Panel: Messages List */}
+              <div className="border rounded-lg overflow-y-auto bg-white">
+                <div className="p-3 border-b font-semibold text-[#0245A3]">
+                  Messages
                 </div>
+
+                {loadingMessages ? (
+                  <div className="p-4 text-gray-500 text-sm">Loading messages...</div>
+                ) : messages.length === 0 ? (
+                  <div className="p-4 text-gray-500 text-sm">No messages yet</div>
+                ) : (
+                  messages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      onClick={() => {
+                        setSelectedMessage(msg);
+                        setIsEditing(false); // Close new message form when selecting
+                      }}
+                      className={`p-3 border-b cursor-pointer hover:bg-gray-100 ${
+                        selectedMessage?.id === msg.id ? "bg-gray-50" : ""
+                      }`}
+                    >
+                      <div className="font-medium text-sm">{msg.sender}</div>
+                      <div className="text-xs text-gray-500 truncate">
+                        {msg.message.length > 50
+                          ? msg.message.slice(0, 50) + "..."
+                          : msg.message}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
-            ))}
 
-          </div>
+              {/* Right Panel: Message View / Send Form */}
+              <div className="md:col-span-2 border rounded-lg bg-white flex flex-col">
 
-
-          <div className="md:col-span-2 border rounded-lg bg-white flex flex-col">
-
-            {/* Header */}
-            <div className="border-b p-3 flex justify-between items-center">
-              <h3 className="font-semibold text-[#0245A3]">
-                {selectedMessage ? selectedMessage.subject : "Select a message"}
-              </h3>
-
-              <button
-                onClick={() => setIsEditing(true)}
-                className="px-3 py-1 bg-[#0245A3] text-white rounded text-sm"
-              >
-                New Message
-              </button>
-            </div>
-
-            <div className="flex-1 p-4 overflow-y-auto">
-
-              {selectedMessage && (
-                <div>
-
-                  <div className="text-sm text-gray-500 mb-2">
-                    From: {selectedMessage.sender}
-                  </div>
-
-                  <div className="text-gray-800 whitespace-pre-line">
-                    {selectedMessage.message}
-                  </div>
-
-                </div>
-              )}
-
-            </div>
-
-            {isEditing && (
-              <div className="border-t p-4">
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {renderField('Subject', formData.subject, 'subject')}
-
-                  <div className="md:col-span-2">
-                    {renderField('Message', formData.message, 'message')}
-                  </div>
-                </div>
-
-                <div className="mt-4 flex gap-2">
-                  <button className="px-4 py-2 bg-[#f8a528] text-[#0245A3] rounded-md text-sm font-medium">
-                    Send
-                  </button>
+                {/* Header */}
+                <div className="border-b p-3 flex justify-between items-center">
+                  <h3 className="font-semibold text-[#0245A3]">
+                    {selectedMessage ? selectedMessage.sender : "Select a message"}
+                  </h3>
 
                   <button
-                    onClick={() => setIsEditing(false)}
-                    className="px-4 py-2 border rounded-md text-sm"
+                    onClick={() => {
+                      setIsEditing(true);
+                      setSelectedMessage(null); // Clear selected when composing
+                    }}
+                    className="px-3 py-1 bg-[#0245A3] text-white rounded text-sm"
                   >
-                    Cancel
+                    New Message
                   </button>
                 </div>
 
+                {/* Message Body */}
+                <div className="flex-1 p-4 overflow-y-auto">
+                  {selectedMessage && !isEditing && (
+                    <div>
+                      <div className="text-sm text-gray-500 mb-2">
+                        From: {selectedMessage.sender}
+                      </div>
+
+                      <div className="text-gray-800 whitespace-pre-line">
+                        {selectedMessage.message}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Send Message Form */}
+                {isEditing && (
+                  <div className="border-t p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {renderField("Subject", formData.subject, "subject")}
+
+                      <div className="md:col-span-2">
+                        {renderField("Message", formData.message, "message")}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex gap-2">
+                      <button
+                        onClick={async () => {
+                          // Validate form
+                          if (!formData.subject || !formData.message) {
+                            alert("Please fill subject and message");
+                            return;
+                          }
+
+                          try {
+                            const payload = {
+                              sender_id: currentUser.id, // assuming currentUser state
+                              receiver_id: formData.receiver_id, // must select receiver
+                              message: formData.message
+                            };
+
+                            const res = await fetch("/api/administrators/send", {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json"
+                              },
+                              body: JSON.stringify(payload)
+                            });
+
+                            const data = await res.json();
+
+                            if (!res.ok) {
+                              alert(data.message || "Failed to send message");
+                              return;
+                            }
+
+                            // Update local messages
+                            setMessages((prev) => [
+                              ...prev,
+                              {
+                                id: data.message_id,
+                                sender: currentUser.email,
+                                receiver: formData.receiver_id,
+                                message: formData.message
+                              }
+                            ]);
+
+                            setFormData({ subject: "", message: "", receiver_id: "" });
+                            setIsEditing(false);
+
+                          } catch (err) {
+                            console.error("Send message error:", err);
+                          }
+                        }}
+                        className="px-4 py-2 bg-[#f8a528] text-[#0245A3] rounded-md text-sm font-medium"
+                      >
+                        Send
+                      </button>
+
+                      <button
+                        onClick={() => setIsEditing(false)}
+                        className="px-4 py-2 border rounded-md text-sm"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-
-          </div>
-
-        </div>
-      );      
-
+            </div>
+          );
       default:
         return null;
     }

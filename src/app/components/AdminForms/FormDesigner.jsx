@@ -58,7 +58,7 @@ export default function CreateForm() {
     };
 
     try {
-      const adminId = sessionStorage.getItem("admin_id"); // Replace with dynamic admin_id if available
+      const adminId = sessionStorage.getItem("admin_id");
       const response = await fetch(`https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/form-designer/${adminId}`, {
         method: "POST",
         headers: {
