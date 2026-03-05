@@ -101,13 +101,13 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      sender: "Admin",
+      sender: "Student",
       subject: "Training Feedback",
       message: "Please submit your weekly feedback form."
     },
     {
       id: 2,
-      sender: "John Doe",
+      sender: "Student",
       subject: "Programme Challenges",
       message: "I'm struggling with transportation to the training center."
     }
