@@ -98,7 +98,22 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
   const userAvatar = "";
   const userName = formData.fullName;
   const size = 'lg';   
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      sender: "Admin",
+      subject: "Training Feedback",
+      message: "Please submit your weekly feedback form."
+    },
+    {
+      id: 2,
+      sender: "John Doe",
+      subject: "Programme Challenges",
+      message: "I'm struggling with transportation to the training center."
+    }
+  ]);
 
+const [selectedMessage, setSelectedMessage] = useState(null);
   const getInitials = (name) => {
     return name
       .split(' ')
