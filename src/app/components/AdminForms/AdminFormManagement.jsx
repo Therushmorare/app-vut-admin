@@ -11,6 +11,7 @@ import {
   Phone,
   Calendar,
   Shield,
+  FileText,
   Plus,
   X,
 } from "lucide-react";
@@ -28,38 +29,77 @@ export default function AdminFormManagement(){
     }, []);
 
     return (
-    <div className="p-6">
-      <div className="flex justify-between mb-4">
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="max-w-7xl mx-auto">
+      <div className="flex justify-end">
+        <h1 className="text-2xl font-bold">Web Forms</h1>
         <Link href="/pages/designer">
-          <button className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-            Create Form
+          <button 
+          className="text-sm px-3 py-1 rounded-lg border hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{ color: COLORS.text, borderColor: COLORS.text }}
+          >
+        <Plus className="w-4 h-4" /> Create Form
           </button>
         </Link>
       </div>
 
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="min-w-full border">
-          <thead className="bg-gray-100">
+        <table className="min-w-full">
+          <thead className="bg-[#201c52] bg-opacity-5 border-b border-gray-200">
             <tr>
-              <th className="p-2 text-left">Form Name</th>
-              <th className="p-2 text-left">Created On</th>
-              <th className="p-2 text-left">Responses</th>
-              <th className="p-2 text-left">Actions</th>
+              <th className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+                <div className="flex items-center space-x-1">
+                    Form Name
+                </div>
+                </th>
+              <th className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+                <div className="flex items-center space-x-1">
+                    Created On
+                </div>
+             </th>
+              <th className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+                <div className="flex items-center space-x-1">
+                    Responses
+                </div>
+                </th>
+              <th className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+                <div className="flex items-center space-x-1">
+                    Actions
+                </div>
+                </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y">
             {forms.map((form) => (
-              <tr key={form.formId} className="border-t">
-                <td className="p-2">{form.title}</td>
-                <td className="p-2">{form.createdOn}</td>
-                <td className="p-2">{form.responses}</td>
-                <td className="p-2">
+              <tr key={form.formId} className="hover:bg-gray-50">
+                <td className="px-6 py-4 text-sm space-y-1">
+                    <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-gray-400" /> {form.title}
+                    </div>
+                </td>
+                <td className="px-6 py-4 text-sm space-y-1">
+                    <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-gray-400" /> {form.createdOn}
+                    </div>
+                </td>
+                <td className="px-6 py-4 text-sm space-y-1">
+                    <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-gray-400" /> {form.responses}
+                    </div>
+                </td>
+                <td className="px-6 py-4 flex gap-2">
                   <Link href={`/admin/form/${form.formId}`}>
-                    <button className="text-blue-600 hover:underline mr-2">View</button>
+                    <button 
+                        className="p-2 rounded-lg hover:bg-gray-100"
+                        style={{ color: COLORS.text }}
+                    >View</button>
                   </Link>
                   <Link href={`/admin/edit-form/${form.formId}`}>
-                    <button className="text-green-600 hover:underline">Edit</button>
+                    <button 
+                        className="p-2 rounded-lg hover:bg-gray-100"
+                        style={{ color: COLORS.danger }}
+                    >Edit</button>
                   </Link>
                 </td>
               </tr>
@@ -67,6 +107,10 @@ export default function AdminFormManagement(){
           </tbody>
         </table>
       </div>
+      </div>
+
     </div>
+    </div>
+
   );
 }
