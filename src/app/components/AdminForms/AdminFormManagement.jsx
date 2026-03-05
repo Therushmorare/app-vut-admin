@@ -34,8 +34,8 @@ export default function AdminFormManagement(){
       <div className="flex justify-end">
         <Link href="/pages/designer">
           <button 
-          className="flex items-center gap-2 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 transition-opacity shadow-md"
-          style={{ backgroundColor: COLORS.success }}
+          className="flex items-center gap-2 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 transition-opacity shadow-md mb-4"
+          style={{ backgroundColor: COLORS.text }}
           >
         <Plus className="w-5 h-5" /> Create Form
           </button>
