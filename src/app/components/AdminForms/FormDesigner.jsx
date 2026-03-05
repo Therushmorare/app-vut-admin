@@ -30,8 +30,57 @@ export default function CreateForm() {
     setFields(newFields);
   };
 
-  const saveForm = () => {
-    console.log("Form saved!", { title: formTitle, fields });
+  const saveForm = async () => {
+    if (!formTitle.trim()) {
+      alert("Form title is required");
+      return;
+    }
+
+    if (fields.length === 0) {
+      alert("Please add at least one field");
+      return;
+    }
+
+    // Transform fields to match API spec
+    const payloadFields = fields.map((f) => ({
+      label: f.label.trim(),
+      type: f.type,
+      required: f.required,
+      options:
+        f.type === "select"
+          ? f.options.split(",").map((o) => o.trim()).filter(Boolean)
+          : [],
+    }));
+
+    const payload = {
+      form_title: formTitle.trim(),
+      fields: payloadFields,
+    };
+
+    try {
+      const adminId = sessionStorage.getItem("admin_id"); // Replace with dynamic admin_id if available
+      const response = await fetch(`https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/form-designer/${adminId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Form created successfully!");
+        setFormTitle("");
+        setFields([]);
+        setOpenIndex(null);
+      } else {
+        alert(data.message || "Something went wrong");
+      }
+    } catch (err) {
+      console.error("Save form error:", err);
+      alert("Failed to save form");
+    }
   };
 
   return (
