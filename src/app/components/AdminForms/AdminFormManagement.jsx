@@ -31,7 +31,7 @@ export default function AdminFormManagement(){
     <div className="p-6">
       <div className="flex justify-between mb-4">
         <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-        <Link href="/admin/create-form">
+        <Link href="/pages/designer">
           <button className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
             Create Form
           </button>
