@@ -136,7 +136,8 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
     { key: 'seta', label: 'SETA Programme', icon: FileText },
     { key: 'workplace', label: 'Workplace', icon: Briefcase },
     { key: 'financial', label: 'Financial', icon: DollarSign },
-    { key: 'documents', label: 'Compliance', icon: CheckCircle }
+    { key: 'documents', label: 'Compliance', icon: CheckCircle },
+    { key: 'communique', label: 'Communique', icon: Mail},
   ];
 
   const renderField = (label, value, field, type = 'text', options = {}) => (
@@ -426,7 +427,99 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
             </div>
           </div>
         );
-      
+
+    case 'communique':
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[500px]">
+
+          <div className="border rounded-lg overflow-y-auto bg-white">
+
+            <div className="p-3 border-b font-semibold text-[#0245A3]">
+              Messages
+            </div>
+
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                onClick={() => setSelectedMessage(msg)}
+                className="p-3 border-b hover:bg-gray-100 cursor-pointer"
+              >
+                <div className="font-medium text-sm">{msg.sender}</div>
+                <div className="text-xs text-gray-500 truncate">
+                  {msg.subject}
+                </div>
+              </div>
+            ))}
+
+          </div>
+
+
+          <div className="md:col-span-2 border rounded-lg bg-white flex flex-col">
+
+            {/* Header */}
+            <div className="border-b p-3 flex justify-between items-center">
+              <h3 className="font-semibold text-[#0245A3]">
+                {selectedMessage ? selectedMessage.subject : "Select a message"}
+              </h3>
+
+              <button
+                onClick={() => setIsEditing(true)}
+                className="px-3 py-1 bg-[#0245A3] text-white rounded text-sm"
+              >
+                New Message
+              </button>
+            </div>
+
+            <div className="flex-1 p-4 overflow-y-auto">
+
+              {selectedMessage && (
+                <div>
+
+                  <div className="text-sm text-gray-500 mb-2">
+                    From: {selectedMessage.sender}
+                  </div>
+
+                  <div className="text-gray-800 whitespace-pre-line">
+                    {selectedMessage.message}
+                  </div>
+
+                </div>
+              )}
+
+            </div>
+
+            {isEditing && (
+              <div className="border-t p-4">
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {renderField('Subject', formData.subject, 'subject')}
+
+                  <div className="md:col-span-2">
+                    {renderField('Message', formData.message, 'message')}
+                  </div>
+                </div>
+
+                <div className="mt-4 flex gap-2">
+                  <button className="px-4 py-2 bg-[#f8a528] text-[#0245A3] rounded-md text-sm font-medium">
+                    Send
+                  </button>
+
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="px-4 py-2 border rounded-md text-sm"
+                  >
+                    Cancel
+                  </button>
+                </div>
+
+              </div>
+            )}
+
+          </div>
+
+        </div>
+      );      
+
       default:
         return null;
     }
