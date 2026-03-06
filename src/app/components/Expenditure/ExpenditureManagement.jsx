@@ -17,7 +17,7 @@ import { COLORS } from "../../utils/helpers";
 import { Wallet, TrendingDown, Coins, Download } from "lucide-react";
 
 const API_BASE =
-  "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators";
+  "https://seta-api-3g5xl.ondigitalocean.app/api/administrators";
 
 const CHART_COLORS = [
   "#6366f1", // indigo

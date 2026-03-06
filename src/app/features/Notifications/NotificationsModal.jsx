@@ -13,7 +13,7 @@ const NotificationsModal = ({ onClose }) => {
   const fetchNotifications = async () => {
     try {
       const logsRes = await fetch(
-        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/user-logs'
+        'https://seta-api-3g5xl.ondigitalocean.app/api/administrators/user-logs'
       );
       const logsData = await logsRes.json();
 

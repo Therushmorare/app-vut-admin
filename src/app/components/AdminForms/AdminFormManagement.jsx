@@ -26,7 +26,7 @@ export default function AdminFormManagement() {
     const fetchForms = async () => {
       try {
         const res = await fetch(
-          "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/all-forms",
+          "https://seta-api-3g5xl.ondigitalocean.app/api/administrators/all-forms",
           { headers: { Accept: "application/json" } }
         );
         if (!res.ok) throw new Error(`Error: ${res.status}`);

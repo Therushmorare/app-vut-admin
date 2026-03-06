@@ -89,7 +89,7 @@ export default function LearnerAllocationForm({
     };
 
     try {
-      const response = await fetch(`https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/allocate-learners/${selectedProgrammeId}`, {
+      const response = await fetch(`https://seta-api-3g5xl.ondigitalocean.app/api/administrators/allocate-learners/${selectedProgrammeId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

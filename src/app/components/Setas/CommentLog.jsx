@@ -29,10 +29,10 @@ const CommentLog = ({ agreementId, agreementRef, onClose }) => {
       }
 
       const res = await fetch(
-        "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/all-activity-logs",
+        "https://seta-api-3g5xl.ondigitalocean.app/api/administrators/all-activity-logs",
         {
           method: "GET",
-          credentials: "include", //REQUIRED
+          credentials: "include",
           headers: {
             Accept: "application/json"
           }
@@ -104,7 +104,7 @@ const CommentLog = ({ agreementId, agreementRef, onClose }) => {
     const payload = {
       administrator_id: adminId,
       agreement_id: agreementId,
-      log_type: commentType, // ✅ DO NOT transform
+      log_type: commentType,
       comment: newComment
     };
 
@@ -123,10 +123,10 @@ const CommentLog = ({ agreementId, agreementRef, onClose }) => {
 
     try {
       const res = await fetch(
-        "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/agreements/activity-log",
+        "https://seta-api-3g5xl.ondigitalocean.app/api/administrators/agreements/activity-log",
         {
           method: "POST",
-          credentials: "include", // ✅ REQUIRED
+          credentials: "include",
           headers: {
             "Content-Type": "application/json"
           },
@@ -141,7 +141,7 @@ const CommentLog = ({ agreementId, agreementRef, onClose }) => {
         throw new Error(data?.message || "Failed to log activity");
       }
 
-      // ✅ Best practice: re-sync from backend
+      // Best practice: re-sync from backend
       await fetchComments();
 
     } catch (err) {

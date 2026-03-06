@@ -92,7 +92,7 @@ const Registration = ({ onRegister, onSwitchToLogin }) => {
       };
 
       const response = await axios.post(
-        "https://seta-management-api-fvzc9.ondigitalocean.app/api/students/signup",
+        "https://seta-api-3g5xl.ondigitalocean.app/api/students/signup",
         payload,
         { headers: { "Content-Type": "application/json" } }
       );

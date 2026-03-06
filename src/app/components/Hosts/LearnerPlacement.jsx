@@ -247,7 +247,7 @@ const enrichedLearners = useMemo(() => {
 
         try {
           const res = await fetch(
-            'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/placeLearner',
+            'https://seta-api-3g5xl.ondigitalocean.app/api/administrators/placeLearner',
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },

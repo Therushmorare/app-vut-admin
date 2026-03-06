@@ -6,7 +6,7 @@ import { COLORS, formatDate } from "../../utils/helpers";
 
 // API endpoint
 const API_URL =
-  "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/user-logs";
+  "https://seta-api-3g5xl.ondigitalocean.app/api/administrators/user-logs";
 
 const PAGE_SIZE = 10;
 

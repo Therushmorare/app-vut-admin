@@ -49,7 +49,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
     const fetchCompanies = async () => {
     try {
       const res = await axios.get(
-        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/host-companies', // replace with API_BASE if needed
+        'https://seta-api-3g5xl.ondigitalocean.app/api/administrators/host-companies', // replace with API_BASE if needed
         { withCredentials: true }
       );
 
@@ -75,7 +75,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   const fetchAgreements = async () => {
     try {
       const res = await axios.get(
-        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/setaAgreements',
+        'https://seta-api-3g5xl.ondigitalocean.app/api/administrators/setaAgreements',
         { withCredentials: true }
       );
 
@@ -99,7 +99,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   const fetchAllocatedLearners = async () => {
     try {
       const res = await axios.get(
-        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/learner-allocations',
+        'https://seta-api-3g5xl.ondigitalocean.app/api/administrators/learner-allocations',
         { withCredentials: true }
       );
 
@@ -153,7 +153,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
   const fetchPlacements = async () => {
     try {
       const res = await axios.get(
-        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/learner-placements',
+        'https://seta-api-3g5xl.ondigitalocean.app/api/administrators/learner-placements',
         { withCredentials: true }
       );
 
@@ -270,7 +270,7 @@ export default function HostCompanyManagement({ allStudents = [] }) {
         try {
           // Call backend DELETE endpoint
           const res = await fetch(
-            `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/delete-host-company/${adminId}/${company.company_id}`,
+            `https://seta-api-3g5xl.ondigitalocean.app/api/administrators/delete-host-company/${adminId}/${company.company_id}`,
             { method: 'DELETE' }
           );
 

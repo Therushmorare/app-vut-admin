@@ -42,7 +42,7 @@ export default function Verify({ onVerify }) {
         };
 
       const response = await axios.post(
-        "https://seta-management-api-fvzc9.ondigitalocean.app/api/students/verify-token",
+        "https://seta-api-3g5xl.ondigitalocean.app/api/students/verify-token",
         payload,
         { headers: { "Content-Type": "application/json" } }
       );

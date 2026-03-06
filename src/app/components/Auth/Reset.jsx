@@ -54,7 +54,7 @@ export default function ResetPassword({ onSwitchToLogin }) {
       };
 
       const response = await axios.post(
-        "https://seta-management-api-fvzc9.ondigitalocean.app/api/students/reset-pass",
+        "https://seta-api-3g5xl.ondigitalocean.app/api/students/reset-pass",
         payload,
         { headers: { "Content-Type": "application/json" } }
       );

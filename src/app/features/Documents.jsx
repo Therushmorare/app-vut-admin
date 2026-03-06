@@ -36,8 +36,8 @@ const StudentDocumentManager = () => {
     const fetchData = async () => {
       try {
         const [studentsRes, documentsRes] = await Promise.all([
-          axios.get("https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/students"),
-          axios.get("https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/studentDocuments")
+          axios.get("https://seta-api-3g5xl.ondigitalocean.app/api/administrators/students"),
+          axios.get("https://seta-api-3g5xl.ondigitalocean.app/api/administrators/studentDocuments")
         ]);
 
         const studentsData = studentsRes.data.students || [];

@@ -16,7 +16,7 @@ import {
 import { COLORS, formatDate } from "../../utils/helpers";
 
 // API endpoints
-const TABLE_API_URL = "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/allAdmins"; // GET for table
+const TABLE_API_URL = "https://seta-api-3g5xl.ondigitalocean.app/api/administrators/allAdmins"; // GET for table
 
 export default function AdminManagement() {
   const [admins, setAdmins] = useState([]);
@@ -164,7 +164,7 @@ export default function AdminManagement() {
         role: newAdmin.role.trim(),
       };
 
-      const url = "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/administrator/addAdministrator"; // correct endpoint
+      const url = "https://seta-api-3g5xl.ondigitalocean.app/api/administrators/administrator/addAdministrator"; // correct endpoint
       const response = await fetch(url, {
         method: "POST",
         headers: {

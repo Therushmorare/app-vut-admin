@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
-  "https://seta-management-api-fvzc9.ondigitalocean.app";
+  "https://seta-api-3g5xl.ondigitalocean.app";
 
 const SETAProfileForm = ({ profile, agreementId, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({

@@ -87,12 +87,12 @@ const AgreementForm = ({ agreement, onSubmit, onCancel }) => {
 
       if (formData.agreementId) {
         await axios.post(
-          `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/agreements/${formData.agreementId}`,
+          `https://seta-api-3g5xl.ondigitalocean.app/api/administrators/agreements/${formData.agreementId}`,
           payload
         );
       } else {
         await axios.post(
-          "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/agreements",
+          "https://seta-api-3g5xl.ondigitalocean.app/api/administrators/agreements",
           payload
         );
       }

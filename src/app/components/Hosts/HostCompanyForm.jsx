@@ -83,8 +83,8 @@ export default function HostCompanyForm({ company, agreements, onSubmit, onCance
 
       try {
         const url = company
-          ? `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/editHostCompany/${company.company_id}`
-          : `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/addHostCompany`;
+          ? `https://seta-api-3g5xl.ondigitalocean.app/api/administrators/editHostCompany/${company.company_id}`
+          : `https://seta-api-3g5xl.ondigitalocean.app/api/administrators/addHostCompany`;
 
         const response = await fetch(url, {
           method: "POST",

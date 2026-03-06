@@ -46,7 +46,7 @@ const useLocalStorage = (key, initialValue) => {
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
-  "https://seta-management-api-fvzc9.ondigitalocean.app";
+  "https://seta-api-3g5xl.ondigitalocean.app";
 
 export default function SETAManagementSystem() {
   
@@ -295,7 +295,7 @@ export default function SETAManagementSystem() {
         try {
           // Call backend DELETE endpoint
           const res = await fetch(
-            `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/delete-agreement/${adminId}/${agreement.agreement_id}`,
+            `https://seta-api-3g5xl.ondigitalocean.app/api/administrators/delete-agreement/${adminId}/${agreement.agreement_id}`,
             { method: 'DELETE' }
           );
 
@@ -358,7 +358,7 @@ export default function SETAManagementSystem() {
         try {
           // Call backend DELETE endpoint
           const res = await fetch(
-            `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/delete-profile/${adminId}/${profile.agreementId}`,
+            `https://seta-api-3g5xl.ondigitalocean.app/api/administrators/delete-profile/${adminId}/${profile.agreementId}`,
             { method: 'DELETE' }
           );
 
@@ -416,7 +416,7 @@ export default function SETAManagementSystem() {
         try {
           // Call backend DELETE endpoint
           const res = await fetch(
-            `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/delete-funding-window/${adminId}/${window.funding_window_id}`,
+            `https://seta-api-3g5xl.ondigitalocean.app/api/administrators/delete-funding-window/${adminId}/${window.funding_window_id}`,
             { method: 'DELETE' }
           );
 

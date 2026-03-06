@@ -3,7 +3,7 @@ import axios from "axios";
 // API base (client-safe)
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ??
-  "https://seta-management-api-fvzc9.ondigitalocean.app";
+  "https://seta-api-3g5xl.ondigitalocean.app";
 
 // Shared axios instance
 const api = axios.create({

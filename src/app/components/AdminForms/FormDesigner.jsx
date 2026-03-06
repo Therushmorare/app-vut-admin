@@ -59,7 +59,7 @@ export default function CreateForm() {
 
     try {
       const adminId = sessionStorage.getItem("admin_id");
-      const response = await fetch(`https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/form-designer/${adminId}`, {
+      const response = await fetch(`https://seta-api-3g5xl.ondigitalocean.app/api/administrators/form-designer/${adminId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

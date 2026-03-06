@@ -55,7 +55,7 @@ const Login = ({ onLogin }) => {
       };
 
       const response = await axios.post(
-        "https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/login",
+        "https://seta-api-3g5xl.ondigitalocean.app/api/administrators/login",
         payload,
         {
           headers: { "Content-Type": "application/json" },
@@ -68,7 +68,7 @@ const Login = ({ onLogin }) => {
 
       // Fetch admin full profile
       const profileRes = await axios.get(
-        `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/administrator/${user_id}`,
+        `https://seta-api-3g5xl.ondigitalocean.app/api/administrators/administrator/${user_id}`,
       );
 
       const admin = profileRes.data;

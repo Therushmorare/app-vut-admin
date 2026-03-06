@@ -48,7 +48,7 @@ const ReportsPage = () =>{
     const fetchCompanies = async () => {
     try {
       const res = await axios.get(
-        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/host-companies', // replace with API_BASE if needed
+        'https://seta-api-3g5xl.ondigitalocean.app/api/administrators/host-companies', // replace with API_BASE if needed
         { withCredentials: true }
       );
 
@@ -74,7 +74,7 @@ const ReportsPage = () =>{
   const fetchAgreements = async () => {
     try {
       const res = await axios.get(
-        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/setaAgreements',
+        'https://seta-api-3g5xl.ondigitalocean.app/api/administrators/setaAgreements',
         { withCredentials: true }
       );
 
@@ -98,7 +98,7 @@ const ReportsPage = () =>{
   const fetchFundingWindows = async () => {
     try {
       const res = await axios.get(
-        `https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/getFundingWindows/`,
+        `https://seta-api-3g5xl.ondigitalocean.app/api/administrators/getFundingWindows/`,
         { withCredentials: true }
       );
 
@@ -112,7 +112,7 @@ const ReportsPage = () =>{
   const fetchAllocatedLearners = async () => {
     try {
       const res = await axios.get(
-        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/learner-allocations',
+        'https://seta-api-3g5xl.ondigitalocean.app/api/administrators/learner-allocations',
         { withCredentials: true }
       );
 
@@ -139,7 +139,7 @@ const ReportsPage = () =>{
   const fetchAllStudents = async () => {
     try {
       const res = await axios.get(
-        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/students',
+        'https://seta-api-3g5xl.ondigitalocean.app/api/administrators/students',
         { withCredentials: true }
       );
 
@@ -166,7 +166,7 @@ const ReportsPage = () =>{
   const fetchPlacements = async () => {
     try {
       const res = await axios.get(
-        'https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/learner-placements',
+        'https://seta-api-3g5xl.ondigitalocean.app/api/administrators/learner-placements',
         { withCredentials: true }
       );
 

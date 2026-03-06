@@ -108,7 +108,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
 
   const fetchMessages = async () => {
   try {
-    const response = await fetch("/api/administrators/allMessages");
+    const response = await fetch("https://seta-api-3g5xl.ondigitalocean.app/api/administrators/allMessages");
 
     const data = await response.json();
 
@@ -180,7 +180,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
         message: formData.message
       };
 
-      const response = await fetch("https://seta-management-api-fvzc9.ondigitalocean.app/api/administrators/send", {
+      const response = await fetch("https://seta-api-3g5xl.ondigitalocean.app/api/administrators/send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

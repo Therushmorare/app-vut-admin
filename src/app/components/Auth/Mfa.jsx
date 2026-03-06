@@ -6,7 +6,7 @@ import { GraduationCap, Lock, RotateCw } from "lucide-react";
 import { COLORS } from "../../constants/colors";
 import { useRouter } from "next/navigation";
 
-const API_BASE = "https://seta-management-api-fvzc9.ondigitalocean.app";
+const API_BASE = "https://seta-api-3g5xl.ondigitalocean.app";
 
 export default function MFA({ onVerify }) {
   const [form, setForm] = useState({ mfa_code: "" });
