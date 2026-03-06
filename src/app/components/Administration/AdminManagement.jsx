@@ -277,34 +277,34 @@ export default function AdminManagement() {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-          <thead className="bg-[#201c52] bg-opacity-5 border-b border-gray-200">
+          <thead className="bg-[#387F40] bg-opacity-5 border-b border-gray-200">
             <tr>
-              <th onClick={() => handleSort("name")} className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+              <th onClick={() => handleSort("name")} className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#387F40] hover:bg-opacity-10 transition-colors">
                 <div className="flex items-center space-x-1">
                   <span>Name <SortIcon field="name" /></span>
                 </div>
               </th>
-              <th className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+              <th className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#387F40] hover:bg-opacity-10 transition-colors">
                 <div className="flex items-center space-x-1">
                 <span>Contact</span>
                 </div>
               </th>
-              <th onClick={() => handleSort("role")} className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+              <th onClick={() => handleSort("role")} className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#387F40] hover:bg-opacity-10 transition-colors">
                 <div className="flex items-center space-x-1">
                   <span>Role <SortIcon field="role" /></span>
                 </div>
               </th>
-              <th onClick={() => handleSort("status")} className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+              <th onClick={() => handleSort("status")} className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#387F40] hover:bg-opacity-10 transition-colors">
                 <div className="flex items-center space-x-1">
                   Status <SortIcon field="status" />
                 </div>
               </th>
-              <th onClick={() => handleSort("joined")} className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+              <th onClick={() => handleSort("joined")} className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#387F40] hover:bg-opacity-10 transition-colors">
                 <div className="flex items-center space-x-1">
                   Joined <SortIcon field="joined" />
                 </div>
               </th>
-              <th className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
+              <th className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#387F40] hover:bg-opacity-10 transition-colors">
                 <div className="flex items-center space-x-1">
                   Actions <SortIcon field="actions" />
                 </div>
@@ -317,7 +317,7 @@ export default function AdminManagement() {
               <tr key={admin.admin_id} className="hover:bg-gray-50">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <User className="w-5 h-5 text-gray-400" />
+                    <User className="w-5 h-5 text-[#387F40]" />
                     <div>
                       <p className="font-semibold">{admin.first_name} {admin.last_name}</p>
                       <p className="text-sm text-gray-500">{admin.employee_number}</p>
@@ -327,15 +327,15 @@ export default function AdminManagement() {
 
                 <td className="px-6 py-4 text-sm space-y-1">
                   <div className="flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-gray-400" /> {admin.email}
+                    <Mail className="w-4 h-4 text-[#387F40]" /> {admin.email}
                   </div>
                   <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-gray-400" /> {admin.phone_number}
+                    <Phone className="w-4 h-4 text-[#387F40]" /> {admin.phone_number}
                   </div>
                 </td>
 
                 <td className="px-6 py-4">
-                  <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                  <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-[#387F40] text-white">
                     <Shield className="w-3 h-3" /> {admin.role}
                   </span>
                 </td>
@@ -347,7 +347,7 @@ export default function AdminManagement() {
                 </td>
 
                 <td className="px-6 py-4 text-sm">
-                  <Calendar className="inline w-4 h-4 mr-1 text-gray-400" />
+                  <Calendar className="inline w-4 h-4 mr-1 text-[#387F40]" />
                   {formatDate(admin.joined_at)}
                 </td>
 
@@ -379,7 +379,7 @@ export default function AdminManagement() {
         {admins.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500 mb-4">No Admins found matching your criteria</p>
-          <button onClick={onClearFilters} className="text-[#5F9BEA] hover:text-[#201c52] font-medium">
+          <button onClick={onClearFilters} className="text-[#5F9BEA] hover:text-[#387F40] font-medium">
             Clear filters to see all admins
           </button>
         </div>
@@ -441,7 +441,7 @@ export default function AdminManagement() {
                 onChange={e =>
                   setNewAdmin({ ...newAdmin, role: e.target.value })
                 }
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-[#387F40]/20 outline-none"
                 required
               >
                 <option value="">Select role</option>
@@ -463,7 +463,7 @@ export default function AdminManagement() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
+                className="rounded-lg bg-[#387F40] px-5 py-2 text-sm font-medium text-white hover:bg-[#2a6b30] disabled:opacity-60"
               >
                 {submitting ? "Adding…" : "Add Admin"}
               </button>

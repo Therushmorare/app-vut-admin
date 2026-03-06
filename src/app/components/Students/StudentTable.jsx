@@ -9,7 +9,7 @@ const StudentsTable = ({ students, onClearFilters, onQuickAction }) => {
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-[#201c52] bg-opacity-5 border-b border-gray-200">
+          <thead className="bg-[#387F40] bg-opacity-5 border-b border-gray-200">
             <tr>
               <th className="text-left p-4 font-semibold text-white cursor-pointer hover:bg-[#201c52] hover:bg-opacity-10 transition-colors">
                 <div className="flex items-center space-x-1">

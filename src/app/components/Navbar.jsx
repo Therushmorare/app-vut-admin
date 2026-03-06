@@ -130,7 +130,7 @@ const Navbar = () => {
 
     return (
       <div
-        className={`${sizes[size]} bg-[#201c52] rounded-full flex items-center justify-center text-white font-semibold`}
+        className={`${sizes[size]} bg-[#387F40] rounded-full flex items-center justify-center text-white font-semibold`}
       >
         {getInitials(userName)}
       </div>
@@ -164,9 +164,9 @@ const Navbar = () => {
         {/* Left side: Title + Icon */}
         <div className="ml-20 flex items-center gap-3">
           {CurrentIcon && (
-            <CurrentIcon size={26} className="text-[#d08a00]" />
+            <CurrentIcon size={26} className="text-[#D8322D]" />
           )}
-          <h1 className="text-2xl font-bold text-[#201c52] whitespace-nowrap">
+          <h1 className="text-2xl font-bold text-[#387F40] whitespace-nowrap">
             {currentPageTitle}
           </h1>
         </div>

@@ -8,7 +8,7 @@ const StudentRow = ({ student, onQuickAction }) => (
     <td className="p-4">
       <div className="flex items-center space-x-3">
         <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-          <img src={student.avatar} alt={student.name} className="w-full h-full object-cover  " />
+          <img src={student.avatar} alt={student.name} className="w-full h-full object-cover bg-[#387F40] " />
         </div>
         <div className="min-w-0">
           <h4 className="font-semibold text-[#201c52]">{student.name}</h4>
@@ -19,7 +19,7 @@ const StudentRow = ({ student, onQuickAction }) => (
 
     <td className="p-4">
       <div className="text-sm text-gray-700">{student.programme}</div>
-      <div className="text-xs text-[#d08a00] mt-1">{student.faculty}</div>
+      <div className="text-xs text-[#387F40] mt-1">{student.faculty}</div>
     </td>
 
     <td className="p-4">

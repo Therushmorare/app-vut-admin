@@ -25,12 +25,12 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="w-56 h-screen bg-[#201c52] flex flex-col fixed top-0 left-0 z-40 shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]">
+    <div className="w-56 h-screen bg-[#387F40] flex flex-col fixed top-0 left-0 z-40 shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]">
 
       {/* Logo Section */}    
       <div className="bg-white p-6 border-b border-gray-200 flex-shrink-0">
         <img 
-          src="https://upload.wikimedia.org/wikipedia/commons/5/5f/VUT_logo-TM.png" 
+          src="https://www.hwseta.org.za/wp-content/uploads/2019/12/Logo-HWSETA.png" 
           alt="Logo" 
           className=""
         />
@@ -48,7 +48,7 @@ const Sidebar = () => {
                   onClick={() => handleItemClick(item.href)}
                   className={`w-full flex items-center justify-between p-2 rounded-md transition-all duration-200 border-none cursor-pointer text-md ${
                     isActive 
-                      ? 'bg-[#d08a00] text-[#201c52] font-semibold shadow-md' 
+                      ? 'bg-[#FACB48] text-[#201c52] font-semibold shadow-md' 
                       : 'text-white hover:bg-white hover:bg-opacity-20 hover:text-[#d08a00] hover:font-medium'
                   }`}
                 >

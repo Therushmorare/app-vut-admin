@@ -202,7 +202,7 @@ export const generateStudents = async () => {
 
       avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
         `${student.first_name} ${student.last_name}`
-      )}&background=0245A3&color=ffffff&size=128`,
+      )}&background=387f40&color=ffffff&size=128`,
     };
   });
 };

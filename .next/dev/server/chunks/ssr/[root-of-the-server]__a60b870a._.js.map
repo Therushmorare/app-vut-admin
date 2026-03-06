@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 14, "column": 0}, "map": {"version":3,"sources":["file:///D:/Bokamoso%20Tech/HWSETA/app-vut-admin/src/app/page.js"],"sourcesContent":["// app/page.js\r\nimport { redirect } from \"next/navigation\";\r\n\r\nexport default function Home() {\r\n  redirect(\"/login\"); // send everyone to login\r\n}"],"names":[],"mappings":";;;;AAAA,cAAc;AACd;AAAA;;AAEe,SAAS;IACtB,IAAA,iMAAQ,EAAC,WAAW,yBAAyB;AAC/C"}}]
+}

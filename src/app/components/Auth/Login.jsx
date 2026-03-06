@@ -108,8 +108,7 @@ const Login = ({ onLogin }) => {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{ backgroundColor: COLORS.bgLight }}
+      className="min-h-screen flex items-center justify-center p-4 "
     >
       <div
         className="w-full max-w-md rounded-lg shadow-lg p-8"
@@ -119,7 +118,7 @@ const Login = ({ onLogin }) => {
           {imageLoaded ? (
             <div className="flex items-center justify-center">
               <img
-                src="https://res.cloudinary.com/dbuuizuka/image/upload/v1761697835/id3tj44Wsz_1761674029816_z2fjde.png"
+                src="https://www.hwseta.org.za/wp-content/uploads/2019/12/Logo-HWSETA.png"
                 alt="Graduation Cap"
                 className="w-20 h-20 object-contain"
                 onError={() => setImageLoaded(false)}
@@ -127,13 +126,11 @@ const Login = ({ onLogin }) => {
             </div>
           ) : (
             <GraduationCap
-              className="w-16 h-16"
-              style={{ color: COLORS.primary }}
+              className="w-16 h-16 bg-[#387F40]"
             />
           )}
           <h1
-            className="text-3xl font-bold mb-2"
-            style={{ color: COLORS.primary }}
+            className="text-3xl font-bold mb-2 text-[#387F40]"
           >
             Welcome Back
           </h1>
@@ -159,7 +156,7 @@ const Login = ({ onLogin }) => {
               Email Address
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#387F40]" />
               <input
                 type="email"
                 value={formData.email}
@@ -182,7 +179,7 @@ const Login = ({ onLogin }) => {
               Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#387F40]" />
               <input
                 type={showPassword ? "text" : "password"}
                 value={formData.password}
@@ -197,9 +194,9 @@ const Login = ({ onLogin }) => {
                 className="absolute right-3 top-1/2 -translate-y-1/2"
               >
                 {showPassword ? (
-                  <EyeOff className="w-5 h-5 text-gray-400" />
+                  <EyeOff className="w-5 h-5 text-[#387F40]" />
                 ) : (
-                  <Eye className="w-5 h-5 text-gray-400" />
+                  <Eye className="w-5 h-5 text-[#387F40]" />
                 )}
               </button>
             </div>
@@ -231,8 +228,7 @@ const Login = ({ onLogin }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-lg text-white font-semibold hover:opacity-90"
-            style={{ backgroundColor: COLORS.primary }}
+            className="w-full py-3 rounded-lg text-white font-semibold hover:opacity-90 bg-[#387F40] hover:bg-[#2a5d2f]"
           >
             {loading ? "Logging in..." : "Login"}
           </button>

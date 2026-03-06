@@ -1,0 +1,13 @@
+{
+  "/login/page": "app/login/page.js",
+  "/page": "app/page.js",
+  "/pages/admins/page": "app/pages/admins/page.js",
+  "/pages/documents/page": "app/pages/documents/page.js",
+  "/pages/forms/page": "app/pages/forms/page.js",
+  "/pages/hosts/page": "app/pages/hosts/page.js",
+  "/pages/logs/page": "app/pages/logs/page.js",
+  "/pages/reports/page": "app/pages/reports/page.js",
+  "/pages/setas/page": "app/pages/setas/page.js",
+  "/pages/spending/page": "app/pages/spending/page.js",
+  "/pages/students/page": "app/pages/students/page.js"
+}

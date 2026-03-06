@@ -5,12 +5,13 @@ import { Search, FolderOpen, File, Flag, CheckCircle, Download, Eye, Filter, X, 
 import axios from "axios";
 
 const COLORS = {
-  primary: '#201C52',
-  secondary: '#D08A00',
-  text: '#002F6E',
-  accent: '#8B745A',
+  primary: '#387F40',
+  secondary: '#FACB48',
+  text: '#959BA9',
+  accent: '#61CE70',
+  thirdary: '#D8322D',
   danger: '#DB282F',
-  info: '#0076C0',
+  info: '#23A455',
   success: '#009862',
   warning: '#FFDB00',
   bgLight: '#F9F9F9',
@@ -275,7 +276,8 @@ const StudentDocumentManager = () => {
                 borderRadius: '6px',
                 fontSize: '14px',
                 backgroundColor: COLORS.bgWhite,
-                color: COLORS.text
+                color: COLORS.text,
+                hover: { borderColor: COLORS.primary }
               }}
             >
               <option value="">All Students</option>
@@ -305,7 +307,9 @@ const StudentDocumentManager = () => {
                     padding: '12px 12px 12px 40px',
                     border: `1px solid ${COLORS.border}`,
                     borderRadius: '6px',
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    hover: { borderColor: COLORS.primary }
+
                   }}
                 />
               </div>

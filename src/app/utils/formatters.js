@@ -13,7 +13,7 @@ const formatDate = (date) => {
 
 const generateAvatar = (firstName, lastName) => {
   const name = `${firstName || 'N'} ${lastName || 'A'}`;
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=22c55e&color=ffffff&size=128`;
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=387f40&color=ffffff&size=128`;
 };
 
 const maskBankAccount = (account) => {

@@ -350,11 +350,11 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
         return (
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-[#0245A3]">Personal Information</h3>
+              <h3 className="text-lg font-semibold text-[#387f40]">Personal Information</h3>
               {isEditing && (
                 <button
                   onClick={() => handleUpload('ID Document')}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-[#f8a528] text-[#0245A3] rounded-md hover:bg-opacity-90 text-sm font-medium"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-[#f8a528] text-[#387f40] rounded-md hover:bg-opacity-90 text-sm font-medium"
                 >
                   <Upload size={14} />
                   Upload ID/Passport
@@ -390,10 +390,10 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
         return (
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-[#0245A3]">Contact Information</h3>
+              <h3 className="text-lg font-semibold text-[#387f40]">Contact Information</h3>
               <button
                 onClick={handleSendEmail}
-                className="flex items-center gap-2 px-3 py-1.5 bg-[#0245A3] text-white rounded-md hover:bg-opacity-90 text-sm font-medium"
+                className="flex items-center gap-2 px-3 py-1.5 bg-[#387f40] text-white rounded-md hover:bg-opacity-90 text-sm font-medium"
               >
                 <Send size={14} />
                 Send Email
@@ -413,7 +413,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
             </div>
             
             {/*
-            <h4 className="text-md font-semibold text-[#0245A3] mt-6 mb-3">Emergency Contact</h4>
+            <h4 className="text-md font-semibold text-[#387f40] mt-6 mb-3">Emergency Contact</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderField('Next of Kin Name', formData.nextOfKinName, 'nextOfKinName')}
               {renderField('Relationship', formData.nextOfKinRelation, 'nextOfKinRelation')}
@@ -426,7 +426,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
       case 'academic':
         return (
           <div>
-            <h3 className="text-lg font-semibold text-[#0245A3] mb-4">Academic</h3>
+            <h3 className="text-lg font-semibold text-[#387f40] mb-4">Academic</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderField('Student Number', formData.studentNumber, 'studentNumber')}
               {renderField('Faculty', formData.faculty, 'faculty')}
@@ -445,7 +445,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
       case 'seta':
         return (
           <div>
-            <h3 className="text-lg font-semibold text-[#0245A3] mb-4">SETA Programme Details</h3>
+            <h3 className="text-lg font-semibold text-[#387f40] mb-4">SETA Programme Details</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderField('SETA Name', formData.seta, 'seta')}
               {renderField('SETA Code', formData.setaName, 'setaName')}
@@ -459,7 +459,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
             </div>
             {isEditing && (
               <div className="mt-4">
-                <button className="px-4 py-2 bg-[#f8a528] text-[#0245A3] rounded-md hover:bg-opacity-90 text-sm font-medium">
+                <button className="px-4 py-2 bg-[#f8a528] text-[#387f40] rounded-md hover:bg-opacity-90 text-sm font-medium">
                   Upload Learner Agreement
                 </button>
               </div>
@@ -470,7 +470,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
       case 'workplace':
         return (
           <div>
-            <h3 className="text-lg font-semibold text-[#0245A3] mb-4">Workplace Placement</h3>
+            <h3 className="text-lg font-semibold text-[#387f40] mb-4">Workplace Placement</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderField('Employer/Company Name', formData.employerName, 'employerName')}
               {renderField('Supervisor Name', formData.supervisorName, 'supervisorName')}
@@ -488,10 +488,10 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
             </div>
             {isEditing && (
               <div className="mt-4 flex gap-2">
-                <button className="px-4 py-2 bg-[#f8a528] text-[#0245A3] rounded-md hover:bg-opacity-90 text-sm font-medium">
+                <button className="px-4 py-2 bg-[#f8a528] text-[#387f40] rounded-md hover:bg-opacity-90 text-sm font-medium">
                   Upload Logbook
                 </button>
-                <button className="px-4 py-2 bg-[#0245A3] text-white rounded-md hover:bg-opacity-90 text-sm font-medium">
+                <button className="px-4 py-2 bg-[#387f40] text-white rounded-md hover:bg-opacity-90 text-sm font-medium">
                   Approve Hours
                 </button>
               </div>
@@ -502,7 +502,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
       case 'financial':
         return (
           <div>
-            <h3 className="text-lg font-semibold text-[#0245A3] mb-4">Financial Information & Stipend</h3>
+            <h3 className="text-lg font-semibold text-[#387f40] mb-4">Financial Information & Stipend</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderField('Funding Type', formData.fundingType, 'fundingType', 'text', {
                 select: true,
@@ -520,18 +520,18 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
               {renderField('Next Payment Date', formData.nextPaymentDate, 'nextPaymentDate', 'date')}
             </div>
             {/* PaySlip Management Section
-            <div className="mt-6 p-4 bg-blue-50 border border-[#0245A3] rounded-lg">
-              <h4 className="text-md font-semibold text-[#0245A3] mb-3">Payslip Management</h4>
+            <div className="mt-6 p-4 bg-blue-50 border border-[#387f40] rounded-lg">
+              <h4 className="text-md font-semibold text-[#387f40] mb-3">Payslip Management</h4>
               <p className="text-sm text-gray-700 mb-3">Generate and manage student payslips based on attendance and stipend data.</p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowPayslip(true)}
-                  className="px-4 py-2 bg-[#f8a528] text-[#0245A3] rounded-md hover:bg-opacity-90 text-sm font-semibold flex items-center gap-2"
+                  className="px-4 py-2 bg-[#f8a528] text-[#387f40] rounded-md hover:bg-opacity-90 text-sm font-semibold flex items-center gap-2"
                 >
                   <FileText size={16} />
                   Generate Payslip
                 </button>
-                <button className="px-4 py-2 bg-[#0245A3] text-white rounded-md hover:bg-opacity-90 text-sm font-medium flex items-center gap-2">
+                <button className="px-4 py-2 bg-[#387f40] text-white rounded-md hover:bg-opacity-90 text-sm font-medium flex items-center gap-2">
                   <Download size={16} />
                   Download PDF
                 </button>
@@ -549,7 +549,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
         return (
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-[#0245A3]">Compliance Documents</h3>
+              <h3 className="text-lg font-semibold text-[#387f40]">Compliance Documents</h3>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-gray-700">Overall Status:</span>
                 <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
@@ -583,7 +583,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
 
               {/* Left Panel: Messages List */}
               <div className="border rounded-lg overflow-y-auto bg-white">
-                <div className="p-3 border-b font-semibold text-[#0245A3]">
+                <div className="p-3 border-b font-semibold text-[#387f40]">
                   Messages
                 </div>
 
@@ -619,7 +619,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
 
                 {/* Header */}
                 <div className="border-b p-3 flex justify-between items-center">
-                  <h3 className="font-semibold text-[#0245A3]">
+                  <h3 className="font-semibold text-[#387f40]">
                     {selectedMessage ? selectedMessage.sender : "Select a message"}
                   </h3>
 
@@ -628,7 +628,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
                       setIsEditing(true);
                       setSelectedMessage(null); // Clear selected when composing
                     }}
-                    className="px-3 py-1 bg-[#0245A3] text-white rounded text-sm"
+                    className="px-3 py-1 bg-[#387f40] text-white rounded text-sm"
                   >
                     New Message
                   </button>
@@ -642,7 +642,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
                         From: {selectedMessage.sender}
                       </div>
 
-                      <div className="text-gray-800 whitespace-pre-line">
+                      <div className="text-[#387F40] whitespace-pre-line">
                         {selectedMessage.message}
                       </div>
                     </div>
@@ -664,7 +664,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
                       <button
                         type="button"
                         onClick={sendMessage}
-                        className="px-4 py-2 bg-[#f8a528] text-[#0245A3] rounded-md text-sm font-medium"
+                        className="px-4 py-2 bg-[#facb48] text-[#387F40] rounded-md text-sm font-medium"
                       >
                         Send
                       </button>
@@ -686,7 +686,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
           return (
             <div className="bg-white p-6 rounded-lg border">
 
-              <h3 className="text-lg font-semibold text-[#0245A3] mb-4">
+              <h3 className="text-lg font-semibold text-[#387f40] mb-4">
                 Shared Documents
               </h3>
 
@@ -708,7 +708,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
 
                 <button
                   type="submit"
-                  className="bg-[#0245A3] text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                  className="bg-[#387f40] text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                   disabled={uploading}
                 >
                   {uploading ? "Uploading..." : "Upload Document"}
@@ -741,7 +741,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
     }
 
     return (
-      <div className={`${sizes[size]} bg-[#0245A3] rounded-full flex items-center justify-center text-white font-semibold`}>
+      <div className={`${sizes[size]} bg-[#387f40] rounded-full flex items-center justify-center text-white font-semibold`}>
         {getInitials(userName)}
       </div>
     );
@@ -751,7 +751,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
     <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl h-full w-full overflow-hidden">
         {/* Header */}
-        <div className="bg-[#201c52] text-white p-6 flex items-center justify-between">
+        <div className="bg-[#387F40] text-white p-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
               <AvatarComponent size="lg" />
@@ -765,7 +765,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
             {isEditing ? (
               <button
                 onClick={handleSave}
-                className="flex items-center gap-2 px-4 py-2 bg-[#f8a528] text-[#201c52] rounded-md hover:bg-opacity-90 transition-colors font-semibold"
+                className="flex items-center gap-2 px-4 py-2 bg-[#facb48] text-[#201c52] rounded-md hover:bg-opacity-90 transition-colors font-semibold"
               >
                 <Save size={16} />
                 Save Changes
@@ -789,7 +789,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-[#201c52] px-6 overflow-x-auto">
+        <div className="bg-[#387F40] px-6 overflow-x-auto">
           <div className="flex gap-2 min-w-max">
             {tabs.map(tab => {
               const Icon = tab.icon;
@@ -800,7 +800,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
                   onClick={() => setActiveTab(tab.key)}
                   className={`flex items-center gap-2 px-4 py-3 transition-all duration-200 border-none cursor-pointer text-md ${
                     isActive 
-                      ? 'bg-[#f8a528] text-[#0245A3] font-semibold shadow-md' 
+                      ? 'bg-[#facb48] text-[#387f40] font-semibold shadow-md' 
                       : 'text-white hover:bg-white hover:bg-opacity-20 hover:text-[#f8a528] hover:font-medium'
                   }`}
                 >

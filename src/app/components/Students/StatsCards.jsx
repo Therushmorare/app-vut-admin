@@ -45,7 +45,7 @@ const StatsCards = ({ students }) => {
             <p className="text-sm text-gray-600 mb-1">Total Students</p>
             <p className="text-4xl font-bold text-[#0245A3]">{stats.total}</p>
           </div>
-          <div className="w-16 h-16 bg-[#0245A3] bg-opacity-10 rounded-full flex items-center justify-center">
+          <div className="w-16 h-16 bg-[#D8322D] bg-opacity-10 rounded-full flex items-center justify-center">
             <Users className="text-white" size={32} />
           </div>
         </div>
@@ -60,7 +60,7 @@ const StatsCards = ({ students }) => {
             <p className="text-2xl font-bold text-[#0245A3]">{Object.keys(stats.facultyCounts).length}</p>
             <p className="text-xs text-gray-500 mb-3">Faculties</p>
           </div>
-          <div className="w-16 h-16 bg-[#3A6F47] bg-opacity-10 rounded-full flex items-center justify-center">
+          <div className="w-16 h-16 bg-[#387F40] bg-opacity-10 rounded-full flex items-center justify-center">
             <Building2 className="text-white" size={32} />
           </div>
         </div>
@@ -89,7 +89,7 @@ const StatsCards = ({ students }) => {
             <p className="text-2xl font-bold text-[#0245A3]">{Object.keys(stats.programmeCounts).length}</p>
             <p className="text-xs text-gray-500 mb-3">Programmes</p>
           </div>
-          <div className="w-16 h-16 bg-[#f8a528] bg-opacity-10 rounded-full flex items-center justify-center">
+          <div className="w-16 h-16 bg-[#facb48] bg-opacity-10 rounded-full flex items-center justify-center">
             <BookOpen className="text-white" size={32} />
           </div>
         </div>
