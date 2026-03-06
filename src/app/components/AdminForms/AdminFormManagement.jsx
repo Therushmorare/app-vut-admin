@@ -11,6 +11,246 @@ import {
 import { COLORS } from "../../utils/helpers";
 
 export default function AdminFormManagement() {
+
+  const [forms, setForms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+
+    const fetchForms = async () => {
+      try {
+
+        const res = await fetch(
+          "https://seta-api-3g5xl.ondigitalocean.app/api/administrators/all-forms",
+          { headers: { Accept: "application/json" } }
+        );
+
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        const mappedForms = data.map((form) => ({
+          formId: form.form_id,
+          title: form.title,
+          createdOn: new Date(form.created_at).toLocaleDateString(),
+          responses: form.response_count
+        }));
+
+        setForms(mappedForms);
+
+      } catch (err) {
+
+        console.error("Fetch failed:", err);
+
+        /* Instead of breaking UI, show empty state */
+        setForms([]);
+        setError("Could not load forms");
+
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchForms();
+
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-8">
+
+      <div className="max-w-7xl mx-auto">
+
+        {/* HEADER */}
+        <div className="flex items-center justify-between mb-8">
+
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              Form Management
+            </h1>
+
+            <p className="text-gray-500 mt-1">
+              Create and manage beneficiary tracking forms
+            </p>
+          </div>
+
+          <Link href="/pages/designer">
+            <button
+              className="flex items-center gap-2 px-6 py-3 rounded-xl text-white font-medium hover:opacity-90 transition shadow-sm"
+              style={{ backgroundColor: COLORS.text }}
+            >
+              <Plus className="w-5 h-5" />
+              Create Form
+            </button>
+          </Link>
+
+        </div>
+
+        {/* TABLE */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+
+          <div className="overflow-x-auto">
+
+            <table className="min-w-full">
+
+              {/* HEADER */}
+              <thead className="bg-[#201c52] border-b border-gray-200">
+
+                <tr>
+                  <th className="text-left p-4 font-semibold text-white">
+                    Form Name
+                  </th>
+
+                  <th className="text-left p-4 font-semibold text-white">
+                    Created On
+                  </th>
+
+                  <th className="text-left p-4 font-semibold text-white">
+                    Responses
+                  </th>
+
+                  <th className="text-left p-4 font-semibold text-white">
+                    Actions
+                  </th>
+                </tr>
+
+              </thead>
+
+              {/* BODY */}
+              <tbody className="divide-y">
+
+                {/* Loading */}
+                {loading && (
+                  <tr>
+                    <td colSpan="4" className="text-center py-12 text-gray-500">
+                      Loading forms...
+                    </td>
+                  </tr>
+                )}
+
+                {/* Error */}
+                {!loading && error && (
+                  <tr>
+                    <td colSpan="4" className="text-center py-12 text-red-500">
+                      {error}
+                    </td>
+                  </tr>
+                )}
+
+                {/* Empty */}
+                {!loading && !error && forms.length === 0 && (
+                  <tr>
+                    <td colSpan="4" className="text-center py-16">
+
+                      <div className="flex flex-col items-center gap-4 text-gray-500">
+
+                        <FileText className="w-12 h-12 text-gray-300" />
+
+                        <p className="text-lg font-medium">
+                          No forms created yet
+                        </p>
+
+                        <Link href="/pages/designer">
+                          <button
+                            className="flex items-center gap-2 px-5 py-3 rounded-xl text-white font-medium hover:opacity-90 transition shadow-sm"
+                            style={{ backgroundColor: COLORS.text }}
+                          >
+                            <Plus className="w-5 h-5" />
+                            Create First Form
+                          </button>
+                        </Link>
+
+                      </div>
+
+                    </td>
+                  </tr>
+                )}
+
+                {/* Data */}
+                {!loading && !error && forms.map((form) => (
+
+                  <tr key={form.formId} className="hover:bg-gray-50">
+
+                    <td className="px-6 py-4 text-sm">
+
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-gray-400" />
+                        {form.title}
+                      </div>
+
+                    </td>
+
+                    <td className="px-6 py-4 text-sm">
+
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-gray-400" />
+                        {form.createdOn}
+                      </div>
+
+                    </td>
+
+                    <td className="px-6 py-4 text-sm">
+
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-gray-400" />
+                        {form.responses}
+                      </div>
+
+                    </td>
+
+                    <td className="px-6 py-4 flex gap-2">
+
+                      <Link href={`/admin/form/${form.formId}`}>
+                        <button
+                          className="px-3 py-1 rounded-lg hover:bg-gray-100"
+                          style={{ color: COLORS.text }}
+                        >
+                          View
+                        </button>
+                      </Link>
+
+                      <Link href={`/admin/edit-form/${form.formId}`}>
+                        <button
+                          className="px-3 py-1 rounded-lg hover:bg-gray-100"
+                          style={{ color: COLORS.danger }}
+                        >
+                          Edit
+                        </button>
+                      </Link>
+
+                    </td>
+
+                  </tr>
+
+                ))}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}"use client";
+
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import {
+  FileText,
+  Calendar,
+  Mail,
+  Plus
+} from "lucide-react";
+import { COLORS } from "../../utils/helpers";
+
+export default function AdminFormManagement() {
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
