@@ -108,31 +108,38 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
   }, []);
 
   const fetchMessages = async () => {
-  try {
-    const response = await fetch("https://seta-api-3g5xl.ondigitalocean.app/api/administrators/allMessages");
+    try {
+      const response = await fetch(
+        "https://seta-api-3g5xl.ondigitalocean.app/api/administrators/allMessages"
+      );
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) {
-      console.error("Failed to fetch messages");
-      return;
+      if (!response.ok) {
+        console.error("Failed to fetch messages");
+        return;
+      }
+
+      // Filter messages for the logged in user
+      const userMessages = data.filter(
+        msg => msg.receiver_email === formData.personalEmail
+      );
+
+      const formattedMessages = userMessages.map(msg => ({
+        id: msg.message_id,
+        sender: msg.sender_email,
+        receiver: msg.receiver_email,
+        message: msg.message,
+        created_at: msg.created_at
+      }));
+
+      setMessages(formattedMessages);
+
+    } catch (error) {
+      console.error("Fetch messages error:", error);
+    } finally {
+      setLoadingMessages(false);
     }
-
-    const formattedMessages = data.map(msg => ({
-      id: msg.message_id,
-      sender: msg.sender_email,
-      receiver: msg.receiver_email,
-      message: msg.message,
-      created_at: msg.created_at
-    }));
-
-    setMessages(formattedMessages);
-
-  } catch (error) {
-    console.error("Fetch messages error:", error);
-  } finally {
-    setLoadingMessages(false);
-  }
   };
 
   const getInitials = (name) => {
