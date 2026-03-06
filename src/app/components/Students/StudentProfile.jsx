@@ -10,6 +10,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     // Personal Info
+    studentID: student?.id || 'None',
     fullName: student?.name || 'None',
     studentNumber: student?.studentNumber || 'None',
     idNumber: student?.idNumber || 'None',
@@ -164,7 +165,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
     alert(`Sending email to ${formData.universityEmail}...`);
   };
 
-    const sendMessage = async () => {
+  const sendMessage = async () => {
     try {
 
       if (!selectedUser) {
@@ -176,7 +177,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
 
       const payload = {
         sender_id: adminId,
-        receiver_id: selectedUser.id,
+        receiver_id: formData.studentID,
         message: formData.message
       };
 
@@ -599,53 +600,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
 
                     <div className="mt-4 flex gap-2">
                       <button
-                        onClick={async () => {
-                          // Validate form
-                          if (!formData.subject || !formData.message) {
-                            alert("Please fill subject and message");
-                            return;
-                          }
-
-                          try {
-                            const payload = {
-                              sender_id: currentUser.id, // assuming currentUser state
-                              receiver_id: formData.receiver_id, // must select receiver
-                              message: formData.message
-                            };
-
-                            const res = await fetch("/api/administrators/send", {
-                              method: "POST",
-                              headers: {
-                                "Content-Type": "application/json"
-                              },
-                              body: JSON.stringify(payload)
-                            });
-
-                            const data = await res.json();
-
-                            if (!res.ok) {
-                              alert(data.message || "Failed to send message");
-                              return;
-                            }
-
-                            // Update local messages
-                            setMessages((prev) => [
-                              ...prev,
-                              {
-                                id: data.message_id,
-                                sender: currentUser.email,
-                                receiver: formData.receiver_id,
-                                message: formData.message
-                              }
-                            ]);
-
-                            setFormData({ subject: "", message: "", receiver_id: "" });
-                            setIsEditing(false);
-
-                          } catch (err) {
-                            console.error("Send message error:", err);
-                          }
-                        }}
+                        onClick={sendMessage}
                         className="px-4 py-2 bg-[#f8a528] text-[#0245A3] rounded-md text-sm font-medium"
                       >
                         Send
