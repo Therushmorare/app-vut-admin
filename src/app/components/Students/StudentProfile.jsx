@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect,  useMemo} from 'react';
 import PayslipModal from './Payslip';
 import { X, Edit2, Save, User, Phone, Mail, MapPin, GraduationCap, Briefcase, DollarSign, FileText, Upload, Download, Send, CheckCircle, Eye } from 'lucide-react';
 
