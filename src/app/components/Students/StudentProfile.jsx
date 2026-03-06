@@ -102,6 +102,8 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
   const [messages, setMessages] = useState([]);
   const [loadingMessages, setLoadingMessages] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const [document, setDocument] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
   fetchMessages();
@@ -218,6 +220,57 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
     }
   };
 
+  const handleUploadDocument = async (e) => {
+  e.preventDefault();
+
+  const studentId = sessionStorage.getItem("student_id");
+
+  if (!document) {
+    alert("Please select a document");
+    return;
+  }
+
+  if (!studentId) {
+    alert("Student session not found");
+    return;
+  }
+
+  try {
+    setUploading(true);
+
+    const formDataUpload = new FormData();
+
+    formDataUpload.append("admin_id", adminId);
+    formDataUpload.append("student_id", studentId);
+    formDataUpload.append("document", document);
+
+    const response = await fetch(
+      "https://seta-api-3g5xl.ondigitalocean.app/api/administrators/upload",
+      {
+        method: "POST",
+        body: formDataUpload
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Upload failed:", data);
+      alert("Upload failed");
+      return;
+    }
+
+    alert("Document uploaded successfully");
+
+    setDocument(null);
+
+  } catch (error) {
+    console.error("Upload error:", error);
+  } finally {
+    setUploading(false);
+  }
+  };
+
   const tabs = [
     { key: 'personal', label: 'Personal Info', icon: User },
     { key: 'contact', label: 'Contact Info', icon: Phone },
@@ -227,6 +280,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
     { key: 'financial', label: 'Financial', icon: DollarSign },
     { key: 'documents', label: 'Compliance', icon: CheckCircle },
     { key: 'communique', label: 'Communique', icon: Mail},
+    { key: 'uploads', label: 'Shared Documents', icon: FileText}
   ];
 
   const renderField = (label, value, field, type = 'text', options = {}) => (
@@ -619,6 +673,43 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
                   </div>
                 )}
               </div>
+            </div>
+          );
+
+          case 'uploads':
+          return (
+            <div className="bg-white p-6 rounded-lg border">
+
+              <h3 className="text-lg font-semibold text-[#0245A3] mb-4">
+                Shared Documents
+              </h3>
+
+              <form onSubmit={handleUploadDocument} className="space-y-4">
+
+                {/* File Upload */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Upload Document
+                  </label>
+
+                  <input
+                    type="file"
+                    onChange={(e) => setDocument(e.target.files[0])}
+                    className="w-full border rounded-lg px-3 py-2"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="bg-[#0245A3] text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                  disabled={uploading}
+                >
+                  {uploading ? "Uploading..." : "Upload Document"}
+                </button>
+
+              </form>
+
             </div>
           );
       default:
