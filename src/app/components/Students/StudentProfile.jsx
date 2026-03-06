@@ -223,7 +223,8 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
   const handleUploadDocument = async (e) => {
   e.preventDefault();
 
-  const studentId = sessionStorage.getItem("student_id");
+  const studentId = formData.studentID;
+  const adminId = sessionStorage.getItem("admin_id");
 
   if (!document) {
     alert("Please select a document");
@@ -232,6 +233,11 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
 
   if (!studentId) {
     alert("Student session not found");
+    return;
+  }
+
+  if (!adminId){
+    alert("Admin session not found");
     return;
   }
 
