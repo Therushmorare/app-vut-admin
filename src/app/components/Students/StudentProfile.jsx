@@ -168,11 +168,6 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
   const sendMessage = async () => {
     try {
 
-      if (!selectedUser) {
-        alert("Please select a user to message");
-        return;
-      }
-
       const adminId = sessionStorage.getItem("admin_id");
 
       const payload = {
@@ -600,6 +595,7 @@ const StudentProfileModal = ({ student, onClose, onSave }) => {
 
                     <div className="mt-4 flex gap-2">
                       <button
+                        type="button"
                         onClick={sendMessage}
                         className="px-4 py-2 bg-[#f8a528] text-[#0245A3] rounded-md text-sm font-medium"
                       >
